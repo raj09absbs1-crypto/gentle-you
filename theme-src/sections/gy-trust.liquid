@@ -1,0 +1,78 @@
+{%- comment -%}
+  GentleYou reassurance row. Every line is merchant text from a block, so the
+  theme never states a policy of its own.
+{%- endcomment -%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+
+<section
+  class="gy-section gy-section--{{ section.settings.tone }} gy-trust-section"
+  style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
+  data-gy-reveal-scope
+  {{ section.shopify_attributes }}
+>
+  <div class="gy-container">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="gy-section__heading gy-section__heading--center" data-gy-reveal>
+        {{ section.settings.heading | escape }}
+      </h2>
+    {%- endif -%}
+
+    <ul class="gy-trust-row" role="list">
+      {%- for block in section.blocks -%}
+        <li class="gy-trust-row__item" data-gy-reveal style="--gy-reveal-delay: {{ forloop.index0 | times: 70 }}ms" {{ block.shopify_attributes }}>
+          <span class="gy-trust-row__icon" aria-hidden="true">
+            {%- case block.settings.icon -%}
+              {%- when 'package' -%}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8.5v7a1 1 0 0 1-.55.9l-7.5 3.9a2 2 0 0 1-1.9 0l-7.5-3.9a1 1 0 0 1-.55-.9v-7"/><path d="M3.2 7.6 11.05 3.7a2 2 0 0 1 1.9 0l7.85 3.9-8.35 4.2a1 1 0 0 1-.9 0z"/><path d="M12 11.9V20"/></svg>
+              {%- when 'exchange' -%}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 0 1-13.3 6"/><path d="M4 12a8 8 0 0 1 13.3-6"/><path d="M17.3 2.6V6h-3.4"/><path d="M6.7 21.4V18h3.4"/></svg>
+              {%- when 'truck' -%}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5h11v10H2z"/><path d="M13 9.5h4l3 3.2v3.8h-7z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>
+              {%- else -%}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 4.8 5.6v5.5c0 4.2 2.9 7.9 7.2 9.1 4.3-1.2 7.2-4.9 7.2-9.1V5.6z"/><path d="m9 12 2.1 2.2L15.2 10"/></svg>
+            {%- endcase -%}
+          </span>
+          <span class="gy-trust-row__label">{{ block.settings.text | escape }}</span>
+          {%- if block.settings.note != blank -%}
+            <span class="gy-trust-row__note">{{ block.settings.note | escape }}</span>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "GentleYou trust row",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading" },
+    {
+      "type": "select", "id": "tone", "label": "Background", "default": "lavender",
+      "options": [ { "value": "ivory", "label": "Warm ivory" }, { "value": "lavender", "label": "Soft lavender" }, { "value": "deep", "label": "Deep charcoal" } ]
+    },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 180, "step": 4, "unit": "px", "label": "Top padding", "default": 72 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 180, "step": 4, "unit": "px", "label": "Bottom padding", "default": 72 }
+  ],
+  "blocks": [
+    {
+      "type": "point",
+      "name": "Reassurance",
+      "settings": [
+        {
+          "type": "select", "id": "icon", "label": "Icon", "default": "package",
+          "options": [ { "value": "package", "label": "Package" }, { "value": "exchange", "label": "Exchange" }, { "value": "shield", "label": "Shield" }, { "value": "truck", "label": "Delivery" } ]
+        },
+        { "type": "text", "id": "text", "label": "Text", "info": "Use the store's own published policy wording.", "default": "Cash on delivery" },
+        { "type": "text", "id": "note", "label": "Small note" }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [ { "name": "GentleYou trust row", "blocks": [ { "type": "point" }, { "type": "point" }, { "type": "point" }, { "type": "point" } ] } ]
+}
+{% endschema %}

@@ -1,0 +1,122 @@
+{%- comment -%}
+  GentleYou collection editorial — used for "Shop by category" and for the
+  compact "Find your everyday" guide. Each block points at a Shopify collection
+  chosen in the Theme Editor; titles and links come from that collection, and
+  the image falls back to the collection's first product when the collection
+  itself has no image.
+{%- endcomment -%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+
+<section
+  class="gy-section gy-section--{{ section.settings.tone }} gy-cols gy-cols--{{ section.settings.layout }}"
+  style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
+  data-gy-reveal-scope
+  {{ section.shopify_attributes }}
+>
+  <div class="gy-container">
+    <header class="gy-section__head" data-gy-reveal>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="gy-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="gy-section__heading">{{ section.settings.heading | escape | newline_to_br }}</h2>
+      {%- endif -%}
+    </header>
+
+    <div class="gy-cols__grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign col = collections[block.settings.collection]
+          assign label = block.settings.label
+          if label == blank
+            assign label = col.title
+          endif
+          assign media = block.settings.image
+          if media == blank
+            assign media = col.image
+          endif
+          if media == blank
+            assign media = col.products.first.featured_image
+          endif
+          assign link = col.url | default: block.settings.link
+        -%}
+        <a
+          class="gy-cols__item{% if block.settings.feature %} gy-cols__item--feature{% endif %}"
+          href="{{ link }}"
+          data-gy-reveal
+          style="--gy-reveal-delay: {{ forloop.index0 | times: 80 }}ms"
+          {{ block.shopify_attributes }}
+        >
+          <div class="gy-cols__media">
+            {%- if media != blank -%}
+              <img
+                class="gy-cols__image"
+                src="{{ media | image_url: width: 1200 }}"
+                srcset="
+                  {{ media | image_url: width: 500 }} 500w,
+                  {{ media | image_url: width: 800 }} 800w,
+                  {{ media | image_url: width: 1200 }} 1200w
+                "
+                sizes="(min-width: 990px) 40vw, 92vw"
+                width="{{ media.width }}"
+                height="{{ media.height }}"
+                alt="{{ media.alt | escape | default: label | escape }}"
+                loading="lazy"
+                decoding="async"
+              >
+            {%- else -%}
+              {{ 'collection-1' | placeholder_svg_tag: 'gy-cols__image' }}
+            {%- endif -%}
+          </div>
+          <div class="gy-cols__caption">
+            <span class="gy-cols__label">{{ label }}</span>
+            {%- if block.settings.text != blank -%}
+              <span class="gy-cols__text">{{ block.settings.text | escape }}</span>
+            {%- endif -%}
+            <span class="gy-cols__arrow" aria-hidden="true">&rarr;</span>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "GentleYou collections",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Shop by category" },
+    {
+      "type": "select", "id": "layout", "label": "Layout", "default": "editorial",
+      "options": [ { "value": "editorial", "label": "Editorial (feature + supporting)" }, { "value": "compact", "label": "Compact row" } ]
+    },
+    {
+      "type": "select", "id": "tone", "label": "Background", "default": "ivory",
+      "options": [ { "value": "ivory", "label": "Warm ivory" }, { "value": "lavender", "label": "Soft lavender" }, { "value": "deep", "label": "Deep charcoal" } ]
+    },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 180, "step": 4, "unit": "px", "label": "Top padding", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 180, "step": 4, "unit": "px", "label": "Bottom padding", "default": 96 }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "label", "label": "Label override", "info": "Leave blank to use the collection title." },
+        { "type": "text", "id": "text", "label": "Small supporting line" },
+        { "type": "image_picker", "id": "image", "label": "Image override", "info": "Leave blank to use the collection image, then the first product image." },
+        { "type": "url", "id": "link", "label": "Link override" },
+        { "type": "checkbox", "id": "feature", "label": "Make this the large feature", "default": false }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [ { "name": "GentleYou collections", "blocks": [ { "type": "category" }, { "type": "category" }, { "type": "category" } ] } ]
+}
+{% endschema %}

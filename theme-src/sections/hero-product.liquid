@@ -205,7 +205,8 @@
                 eyebrow: block_eyebrow,
                 text: block_text,
                 show_compare_at_price: section.settings.show_compare_at_price,
-                show_discount: section.settings.show_discount
+                show_discount: section.settings.show_discount,
+                description_words: section.settings.description_words
               -%}
             {%- endfor -%}
           {%- else -%}
@@ -215,7 +216,8 @@
               eyebrow: section.settings.eyebrow,
               text: section.settings.text,
               show_compare_at_price: section.settings.show_compare_at_price,
-              show_discount: section.settings.show_discount
+              show_discount: section.settings.show_discount,
+              description_words: section.settings.description_words
             -%}
           {%- endif -%}
         </div>
@@ -360,7 +362,17 @@
       "type": "richtext",
       "id": "text",
       "label": "t:sections.hero-product.settings.text.label",
-      "default": "<p>Everyday luxury, made for real comfort. Soft-touch fabric, seamless finish, and a fit that stays gentle from morning to night.</p>"
+      "info": "t:sections.hero-product.settings.text.info"
+    },
+    {
+      "type": "range",
+      "id": "description_words",
+      "min": 12,
+      "max": 45,
+      "step": 1,
+      "label": "t:sections.hero-product.settings.description_words.label",
+      "info": "t:sections.hero-product.settings.description_words.info",
+      "default": 26
     },
     {
       "type": "text",

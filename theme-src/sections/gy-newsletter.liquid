@@ -1,0 +1,75 @@
+{%- comment -%}
+  GentleYou newsletter. Uses Shopify's native customer form, so sign-ups land in
+  the store's customer list exactly as they do elsewhere in the theme.
+{%- endcomment -%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+
+<section
+  class="gy-section gy-section--{{ section.settings.tone }} gy-news"
+  style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
+  data-gy-reveal-scope
+  {{ section.shopify_attributes }}
+>
+  <div class="gy-container gy-news__inner" data-gy-reveal>
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="gy-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2 class="gy-news__heading">{{ section.settings.heading | escape | newline_to_br }}</h2>
+    {%- endif -%}
+    {%- if section.settings.text != blank -%}
+      <div class="gy-news__text rte">{{ section.settings.text }}</div>
+    {%- endif -%}
+
+    {%- form 'customer', class: 'gy-news__form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <label class="visually-hidden" for="GyNewsletter-{{ section.id }}">{{ 'newsletter.label' | t }}</label>
+      <input
+        id="GyNewsletter-{{ section.id }}"
+        class="gy-news__input"
+        type="email"
+        name="contact[email]"
+        value="{{ form.email }}"
+        autocorrect="off"
+        autocapitalize="off"
+        autocomplete="email"
+        placeholder="{{ 'newsletter.label' | t }}"
+        required
+      >
+      <button class="gy-button gy-news__submit" type="submit" name="commit">
+        {{ section.settings.button_label | default: 'Join GentleYou' | escape }}
+        <span aria-hidden="true">&rarr;</span>
+      </button>
+
+      {%- if form.errors -%}
+        <p class="gy-news__message gy-news__message--error">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</p>
+      {%- endif -%}
+      {%- if form.posted_successfully? -%}
+        <p class="gy-news__message">{{ 'newsletter.success' | t }}</p>
+      {%- endif -%}
+    {%- endform -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "GentleYou newsletter",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Stay close to comfort." },
+    { "type": "richtext", "id": "text", "label": "Supporting text" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Join GentleYou" },
+    {
+      "type": "select", "id": "tone", "label": "Background", "default": "deep",
+      "options": [ { "value": "ivory", "label": "Warm ivory" }, { "value": "lavender", "label": "Soft lavender" }, { "value": "deep", "label": "Deep charcoal" } ]
+    },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 180, "step": 4, "unit": "px", "label": "Top padding", "default": 104 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 180, "step": 4, "unit": "px", "label": "Bottom padding", "default": 104 }
+  ],
+  "presets": [ { "name": "GentleYou newsletter" } ]
+}
+{% endschema %}

@@ -344,12 +344,34 @@
   box-shadow: 0 0 0 4px rgb(var(--gy-ink-muted) / 0.12);
 }
 
+/* Product copy is clamped rather than cut, so a long Shopify description keeps
+   the composition steady: three lines on desktop, four on mobile. */
 .gy-hero__text {
   margin: 0 0 var(--gy-space-lg);
-  max-width: 44ch;
+  max-width: 46ch;
+  min-height: calc(3 * 1.7 * var(--gy-text-body));
   font-size: var(--gy-text-body);
   line-height: 1.7;
   color: rgb(var(--gy-ink-soft));
+}
+
+.gy-hero__text p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 749px) {
+  .gy-hero__text {
+    min-height: calc(4 * 1.7 * var(--gy-text-body));
+  }
+
+  .gy-hero__text p {
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+  }
 }
 
 .gy-hero__text > :first-child { margin-top: 0; }

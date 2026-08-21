@@ -460,7 +460,12 @@
           "info": "Leave blank to use the product title."
         },
         "text": {
-          "label": "Supporting text"
+          "label": "Supporting text",
+          "info": "Leave blank to show the selected product's own Shopify description, shortened for the hero."
+        },
+        "description_words": {
+          "label": "Description length",
+          "info": "Words kept from the product description before it is trimmed."
         },
         "cta_text": {
           "label": "Button label"

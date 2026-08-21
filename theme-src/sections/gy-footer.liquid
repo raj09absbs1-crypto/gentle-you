@@ -1,0 +1,100 @@
+{%- comment -%}
+  GentleYou footer. Link columns are Shopify menus chosen in the Theme Editor;
+  policy links come from the store's own policy objects.
+{%- endcomment -%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+
+<footer class="gy-footer" {{ section.shopify_attributes }}>
+  <div class="gy-container gy-footer__inner">
+    <div class="gy-footer__brand">
+      {%- if section.settings.logo != blank -%}
+        <img
+          class="gy-footer__logo"
+          src="{{ section.settings.logo | image_url: width: 400 }}"
+          width="{{ section.settings.logo.width }}"
+          height="{{ section.settings.logo.height }}"
+          style="width: {{ section.settings.logo_width }}px"
+          alt="{{ shop.name | escape }}"
+          loading="lazy"
+        >
+      {%- else -%}
+        <p class="gy-footer__wordmark">{{ shop.name }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="gy-footer__text rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.show_social -%}
+        <ul class="gy-footer__social" role="list">
+          {%- if settings.social_instagram_link != blank -%}
+            <li><a href="{{ settings.social_instagram_link }}">Instagram</a></li>
+          {%- endif -%}
+          {%- if settings.social_facebook_link != blank -%}
+            <li><a href="{{ settings.social_facebook_link }}">Facebook</a></li>
+          {%- endif -%}
+          {%- if settings.social_youtube_link != blank -%}
+            <li><a href="{{ settings.social_youtube_link }}">YouTube</a></li>
+          {%- endif -%}
+          {%- if settings.social_tiktok_link != blank -%}
+            <li><a href="{{ settings.social_tiktok_link }}">TikTok</a></li>
+          {%- endif -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    <div class="gy-footer__columns">
+      {%- for block in section.blocks -%}
+        <div class="gy-footer__column" {{ block.shopify_attributes }}>
+          {%- if block.settings.heading != blank -%}
+            <h2 class="gy-footer__heading">{{ block.settings.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if block.settings.menu != blank -%}
+            <ul class="gy-footer__links" role="list">
+              {%- for link in block.settings.menu.links -%}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <div class="gy-container gy-footer__base">
+    <p class="gy-footer__copy">&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}</p>
+    <ul class="gy-footer__policies" role="list">
+      {%- for policy in shop.policies -%}
+        {%- if policy != blank -%}
+          <li><a href="{{ policy.url }}">{{ policy.title }}</a></li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "GentleYou footer",
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    { "type": "range", "id": "logo_width", "min": 80, "max": 300, "step": 10, "unit": "px", "label": "Logo width", "default": 160 },
+    { "type": "richtext", "id": "text", "label": "Short brand line" },
+    { "type": "checkbox", "id": "show_social", "label": "Show social links", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Link column",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Shop" },
+        { "type": "link_list", "id": "menu", "label": "Menu" }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "enabled_on": { "groups": ["footer"] }
+}
+{% endschema %}

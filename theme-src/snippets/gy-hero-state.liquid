@@ -8,6 +8,7 @@
 
   Accepts:
   - product, index, eyebrow, text
+  - description_words: {Number} truncation length for the product description
   - show_compare_at_price, show_discount: {Boolean} section settings
 {%- endcomment -%}
 
@@ -35,6 +36,25 @@
   assign show_saving = false
   if show_discount and discount_percent > 0
     assign show_saving = true
+  endif
+
+  comment
+    Supporting copy follows the product unless the merchant has written an
+    override. The product's own Shopify description is cleaned for display
+    only — tags stripped, the common 'Product description:' label and tick
+    glyphs removed, whitespace collapsed and the text truncated. Nothing is
+    rewritten and nothing is written back to Shopify.
+  endcomment
+  assign body = text
+  if body == blank
+    assign words = description_words | default: 26
+    assign raw = product.description | strip_html | replace: '&nbsp;', ' ' | replace: '&amp;', '&'
+    assign raw = raw | replace: 'Product Description:', '' | replace: 'Product description:', ''
+    assign raw = raw | replace: '✔', '' | replace: '✓', '' | replace: '•', ''
+    assign raw = raw | strip | truncatewords: words
+    if raw != blank
+      assign body = raw
+    endif
   endif
 -%}
 
@@ -88,7 +108,13 @@
     </p>
   {%- endif -%}
 
-  {%- if text != blank -%}
-    <div class="gy-hero__text rte">{{ text }}</div>
+  {%- if body != blank -%}
+    <div class="gy-hero__text rte">
+      {%- if text != blank -%}
+        {{ text }}
+      {%- else -%}
+        <p>{{ body }}</p>
+      {%- endif -%}
+    </div>
   {%- endif -%}
 </div>
