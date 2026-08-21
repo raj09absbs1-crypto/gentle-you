@@ -508,7 +508,8 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: min(28rem, 92vw);
+  /* Wide enough for the full five-column size chart on desktop. */
+  width: min(36rem, 94vw);
   display: flex;
   flex-direction: column;
   padding: clamp(1.25rem, 3vw, 2rem);
@@ -1133,11 +1134,53 @@ body.gy-no-scroll { overflow: hidden; }
 
 /* The table scrolls inside its own container; the page never does. */
 .gy-chart__scroll {
+  position: relative;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border: 1px solid rgb(var(--gy-ink) / 0.1);
   border-radius: var(--gy-radius-sm);
   background-color: rgb(var(--gy-canvas));
+  /* Only this container ever scrolls sideways; the page never does. */
+  overscroll-behavior-x: contain;
+}
+
+/* A soft right edge while there is more table to reach. */
+.gy-chart__wrap {
+  position: relative;
+}
+
+.gy-chart__wrap.is-scrollable::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  width: 2.5rem;
+  border-radius: 0 var(--gy-radius-sm) var(--gy-radius-sm) 0;
+  background: linear-gradient(90deg, rgb(var(--gy-canvas) / 0), rgb(var(--gy-canvas)));
+  pointer-events: none;
+  transition: opacity var(--gy-duration) var(--gy-ease);
+}
+
+.gy-chart__wrap.is-scrolled-end::after {
+  opacity: 0;
+}
+
+.gy-chart__hint {
+  display: none;
+  margin: 0.5rem 0 0;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-chart__wrap.is-scrollable .gy-chart__hint {
+  display: block;
+}
+
+.gy-chart__wrap.is-scrolled-end .gy-chart__hint {
+  visibility: hidden;
 }
 
 .gy-chart__scroll:focus-visible {
@@ -1147,7 +1190,9 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-chart__table {
   width: 100%;
-  min-width: 30rem;
+  /* Columns never wrap, so the table takes the width its content needs and the
+     container scrolls if that exceeds the panel. */
+  min-width: max-content;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
 }
@@ -1212,20 +1257,17 @@ body.gy-no-scroll { overflow: hidden; }
 }
 
 @media screen and (max-width: 749px) {
-  .gy-chart__table {
-    min-width: 26rem;
-  }
-
   .gy-chart__table th,
   .gy-chart__table td {
-    padding: 0.6rem 0.55rem;
-    font-size: 0.76rem;
+    padding: 0.58rem 0.5rem;
+    font-size: 0.74rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .gy-chart__table tbody tr:hover th,
-  .gy-chart__table tbody tr:hover td {
+  .gy-chart__table tbody tr:hover td,
+  .gy-chart__wrap::after {
     transition: none !important;
   }
 }

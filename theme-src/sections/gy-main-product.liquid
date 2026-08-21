@@ -410,7 +410,8 @@
               {%- endif -%}
             </header>
 
-            <div class="gy-chart__scroll" tabindex="0" role="group" aria-label="{{ section.settings.size_chart_heading | default: 'Size chart' | escape }}">
+            <div class="gy-chart__wrap" data-gy-chart-wrap>
+            <div class="gy-chart__scroll" tabindex="0" role="group" aria-label="{{ section.settings.size_chart_heading | default: 'Size chart' | escape }}" data-gy-chart-scroll>
               <table class="gy-chart__table">
                 <thead>
                   <tr>
@@ -437,6 +438,8 @@
                   {%- endfor -%}
                 </tbody>
               </table>
+            </div>
+            <p class="gy-chart__hint" data-gy-chart-hint>{{ 'sections.gy.swipe_table' | t }}</p>
             </div>
           </section>
         {%- endif -%}

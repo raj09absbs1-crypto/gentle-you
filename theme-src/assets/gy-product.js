@@ -172,6 +172,16 @@
       document.body.classList.add('gy-no-scroll');
       (panel?.querySelector(FOCUSABLE) || panel)?.focus();
       document.addEventListener('keydown', onKey);
+      // Re-measure the size chart now that the panel has a real width.
+      window.setTimeout(() => {
+        root.querySelectorAll('[data-gy-chart-wrap]').forEach((wrap) => {
+          const scroller = wrap.querySelector('[data-gy-chart-scroll]');
+          if (!scroller) return;
+          const overflow = scroller.scrollWidth - scroller.clientWidth;
+          wrap.classList.toggle('is-scrollable', overflow > 2);
+          wrap.classList.toggle('is-scrolled-end', overflow <= 2);
+        });
+      }, 60);
     };
 
     const close = () => {
@@ -243,8 +253,38 @@
     });
   }
 
+  /* ---- Size chart scroll affordance ----
+     The chart keeps all five columns; when the panel is too narrow to show
+     them at once the container (never the page) scrolls, and the hint and edge
+     fade appear until the end is reached. */
+
+  function initChart(scope) {
+    (scope || document).querySelectorAll('[data-gy-chart-wrap]').forEach((wrap) => {
+      if (wrap.dataset.gyReady === 'true') return;
+      wrap.dataset.gyReady = 'true';
+
+      const scroller = wrap.querySelector('[data-gy-chart-scroll]');
+      if (!scroller) return;
+
+      const update = () => {
+        const overflow = scroller.scrollWidth - scroller.clientWidth;
+        wrap.classList.toggle('is-scrollable', overflow > 2);
+        wrap.classList.toggle('is-scrolled-end', overflow <= 2 || scroller.scrollLeft >= overflow - 2);
+      };
+
+      scroller.addEventListener('scroll', update, { passive: true });
+      if ('ResizeObserver' in window) new ResizeObserver(update).observe(scroller);
+      window.addEventListener('resize', update, { passive: true });
+      // The panel is hidden until opened, so measure once it is on screen too.
+      wrap.closest('[data-gy-size-guide-drawer]')?.addEventListener('transitionend', update);
+      update();
+      window.setTimeout(update, 400);
+    });
+  }
+
   function init(scope) {
     initStickyBar(scope);
+    initChart(scope);
     initSizeGuide(scope);
     initPriceSync(scope);
     if (reduce.matches) {
