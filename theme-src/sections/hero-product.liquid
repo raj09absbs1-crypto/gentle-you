@@ -1,0 +1,364 @@
+{%- comment -%}
+  GentleYou premium product hero.
+
+  Every product value shown here is read live from the Shopify product selected
+  in the Theme Editor (`section.settings.product`) — title, featured image,
+  price, compare-at price, availability and URL. Nothing about the product is
+  hardcoded in this file, so an Admin price change is reflected on the next
+  page render.
+
+  Price output goes through the existing `snippets/price.liquid` so currency
+  formatting, `settings.currency_code_enabled`, price ranges, volume pricing
+  and sold-out handling stay identical to the rest of the theme.
+{%- endcomment -%}
+
+{%- liquid
+  assign product = section.settings.product
+  assign variant = product.selected_or_first_available_variant
+
+  assign heading = section.settings.heading
+  if heading == blank
+    assign heading = product.title
+  endif
+
+  assign cta_url = product.url | default: section.settings.cta_link
+  assign cta_text = section.settings.cta_text | default: 'Shop now'
+
+  assign compare_at = variant.compare_at_price
+  assign current_price = variant.price
+
+  assign show_compare = false
+  if section.settings.show_compare_at_price and compare_at > current_price
+    assign show_compare = true
+  endif
+
+  assign discount_percent = 0
+  if compare_at > current_price and compare_at > 0
+    assign discount_diff = compare_at | minus: current_price | times: 100.0
+    assign discount_percent = discount_diff | divided_by: compare_at | round
+  endif
+
+  assign show_discount = false
+  if section.settings.show_discount and discount_percent > 0
+    assign show_discount = true
+  endif
+-%}
+
+{%- if section.settings.enable_section -%}
+  {{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+  {{ 'component-price.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'gentleyou-hero.js' | asset_url }}" defer="defer"></script>
+
+  {%- style -%}
+    #GyHero-{{ section.id }} .gy-hero__inner {
+      padding-top: {{ section.settings.padding_top | times: 0.7 | round: 0 }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.7 | round: 0 }}px;
+      --gy-hero-width: {{ settings.page_width }}px;
+    }
+
+    @media screen and (min-width: 750px) {
+      #GyHero-{{ section.id }} .gy-hero__inner {
+        padding-top: {{ section.settings.padding_top }}px;
+        padding-bottom: {{ section.settings.padding_bottom }}px;
+      }
+    }
+  {%- endstyle -%}
+
+  <div
+    id="GyHero-{{ section.id }}"
+    class="gy-hero gy-hero--{{ section.settings.desktop_layout }}{% if section.settings.background_image != blank %} gy-hero--has-bg-image{% endif %}"
+    data-gy-hero
+    data-gy-tilt="{{ section.settings.tilt_strength }}"
+    {{ section.shopify_attributes }}
+  >
+    <div class="gy-hero__backdrop" data-gy-parallax aria-hidden="true"></div>
+
+    {%- if section.settings.background_image != blank -%}
+      <img
+        class="gy-hero__bg-image"
+        src="{{ section.settings.background_image | image_url: width: 2200 }}"
+        srcset="
+          {{ section.settings.background_image | image_url: width: 900 }} 900w,
+          {{ section.settings.background_image | image_url: width: 1400 }} 1400w,
+          {{ section.settings.background_image | image_url: width: 2200 }} 2200w
+        "
+        sizes="100vw"
+        width="{{ section.settings.background_image.width }}"
+        height="{{ section.settings.background_image.height }}"
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        fetchpriority="low"
+      >
+    {%- endif -%}
+
+    <div class="gy-hero__inner">
+      <div class="gy-hero__media">
+        <div class="gy-hero__stage" data-gy-stage>
+          <div
+            class="gy-hero__product"
+            data-gy-product
+            {% if section.settings.enable_float %}data-gy-float{% endif %}
+          >
+            {%- if product.featured_image -%}
+              <img
+                class="gy-hero__product-image"
+                src="{{ product.featured_image | image_url: width: 1400 }}"
+                srcset="
+                  {{ product.featured_image | image_url: width: 500 }} 500w,
+                  {{ product.featured_image | image_url: width: 800 }} 800w,
+                  {{ product.featured_image | image_url: width: 1100 }} 1100w,
+                  {{ product.featured_image | image_url: width: 1400 }} 1400w
+                "
+                sizes="(min-width: 990px) 40rem, (min-width: 750px) 70vw, 92vw"
+                width="{{ product.featured_image.width }}"
+                height="{{ product.featured_image.height }}"
+                alt="{{ product.featured_image.alt | escape | default: product.title | escape }}"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+              >
+            {%- else -%}
+              <div class="gy-hero__product-placeholder">
+                {{ 'product-apparel-2' | placeholder_svg_tag }}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+
+        {%- if product != blank and section.settings.show_product_title -%}
+          <p class="gy-hero__product-title">{{ product.title }}</p>
+        {%- endif -%}
+      </div>
+
+      <div class="gy-hero__content">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="gy-hero__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+
+        <h2 class="gy-hero__heading">{{ heading }}</h2>
+
+        {%- if product != blank -%}
+          <div class="gy-hero__price-block">
+            <div class="gy-hero__price">
+              {%- render 'price', product: product, use_variant: true, price_class: 'gy-hero__price-render' -%}
+            </div>
+
+            {%- if show_compare or show_discount -%}
+              <div class="gy-hero__price-meta">
+                {%- if show_compare -%}
+                  <span class="gy-hero__compare">
+                    <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                    {%- if settings.currency_code_enabled -%}
+                      {{ compare_at | money_with_currency }}
+                    {%- else -%}
+                      {{ compare_at | money }}
+                    {%- endif -%}
+                  </span>
+                {%- endif -%}
+
+                {%- if show_discount -%}
+                  <span class="gy-hero__discount">
+                    {{ 'sections.hero_product.discount_html' | t: percent: discount_percent }}
+                  </span>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+
+          <p class="gy-hero__status{% unless product.available %} gy-hero__status--sold-out{% endunless %}">
+            {%- if product.available -%}
+              {{ 'sections.hero_product.in_stock' | t }}
+            {%- else -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- endif -%}
+          </p>
+        {%- endif -%}
+
+        {%- if section.settings.text != blank -%}
+          <div class="gy-hero__text rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+
+        <div class="gy-hero__actions">
+          {%- if cta_url != blank -%}
+            <a
+              class="gy-hero__cta{% if product != blank and product.available == false %} gy-hero__cta--soft{% endif %}"
+              href="{{ cta_url }}"
+            >
+              {{ cta_text | escape }}
+              <span class="gy-hero__cta-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          {%- else -%}
+            <span class="gy-hero__cta" aria-disabled="true">
+              {{ cta_text | escape }}
+            </span>
+          {%- endif -%}
+
+          {%- if section.settings.secondary_text != blank -%}
+            <p class="gy-hero__secondary">{{ section.settings.secondary_text | escape }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:sections.hero-product.name",
+  "tag": "section",
+  "class": "gy-hero-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_section",
+      "label": "t:sections.hero-product.settings.enable_section.label",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:sections.hero-product.settings.product_header.content"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:sections.hero-product.settings.product.label",
+      "info": "t:sections.hero-product.settings.product.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_title",
+      "label": "t:sections.hero-product.settings.show_product_title.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_at_price",
+      "label": "t:sections.hero-product.settings.show_compare_at_price.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_discount",
+      "label": "t:sections.hero-product.settings.show_discount.label",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:sections.hero-product.settings.content_header.content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:sections.hero-product.settings.eyebrow.label",
+      "default": "Soft on you"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.hero-product.settings.heading.label",
+      "info": "t:sections.hero-product.settings.heading.info"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:sections.hero-product.settings.text.label",
+      "default": "<p>Everyday luxury, made for real comfort. Soft-touch fabric, seamless finish, and a fit that stays gentle from morning to night.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "t:sections.hero-product.settings.cta_text.label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "t:sections.hero-product.settings.cta_link.label",
+      "info": "t:sections.hero-product.settings.cta_link.info"
+    },
+    {
+      "type": "text",
+      "id": "secondary_text",
+      "label": "t:sections.hero-product.settings.secondary_text.label",
+      "default": "Free shipping · COD available"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.hero-product.settings.layout_header.content"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "t:sections.hero-product.settings.background_image.label",
+      "info": "t:sections.hero-product.settings.background_image.info"
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "t:sections.hero-product.settings.desktop_layout.label",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.hero-product.settings.desktop_layout.options__1.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.hero-product.settings.desktop_layout.options__2.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.hero-product.settings.desktop_layout.options__3.label"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.hero-product.settings.motion_header.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_float",
+      "label": "t:sections.hero-product.settings.enable_float.label",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "tilt_strength",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "deg",
+      "label": "t:sections.hero-product.settings.tilt_strength.label",
+      "info": "t:sections.hero-product.settings.tilt_strength.info",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 72
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.hero-product.presets.name"
+    }
+  ]
+}
+{% endschema %}

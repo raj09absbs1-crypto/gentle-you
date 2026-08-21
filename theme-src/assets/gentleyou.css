@@ -1,0 +1,543 @@
+/*
+  GentleYou design layer
+  ----------------------
+  Layers on top of Dawn's base.css — it never replaces it.
+  Phase 1A introduces the token foundation plus the homepage hero.
+  Later phases reuse the same tokens for cards, PDP and collection work.
+*/
+
+:root {
+  /* Palette — soft luxury: warm neutrals, blush, lavender */
+  --gy-ink: 18 16 20;
+  --gy-ink-soft: 74 68 80;
+  --gy-ink-muted: 122 114 128;
+  --gy-canvas: 252 250 249;
+  --gy-canvas-warm: 247 242 240;
+  --gy-blush: 244 227 224;
+  --gy-blush-deep: 226 190 186;
+  --gy-lavender: 232 224 243;
+  --gy-lavender-deep: 168 148 200;
+  --gy-champagne: 238 226 210;
+  --gy-line: 0 0 0;
+
+  /* Typography — inherits Dawn's Montserrat / Inter pairing */
+  --gy-font-heading: var(--font-heading-family, 'Montserrat', sans-serif);
+  --gy-font-body: var(--font-body-family, 'Inter', sans-serif);
+  --gy-tracking-eyebrow: 0.24em;
+  --gy-tracking-tight: -0.03em;
+
+  /* Fluid type scale */
+  --gy-text-eyebrow: clamp(0.65rem, 0.6rem + 0.2vw, 0.78rem);
+  --gy-text-body: clamp(0.95rem, 0.9rem + 0.25vw, 1.075rem);
+  --gy-text-heading: clamp(2.1rem, 1.2rem + 4vw, 4.15rem);
+  --gy-text-price: clamp(4.4rem, 2rem + 13vw, 11.5rem);
+  --gy-text-compare: clamp(1.05rem, 0.85rem + 1vw, 1.6rem);
+
+  /* Spacing */
+  --gy-space-3xs: 0.25rem;
+  --gy-space-2xs: 0.5rem;
+  --gy-space-xs: 0.75rem;
+  --gy-space-sm: 1rem;
+  --gy-space-md: 1.5rem;
+  --gy-space-lg: 2.25rem;
+  --gy-space-xl: 3.5rem;
+  --gy-space-2xl: 5rem;
+  --gy-space-3xl: 7.5rem;
+
+  /* Radii */
+  --gy-radius-xs: 2px;
+  --gy-radius-sm: 6px;
+  --gy-radius-md: 14px;
+  --gy-radius-lg: 26px;
+  --gy-radius-pill: 999px;
+
+  /* Elevation — soft, wide, low-opacity. Never hard drop shadows. */
+  --gy-elevation-1: 0 1px 2px rgb(var(--gy-ink) / 0.04), 0 8px 24px rgb(var(--gy-ink) / 0.05);
+  --gy-elevation-2: 0 2px 6px rgb(var(--gy-ink) / 0.05), 0 18px 48px rgb(var(--gy-ink) / 0.07);
+  --gy-elevation-3: 0 4px 12px rgb(var(--gy-ink) / 0.06), 0 40px 90px rgb(var(--gy-ink) / 0.11);
+  --gy-elevation-product: 0 30px 60px -20px rgb(var(--gy-ink) / 0.22), 0 80px 120px -60px rgb(var(--gy-blush-deep) / 0.55);
+  --gy-glow-soft: 0 0 90px rgb(var(--gy-lavender-deep) / 0.22);
+
+  /* Motion */
+  --gy-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --gy-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --gy-duration-fast: 180ms;
+  --gy-duration: 420ms;
+  --gy-duration-slow: 900ms;
+}
+
+/* ==========================================================================
+   Hero — premium product hero (sections/hero-product.liquid)
+   ========================================================================== */
+
+.gy-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: rgb(var(--gy-canvas));
+  color: rgb(var(--gy-ink));
+  font-family: var(--gy-font-body);
+}
+
+.gy-hero--has-bg-image {
+  background-color: rgb(var(--gy-canvas-warm));
+}
+
+/* Layered background: warm canvas + two soft colour fields. Purely decorative. */
+.gy-hero__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 55% at 78% 28%, rgb(var(--gy-blush) / 0.85) 0%, rgb(var(--gy-blush) / 0) 70%),
+    radial-gradient(52% 60% at 12% 82%, rgb(var(--gy-lavender) / 0.8) 0%, rgb(var(--gy-lavender) / 0) 72%);
+}
+
+.gy-hero__bg-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.28;
+}
+
+.gy-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--gy-space-xl);
+  grid-template-columns: 1fr;
+  align-items: center;
+  max-width: var(--gy-hero-width, 1400px);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 4rem);
+}
+
+.gy-hero__media {
+  order: 1;
+}
+
+.gy-hero__content {
+  order: 2;
+  max-width: 34rem;
+}
+
+/* ---- Content ---- */
+
+.gy-hero__eyebrow {
+  margin: 0 0 var(--gy-space-md);
+  font-family: var(--gy-font-body);
+  font-size: var(--gy-text-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--gy-tracking-eyebrow);
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-hero__heading {
+  margin: 0 0 var(--gy-space-md);
+  font-family: var(--gy-font-heading);
+  font-size: var(--gy-text-heading);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: var(--gy-tracking-tight);
+  text-wrap: balance;
+}
+
+.gy-hero__price-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gy-space-2xs);
+  margin-block: var(--gy-space-lg);
+}
+
+/* The price is the loudest element on the page — set in the heading face,
+   optically tightened, with the currency symbol scaled back. */
+.gy-hero__price {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gy-space-xs);
+  font-family: var(--gy-font-heading);
+  font-size: var(--gy-text-price);
+  font-weight: 300;
+  line-height: 0.84;
+  letter-spacing: -0.045em;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-hero__price .price {
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+}
+
+/* Re-lay-out Dawn's price markup inside the hero without editing component-price.css.
+   Dawn's own regular/sale visibility rules are mirrored here so only one figure
+   ever shows — the sale price when the product is on sale, the regular price
+   otherwise. */
+.gy-hero__price .price__container {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gy-space-sm);
+  flex-wrap: wrap;
+}
+
+.gy-hero__price .price:not(.price--on-sale) .price__regular,
+.gy-hero__price .price--on-sale .price__sale {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gy-space-sm);
+  flex-wrap: wrap;
+}
+
+.gy-hero__price .price--on-sale .price__regular,
+.gy-hero__price .price:not(.price--on-sale) .price__sale {
+  display: none;
+}
+
+.gy-hero__price .price-item--regular,
+.gy-hero__price .price-item--sale {
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+}
+
+/* Dawn renders the compare-at inline; the hero shows its own, so hide the
+   duplicate and keep the sale figure at full scale. */
+.gy-hero__price .price__sale s.price-item--regular,
+.gy-hero__price .price__badge-sale,
+.gy-hero__price .price__badge-sold-out {
+  display: none;
+}
+
+.gy-hero__price-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--gy-space-sm);
+  min-height: 1.75rem;
+}
+
+.gy-hero__compare {
+  font-size: var(--gy-text-compare);
+  font-weight: 300;
+  color: rgb(var(--gy-ink-muted));
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.1em;
+}
+
+.gy-hero__discount {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4em 0.85em;
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-lavender) / 0.85);
+  color: rgb(var(--gy-ink));
+  font-size: var(--gy-text-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.gy-hero__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gy-space-2xs);
+  margin-bottom: var(--gy-space-md);
+  font-size: var(--gy-text-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-hero__status::before {
+  content: '';
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background-color: rgb(var(--gy-lavender-deep));
+}
+
+.gy-hero__status--sold-out::before {
+  background-color: rgb(var(--gy-ink-muted));
+}
+
+.gy-hero__text {
+  margin: 0 0 var(--gy-space-lg);
+  max-width: 42ch;
+  font-size: var(--gy-text-body);
+  line-height: 1.65;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-hero__text > :first-child { margin-top: 0; }
+.gy-hero__text > :last-child { margin-bottom: 0; }
+
+.gy-hero__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--gy-space-md);
+}
+
+.gy-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gy-space-xs);
+  padding: 1.05rem 2.35rem;
+  border: 1px solid rgb(var(--gy-ink));
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: var(--gy-elevation-1);
+  transition:
+    transform var(--gy-duration-fast) var(--gy-ease),
+    box-shadow var(--gy-duration-fast) var(--gy-ease),
+    background-color var(--gy-duration-fast) var(--gy-ease);
+}
+
+.gy-hero__cta:hover,
+.gy-hero__cta:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--gy-elevation-2);
+  color: rgb(var(--gy-canvas));
+}
+
+.gy-hero__cta[aria-disabled='true'] {
+  background-color: transparent;
+  color: rgb(var(--gy-ink-muted));
+  border-color: rgb(var(--gy-line) / 0.25);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.gy-hero__cta-arrow {
+  transition: transform var(--gy-duration-fast) var(--gy-ease);
+}
+
+.gy-hero__cta:hover .gy-hero__cta-arrow {
+  transform: translateX(4px);
+}
+
+.gy-hero__secondary {
+  margin: 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  color: rgb(var(--gy-ink-muted));
+}
+
+/* ---- Product visual ---- */
+
+.gy-hero__stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+}
+
+/* Soft pedestal glow behind the product — gives depth without a filter on the
+   product image itself, so the garment colour stays accurate. */
+.gy-hero__stage::before {
+  content: '';
+  position: absolute;
+  inset: 8% 4% 6%;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--gy-champagne) / 0.9), rgb(var(--gy-champagne) / 0) 78%);
+  box-shadow: var(--gy-glow-soft);
+}
+
+.gy-hero__product {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 34rem;
+  border-radius: var(--gy-radius-lg);
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform var(--gy-duration) var(--gy-ease-out);
+}
+
+.gy-hero__product-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--gy-radius-lg);
+  box-shadow: var(--gy-elevation-product);
+  /* No filters: the product must stay visually accurate. */
+}
+
+.gy-hero__product-placeholder svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--gy-radius-lg);
+  background-color: rgb(var(--gy-canvas-warm));
+  box-shadow: var(--gy-elevation-2);
+}
+
+/* Contact shadow grounding the product on the stage. */
+.gy-hero__product::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -3.5%;
+  height: 6%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--gy-ink) / 0.2), rgb(var(--gy-ink) / 0) 75%);
+  filter: blur(2px);
+}
+
+.gy-hero__product-title {
+  margin: var(--gy-space-md) 0 0;
+  text-align: center;
+  font-family: var(--gy-font-body);
+  font-size: var(--gy-text-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--gy-tracking-eyebrow);
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+/* ---- Alignment variants ---- */
+
+.gy-hero--center .gy-hero__content {
+  max-width: 46rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.gy-hero--center .gy-hero__price,
+.gy-hero--center .gy-hero__price-meta,
+.gy-hero--center .gy-hero__actions,
+.gy-hero--center .gy-hero__price .price__container,
+.gy-hero--center .gy-hero__price .price:not(.price--on-sale) .price__regular,
+.gy-hero--center .gy-hero__price .price--on-sale .price__sale {
+  justify-content: center;
+}
+
+.gy-hero--center .gy-hero__text {
+  margin-inline: auto;
+}
+
+/* ---- Motion ---- */
+
+.gy-hero__product[data-gy-float] {
+  animation: gy-float 9s var(--gy-ease) infinite;
+}
+
+@keyframes gy-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -12px; }
+}
+
+/* Entrance reveal — only applied once JS confirms motion is allowed. */
+.gy-hero[data-gy-reveal='pending'] .gy-hero__content > *,
+.gy-hero[data-gy-reveal='pending'] .gy-hero__stage {
+  opacity: 0;
+  translate: 0 18px;
+}
+
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *,
+.gy-hero[data-gy-reveal='in'] .gy-hero__stage {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity var(--gy-duration-slow) var(--gy-ease-out),
+    translate var(--gy-duration-slow) var(--gy-ease-out);
+}
+
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(2) { transition-delay: 60ms; }
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(3) { transition-delay: 120ms; }
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(4) { transition-delay: 180ms; }
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(5) { transition-delay: 240ms; }
+
+/* ---- Desktop ---- */
+
+@media screen and (min-width: 750px) {
+  .gy-hero__inner {
+    gap: var(--gy-space-2xl);
+  }
+
+  .gy-hero__product-title {
+    margin-top: var(--gy-space-lg);
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .gy-hero__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(3rem, 5vw, 6rem);
+  }
+
+  /* Desktop: copy left, product right — a strong split composition. */
+  .gy-hero__content {
+    order: 1;
+  }
+
+  .gy-hero__media {
+    order: 2;
+  }
+
+  .gy-hero--right .gy-hero__content { order: 2; }
+  .gy-hero--right .gy-hero__media { order: 1; }
+
+  .gy-hero--center .gy-hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gy-hero--center .gy-hero__content { order: 2; }
+  .gy-hero--center .gy-hero__media { order: 1; }
+
+  .gy-hero__product {
+    max-width: 40rem;
+  }
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .gy-hero__product,
+  .gy-hero__product[data-gy-float],
+  .gy-hero__cta,
+  .gy-hero__cta-arrow {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .gy-hero[data-gy-reveal] .gy-hero__content > *,
+  .gy-hero[data-gy-reveal] .gy-hero__stage {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+}
+
+/* Sold-out CTA: still navigable, visually stepped back. */
+.gy-hero__cta--soft {
+  background-color: transparent;
+  color: rgb(var(--gy-ink));
+  border-color: rgb(var(--gy-line) / 0.35);
+  box-shadow: none;
+}
+
+.gy-hero__cta--soft:hover,
+.gy-hero__cta--soft:focus-visible {
+  color: rgb(var(--gy-ink));
+  border-color: rgb(var(--gy-ink));
+  box-shadow: var(--gy-elevation-1);
+}

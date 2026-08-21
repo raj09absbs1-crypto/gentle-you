@@ -364,6 +364,85 @@
     }
   },
   "sections": {
+    "hero-product": {
+      "name": "Hero product",
+      "presets": {
+        "name": "Hero product"
+      },
+      "settings": {
+        "enable_section": {
+          "label": "Enable hero section"
+        },
+        "product_header": {
+          "content": "Hero product"
+        },
+        "product": {
+          "label": "Hero product",
+          "info": "Title, image, price, compare-at price and availability are pulled live from this product."
+        },
+        "show_product_title": {
+          "label": "Show product name under the image"
+        },
+        "show_compare_at_price": {
+          "label": "Show compare-at price"
+        },
+        "show_discount": {
+          "label": "Show discount badge"
+        },
+        "content_header": {
+          "content": "Content"
+        },
+        "eyebrow": {
+          "label": "Eyebrow text"
+        },
+        "heading": {
+          "label": "Heading",
+          "info": "Leave blank to use the product title."
+        },
+        "text": {
+          "label": "Supporting text"
+        },
+        "cta_text": {
+          "label": "Button label"
+        },
+        "cta_link": {
+          "label": "Button link fallback",
+          "info": "Used only when no hero product is selected."
+        },
+        "secondary_text": {
+          "label": "Secondary text"
+        },
+        "layout_header": {
+          "content": "Layout"
+        },
+        "background_image": {
+          "label": "Background image",
+          "info": "Optional. Sits behind the hero at low opacity."
+        },
+        "desktop_layout": {
+          "label": "Desktop alignment",
+          "options__1": {
+            "label": "Content left"
+          },
+          "options__2": {
+            "label": "Content right"
+          },
+          "options__3": {
+            "label": "Centered"
+          }
+        },
+        "motion_header": {
+          "content": "Motion"
+        },
+        "enable_float": {
+          "label": "Enable subtle floating effect"
+        },
+        "tilt_strength": {
+          "label": "Pointer tilt",
+          "info": "Set to 0 to switch tilt off. Motion is disabled automatically for visitors who prefer reduced motion."
+        }
+      }
+    },
     "all": {
       "animation": {
         "content": "Animations",
