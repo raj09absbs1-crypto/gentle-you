@@ -62,8 +62,10 @@
   padding: 0.85rem 0;
   margin-bottom: var(--gy-space-lg);
   border-bottom: 1px solid rgb(var(--gy-ink) / 0.1);
-  background-color: rgb(var(--gy-canvas) / 0.92);
-  backdrop-filter: blur(10px);
+  background-color: rgb(var(--gy-canvas));
+  /* A soft edge so grid content clearly scrolls underneath the bar rather than
+     reading as the next row of the layout. */
+  box-shadow: 0 10px 18px -16px rgb(var(--gy-ink) / 0.5);
 }
 
 .gy-collection__count {
@@ -358,7 +360,12 @@
 
 /* ---- Cards on the collection grid ---- */
 
-.gy-collection__grid { margin-bottom: var(--gy-space-xl); }
+.gy-collection__grid {
+  margin-bottom: var(--gy-space-xl);
+  /* The gap between rows is deliberately larger than any gap inside a card, so
+     a quick-add button always reads as belonging to the card above it. */
+  row-gap: clamp(2.25rem, 5vw, 3rem);
+}
 
 .gy-card__media { position: relative; }
 
@@ -374,7 +381,7 @@
   opacity: 1;
 }
 
-.gy-card__action { margin-top: 0.6rem; }
+.gy-card__action { margin-top: 0.55rem; }
 
 .gy-card__form { margin: 0; }
 

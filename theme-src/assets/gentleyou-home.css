@@ -201,6 +201,16 @@
 
 /* The card stacks the link and any quick-add action; the link grows, the
    action stays in flow underneath it. */
+/* The grid item stretches; the card fills it, so every card in a row ends at
+   the same baseline and its CTA stays tied to it. */
+.gy-grid__item {
+  display: flex;
+}
+
+.gy-grid__item > * {
+  width: 100%;
+}
+
 .gy-card {
   display: flex;
   flex-direction: column;
@@ -257,6 +267,7 @@
 
 .gy-card__title {
   margin: var(--gy-space-sm) 0 var(--gy-space-3xs);
+  min-height: calc(2 * 1.45em);
   font-family: var(--gy-font-body);
   font-size: 0.82rem;
   font-weight: 500;
@@ -267,6 +278,12 @@
   -webkit-line-clamp: 2;
   line-clamp: 2;
   overflow: hidden;
+}
+
+/* Price sits at the foot of the link, directly above any quick-add button, so
+   the two always read as one block belonging to the card above them. */
+.gy-card__price {
+  margin-top: auto;
 }
 
 .gy-card__price .price {
