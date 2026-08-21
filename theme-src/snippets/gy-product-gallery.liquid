@@ -1,0 +1,105 @@
+{%- comment -%}
+  GentleYou product gallery.
+
+  Renders the product's real Shopify media. Images are never cropped, filtered
+  or recoloured — each frame keeps the photograph's own aspect ratio. Only the
+  first frame loads eagerly; the rest are lazy.
+
+  Accepts:
+  - product: {Object}
+  - section_id: {String}
+  - zoom: {Boolean} allow opening the active image full size
+{%- endcomment -%}
+
+{%- liquid
+  assign featured = product.selected_or_first_available_variant.featured_media | default: product.featured_media
+-%}
+
+<gy-media-gallery class="gy-pdp__gallery" data-section="{{ section_id }}" data-zoom="{{ zoom }}">
+  <div class="gy-pdp__stage">
+    <ul class="gy-pdp__frames" role="list" data-gy-frames>
+      {%- for media in product.media -%}
+        {%- liquid
+          assign is_active = false
+          if media.id == featured.id
+            assign is_active = true
+          endif
+        -%}
+        <li
+          class="gy-pdp__frame{% if is_active %} is-active{% endif %}"
+          data-media-id="{{ section_id }}-{{ media.id }}"
+          data-gy-frame="{{ forloop.index0 }}"
+          {% unless is_active %}aria-hidden="true"{% endunless %}
+        >
+          {%- if media.media_type == 'image' -%}
+            <img
+              class="gy-pdp__image"
+              src="{{ media | image_url: width: 1400 }}"
+              srcset="
+                {{ media | image_url: width: 500 }} 500w,
+                {{ media | image_url: width: 900 }} 900w,
+                {{ media | image_url: width: 1400 }} 1400w,
+                {{ media | image_url: width: 1800 }} 1800w
+              "
+              sizes="(min-width: 990px) 48vw, 100vw"
+              width="{{ media.preview_image.width }}"
+              height="{{ media.preview_image.height }}"
+              alt="{{ media.alt | escape | default: product.title | escape }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+              {% if forloop.first %}fetchpriority="high"{% endif %}
+              decoding="async"
+              data-full="{{ media | image_url: width: 2000 }}"
+            >
+          {%- else -%}
+            {%- render 'product-media', media: media, loop: false, variant_image: false -%}
+          {%- endif -%}
+        </li>
+      {%- else -%}
+        <li class="gy-pdp__frame is-active">
+          {{ 'product-apparel-2' | placeholder_svg_tag: 'gy-pdp__image' }}
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- if product.media.size > 1 -%}
+      <button class="gy-pdp__nav gy-pdp__nav--prev" type="button" data-gy-frame-prev aria-label="{{ 'general.slider.previous_slide' | t }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7"/></svg>
+      </button>
+      <button class="gy-pdp__nav gy-pdp__nav--next" type="button" data-gy-frame-next aria-label="{{ 'general.slider.next_slide' | t }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><path d="M9.5 5 16 12l-6.5 7"/></svg>
+      </button>
+
+      <p class="gy-pdp__counter" aria-hidden="true">
+        <span data-gy-frame-counter>1</span>
+        <span class="gy-pdp__counter-sep">/</span>
+        <span>{{ product.media.size }}</span>
+      </p>
+    {%- endif -%}
+  </div>
+
+  {%- if product.media.size > 1 -%}
+    <ul class="gy-pdp__thumbs" role="list">
+      {%- for media in product.media -%}
+        <li>
+          <button
+            class="gy-pdp__thumb{% if media.id == featured.id %} is-active{% endif %}"
+            type="button"
+            data-gy-thumb="{{ forloop.index0 }}"
+            aria-label="{{ 'products.product.media.gallery_viewer' | t }} {{ forloop.index }}"
+          >
+            <img
+              src="{{ media.preview_image | image_url: width: 200 }}"
+              srcset="{{ media.preview_image | image_url: width: 120 }} 120w, {{ media.preview_image | image_url: width: 240 }} 240w"
+              sizes="80px"
+              width="{{ media.preview_image.width }}"
+              height="{{ media.preview_image.height }}"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            >
+          </button>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</gy-media-gallery>

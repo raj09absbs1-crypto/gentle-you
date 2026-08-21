@@ -1,0 +1,347 @@
+{%- comment -%}
+  GentleYou product detail page.
+
+  Presentation only. Every value — media, title, price, compare-at price,
+  availability, variants, quantity rules and the description — is read from the
+  Shopify product and variant objects. Price rendering goes through the theme's
+  existing snippets/price.liquid, the variant picker through
+  snippets/product-variant-picker.liquid and the purchase form through
+  snippets/buy-buttons.liquid, so Dawn's product-info.js / product-form.js /
+  cart.js contract and the Shiprocket Fastrr inputs are untouched.
+{%- endcomment -%}
+
+{%- liquid
+  assign product_form_id = 'product-form-' | append: section.id
+  assign variant = product.selected_or_first_available_variant
+  assign compare_at = variant.compare_at_price
+  assign current_price = variant.price
+
+  assign discount_percent = 0
+  if compare_at > current_price and compare_at > 0
+    assign discount_diff = compare_at | minus: current_price | times: 100.0
+    assign discount_percent = discount_diff | divided_by: compare_at | round
+  endif
+-%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+{{ 'gy-product.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
+{{ 'component-swatch.css' | asset_url | stylesheet_tag }}
+{{ 'component-swatch-input.css' | asset_url | stylesheet_tag }}
+{{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'gy-product.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+
+<product-info
+  id="MainProduct-{{ section.id }}"
+  class="gy-pdp gy-section gy-section--ivory"
+  style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
+  data-section="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-update-url="true"
+  data-url="{{ product.url }}"
+  {{ section.shopify_attributes }}
+>
+  <div class="gy-container gy-pdp__inner">
+    <div class="gy-pdp__media">
+      {%- render 'gy-product-gallery',
+        product: product,
+        section_id: section.id,
+        zoom: section.settings.enable_zoom
+      -%}
+    </div>
+
+    <div class="gy-pdp__info" id="ProductInfo-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            <div class="gy-pdp__app" {{ block.shopify_attributes }}>{% render block %}</div>
+
+          {%- when 'vendor' -%}
+            {%- if product.vendor != blank -%}
+              <p class="gy-pdp__vendor" {{ block.shopify_attributes }}>{{ product.vendor }}</p>
+            {%- endif -%}
+
+          {%- when 'title' -%}
+            <h1 class="gy-pdp__title" {{ block.shopify_attributes }}>{{ product.title }}</h1>
+
+          {%- when 'price' -%}
+            <div class="gy-pdp__price-block" {{ block.shopify_attributes }}>
+              <div id="price-{{ section.id }}" class="gy-pdp__price" role="status">
+                {%- render 'price', product: product, use_variant: true, show_badges: false, price_class: 'price--large' -%}
+              </div>
+
+              <div class="gy-pdp__price-meta">
+                {%- if compare_at > current_price -%}
+                  <span class="gy-pdp__compare">
+                    <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                    {%- if settings.currency_code_enabled -%}
+                      {{ compare_at | money_with_currency }}
+                    {%- else -%}
+                      {{ compare_at | money }}
+                    {%- endif -%}
+                  </span>
+                  {%- if block.settings.show_saving and discount_percent > 0 -%}
+                    <span class="gy-pdp__saving">
+                      {{ 'sections.hero_product.discount_html' | t: percent: discount_percent }}
+                    </span>
+                  {%- endif -%}
+                {%- endif -%}
+
+                {%- if block.settings.show_tax_note -%}
+                  <span class="gy-pdp__tax">{{ 'products.product.include_taxes' | t }}</span>
+                {%- endif -%}
+              </div>
+
+              <div
+                id="Inventory-{{ section.id }}"
+                class="gy-pdp__stock{% unless product.selected_or_first_available_variant.inventory_management == 'shopify' %} gy-pdp__stock--hidden{% endunless %}"
+                role="status"
+              >
+                {%- if variant.available -%}
+                  {%- if variant.inventory_management == 'shopify'
+                    and variant.inventory_quantity > 0
+                    and variant.inventory_quantity <= block.settings.inventory_threshold
+                  -%}
+                    {{ 'products.product.inventory_low_stock' | t }}
+                  {%- else -%}
+                    {{ 'products.product.inventory_in_stock' | t }}
+                  {%- endif -%}
+                {%- else -%}
+                  {{ 'products.product.inventory_out_of_stock' | t }}
+                {%- endif -%}
+              </div>
+            </div>
+
+          {%- when 'variant_picker' -%}
+            <div class="gy-pdp__variants">
+              {%- if block.settings.show_size_guide and section.settings.size_guide_text != blank -%}
+                <details class="gy-pdp__size-guide" data-gy-size-guide>
+                  <summary>{{ section.settings.size_guide_label | default: 'Size guide' | escape }}</summary>
+                  <div class="gy-pdp__size-guide-body rte">{{ section.settings.size_guide_text }}</div>
+                </details>
+              {%- endif -%}
+
+              {%- render 'product-variant-picker',
+                product: product,
+                block: block,
+                product_form_id: product_form_id
+              -%}
+            </div>
+
+          {%- when 'quantity_selector' -%}
+            {%- liquid
+              assign cart_qty = cart | item_count_for_variant: variant.id
+            -%}
+            <div class="gy-pdp__quantity product-form__input product-form__quantity" id="Quantity-Form-{{ section.id }}" {{ block.shopify_attributes }}>
+              <label class="quantity__label form__label" for="Quantity-{{ section.id }}">
+                {{ 'products.product.quantity.label' | t }}
+                <span class="quantity__rules-cart{% if cart_qty == 0 %} hidden{% endif %}">
+                  {%- render 'loading-spinner' -%}
+                  <span>({{ 'products.product.quantity.in_cart_html' | t: quantity: cart_qty }})</span>
+                </span>
+              </label>
+              <quantity-input class="quantity" data-url="{{ product.url }}" data-section="{{ section.id }}">
+                <button class="quantity__button" name="minus" type="button">
+                  <span class="visually-hidden">{{ 'products.product.quantity.decrease' | t: product: product.title | escape }}</span>
+                  <span class="svg-wrapper">{{- 'icon-minus.svg' | inline_asset_content -}}</span>
+                </button>
+                <input
+                  class="quantity__input"
+                  type="number"
+                  name="quantity"
+                  id="Quantity-{{ section.id }}"
+                  data-cart-quantity="{{ cart_qty }}"
+                  data-min="{{ variant.quantity_rule.min }}"
+                  min="{{ variant.quantity_rule.min }}"
+                  {% if variant.quantity_rule.max != null %}
+                    data-max="{{ variant.quantity_rule.max }}"
+                    max="{{ variant.quantity_rule.max }}"
+                  {% endif %}
+                  step="{{ variant.quantity_rule.increment }}"
+                  value="{{ variant.quantity_rule.min }}"
+                  form="{{ product_form_id }}"
+                >
+                <button class="quantity__button" name="plus" type="button">
+                  <span class="visually-hidden">{{ 'products.product.quantity.increase' | t: product: product.title | escape }}</span>
+                  <span class="svg-wrapper">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
+                </button>
+              </quantity-input>
+              <div class="quantity__rules caption" id="Quantity-Rules-{{ section.id }}"></div>
+            </div>
+
+          {%- when 'buy_buttons' -%}
+            <div class="gy-pdp__buy" {{ block.shopify_attributes }}>
+              {%- render 'buy-buttons',
+                block: block,
+                product: product,
+                product_form_id: product_form_id,
+                section_id: section.id,
+                show_pickup_availability: true
+              -%}
+            </div>
+
+          {%- when 'short_description' -%}
+            {%- liquid
+              assign words = block.settings.words | default: 32
+              assign short = product.description | strip_html | replace: '&nbsp;', ' ' | replace: '&amp;', '&'
+              assign short = short | replace: 'Product Description:', '' | replace: 'Product description:', ''
+              assign short = short | replace: '✔', '' | replace: '✓', '' | replace: '•', ''
+              assign short = short | strip | truncatewords: words
+            -%}
+            {%- if short != blank -%}
+              <p class="gy-pdp__short" {{ block.shopify_attributes }}>{{ short }}</p>
+            {%- endif -%}
+
+          {%- when 'trust' -%}
+            <ul class="gy-pdp__trust" role="list" {{ block.shopify_attributes }}>
+              {%- assign points = block.settings.points | split: '|' -%}
+              {%- for point in points -%}
+                <li>{{ point | strip }}</li>
+              {%- endfor -%}
+            </ul>
+
+          {%- when 'details' -%}
+            {%- liquid
+              assign body = block.settings.content
+              if block.settings.source == 'description' and product.description != blank
+                assign body = product.description
+              endif
+            -%}
+            {%- if body != blank -%}
+              <details class="gy-pdp__accordion" {% if block.settings.open %}open{% endif %} {{ block.shopify_attributes }}>
+                <summary>
+                  <span>{{ block.settings.heading | escape }}</span>
+                  <span class="gy-pdp__accordion-icon" aria-hidden="true"></span>
+                </summary>
+                <div class="gy-pdp__accordion-body rte">{{ body }}</div>
+              </details>
+            {%- endif -%}
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- if section.settings.enable_sticky_bar -%}
+    <div class="gy-pdp__sticky" data-gy-sticky-bar hidden>
+      <div class="gy-pdp__sticky-inner">
+        <div class="gy-pdp__sticky-media">
+          {%- if product.featured_image -%}
+            <img
+              src="{{ product.featured_image | image_url: width: 120 }}"
+              width="{{ product.featured_image.width }}"
+              height="{{ product.featured_image.height }}"
+              alt=""
+              loading="lazy"
+            >
+          {%- endif -%}
+        </div>
+        <div class="gy-pdp__sticky-text">
+          <p class="gy-pdp__sticky-title">{{ product.title }}</p>
+          <p class="gy-pdp__sticky-price">
+            {%- render 'price', product: product, use_variant: true -%}
+          </p>
+        </div>
+        <button class="gy-button gy-pdp__sticky-button" type="button" data-gy-sticky-add>
+          {{ 'products.product.add_to_cart' | t }}
+        </button>
+      </div>
+    </div>
+  {%- endif -%}
+</product-info>
+
+{% schema %}
+{
+  "name": "GentleYou product",
+  "tag": "section",
+  "class": "gy-pdp-section",
+  "settings": [
+    { "type": "header", "content": "Gallery" },
+    { "type": "checkbox", "id": "enable_zoom", "label": "Open the active image full size on click", "default": true },
+    { "type": "header", "content": "Size guide" },
+    { "type": "text", "id": "size_guide_label", "label": "Size guide label", "default": "Size guide" },
+    { "type": "richtext", "id": "size_guide_text", "label": "Size guide content", "info": "Shown in the size guide panel above the variant options." },
+    { "type": "header", "content": "Mobile" },
+    { "type": "checkbox", "id": "enable_sticky_bar", "label": "Sticky purchase bar on mobile", "default": true },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Top padding", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Bottom padding", "default": 72 }
+  ],
+  "blocks": [
+    { "type": "@app" },
+    { "type": "vendor", "name": "Vendor", "limit": 1 },
+    { "type": "title", "name": "Title", "limit": 1 },
+    {
+      "type": "price", "name": "Price", "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "show_saving", "label": "Show saving percentage", "default": true },
+        { "type": "checkbox", "id": "show_tax_note", "label": "Show tax note", "default": false },
+        { "type": "range", "id": "inventory_threshold", "min": 0, "max": 100, "step": 1, "label": "Low stock threshold", "default": 10 }
+      ]
+    },
+    {
+      "type": "short_description", "name": "Short description", "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "Uses the product's own Shopify description, shortened." },
+        { "type": "range", "id": "words", "min": 12, "max": 60, "step": 2, "label": "Words", "default": 32 }
+      ]
+    },
+    {
+      "type": "variant_picker", "name": "Variant picker", "limit": 1,
+      "settings": [
+        {
+          "type": "select", "id": "picker_type", "label": "Style", "default": "button",
+          "options": [ { "value": "dropdown", "label": "Dropdown" }, { "value": "button", "label": "Pills" } ]
+        },
+        {
+          "type": "select", "id": "swatch_shape", "label": "Swatch shape", "default": "circle",
+          "options": [ { "value": "circle", "label": "Circle" }, { "value": "square", "label": "Square" }, { "value": "none", "label": "None" } ]
+        },
+        { "type": "checkbox", "id": "show_size_guide", "label": "Show size guide link", "default": true }
+      ]
+    },
+    { "type": "quantity_selector", "name": "Quantity selector", "limit": 1 },
+    {
+      "type": "buy_buttons", "name": "Buy buttons", "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show dynamic checkout buttons", "default": true },
+        { "type": "checkbox", "id": "show_gift_card_recipient", "label": "Show gift card recipient form", "default": true }
+      ]
+    },
+    {
+      "type": "trust", "name": "Reassurance line", "limit": 1,
+      "settings": [
+        { "type": "text", "id": "points", "label": "Points", "info": "Separate with |. Use the store's own published policy wording.", "default": "Cash on delivery | 3-day size exchange | Secure payment | Free prepaid shipping" }
+      ]
+    },
+    {
+      "type": "details", "name": "Details section",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Description" },
+        {
+          "type": "select", "id": "source", "label": "Content", "default": "custom",
+          "options": [ { "value": "description", "label": "Product description from Shopify" }, { "value": "custom", "label": "Text below" } ]
+        },
+        { "type": "richtext", "id": "content", "label": "Text" },
+        { "type": "checkbox", "id": "open", "label": "Open by default", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "GentleYou product",
+      "blocks": [
+        { "type": "vendor" }, { "type": "title" }, { "type": "price" },
+        { "type": "short_description" }, { "type": "variant_picker" },
+        { "type": "quantity_selector" }, { "type": "buy_buttons" }, { "type": "trust" }
+      ]
+    }
+  ],
+  "enabled_on": { "templates": ["product"] }
+}
+{% endschema %}
