@@ -199,14 +199,18 @@
   }
 }
 
+/* The card stacks the link and any quick-add action; the link grows, the
+   action stays in flow underneath it. */
 .gy-card {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
 .gy-card__link {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 100%;
   text-decoration: none;
   color: inherit;
 }

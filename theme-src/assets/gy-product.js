@@ -163,12 +163,14 @@
     const panel = root.querySelector('.gy-pdp__drawer-panel');
     let lastFocused = null;
 
+    const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
     const open = (trigger) => {
       lastFocused = trigger || document.activeElement;
       root.hidden = false;
       requestAnimationFrame(() => root.classList.add('is-open'));
       document.body.classList.add('gy-no-scroll');
-      panel?.querySelector('button')?.focus();
+      (panel?.querySelector(FOCUSABLE) || panel)?.focus();
       document.addEventListener('keydown', onKey);
     };
 
@@ -183,7 +185,24 @@
     };
 
     function onKey(event) {
-      if (event.key === 'Escape') close();
+      if (event.key === 'Escape') {
+        close();
+        return;
+      }
+      if (event.key !== 'Tab' || !panel) return;
+
+      // Keep focus inside the panel while it is open.
+      const items = Array.from(panel.querySelectorAll(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
 
     document.querySelectorAll('[data-gy-size-guide-open]').forEach((btn) => {

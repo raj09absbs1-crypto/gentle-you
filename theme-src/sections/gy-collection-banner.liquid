@@ -1,0 +1,81 @@
+{%- comment -%}
+  GentleYou collection header. Title and description come from the Shopify
+  collection; the eyebrow and an optional heading override are merchant text.
+  The collection image is used only when the collection actually has one.
+{%- endcomment -%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+{{ 'gy-collection.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign heading = section.settings.heading
+  if heading == blank
+    assign heading = collection.title
+  endif
+-%}
+
+<section
+  class="gy-section gy-section--{{ section.settings.tone }} gy-colhead{% if collection.image and section.settings.show_image %} gy-colhead--with-image{% endif %}"
+  style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
+  data-gy-reveal-scope
+  {{ section.shopify_attributes }}
+>
+  <div class="gy-container gy-colhead__inner">
+    <div class="gy-colhead__text" data-gy-reveal>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="gy-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      <h1 class="gy-colhead__title">{{ heading }}</h1>
+
+      {%- if section.settings.show_description and collection.description != blank -%}
+        <div class="gy-colhead__desc rte">{{ collection.description }}</div>
+      {%- elsif section.settings.text != blank -%}
+        <div class="gy-colhead__desc rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- if collection.image and section.settings.show_image -%}
+      <figure class="gy-colhead__media" data-gy-reveal>
+        <img
+          src="{{ collection.image | image_url: width: 1200 }}"
+          srcset="
+            {{ collection.image | image_url: width: 600 }} 600w,
+            {{ collection.image | image_url: width: 900 }} 900w,
+            {{ collection.image | image_url: width: 1200 }} 1200w
+          "
+          sizes="(min-width: 990px) 42vw, 92vw"
+          width="{{ collection.image.width }}"
+          height="{{ collection.image.height }}"
+          alt="{{ collection.image.alt | escape | default: collection.title | escape }}"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        >
+      </figure>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "GentleYou collection header",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "GentleYou" },
+    { "type": "text", "id": "heading", "label": "Heading override", "info": "Leave blank to use the collection title." },
+    { "type": "checkbox", "id": "show_description", "label": "Show the collection description", "default": true },
+    { "type": "richtext", "id": "text", "label": "Fallback text", "info": "Shown when the collection has no description." },
+    { "type": "checkbox", "id": "show_image", "label": "Show the collection image when one exists", "default": true },
+    {
+      "type": "select", "id": "tone", "label": "Background", "default": "ivory",
+      "options": [ { "value": "ivory", "label": "Warm ivory" }, { "value": "lavender", "label": "Soft lavender" } ]
+    },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 72 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 40 }
+  ],
+  "enabled_on": { "templates": ["collection"] }
+}
+{% endschema %}

@@ -10,6 +10,9 @@
   - card_product: {Object} product
   - eager: {Boolean} load the image eagerly (above-the-fold cards only)
   - ratio: {String} 'portrait' (default) or 'square'
+  - show_secondary_image: {Boolean} cross-fade to the second media on hover
+  - quick_add: {Boolean} offer add-to-cart / choose-options
+  - section_id: {String} used to build a unique product form id
 {%- endcomment -%}
 
 {%- liquid
@@ -21,6 +24,22 @@
   if compare_at > current_price and compare_at > 0
     assign discount_diff = compare_at | minus: current_price | times: 100.0
     assign discount_percent = discount_diff | divided_by: compare_at | round
+  endif
+
+  assign second_image = card_product.media[1].preview_image
+  assign has_second = false
+  if show_secondary_image and second_image != blank
+    assign has_second = true
+  endif
+
+  comment
+    Quick add is offered only when there is exactly one purchasable variant, so
+    the native product form can post a real variant id. Anything with options to
+    choose sends the customer to the product page instead.
+  endcomment
+  assign single_variant = false
+  if card_product.variants.size == 1 and card_product.has_only_default_variant
+    assign single_variant = true
   endif
 -%}
 
@@ -47,6 +66,25 @@
         {{ 'product-apparel-2' | placeholder_svg_tag: 'gy-card__image' }}
       {%- endif -%}
 
+      {%- if has_second -%}
+        <img
+          class="gy-card__image gy-card__image--second"
+          src="{{ second_image | image_url: width: 800 }}"
+          srcset="
+            {{ second_image | image_url: width: 400 }} 400w,
+            {{ second_image | image_url: width: 600 }} 600w,
+            {{ second_image | image_url: width: 800 }} 800w
+          "
+          sizes="(min-width: 990px) 24rem, (min-width: 750px) 32vw, 46vw"
+          width="{{ second_image.width }}"
+          height="{{ second_image.height }}"
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+        >
+      {%- endif -%}
+
       {%- if card_product.available == false -%}
         <span class="gy-card__flag">{{ 'products.product.sold_out' | t }}</span>
       {%- elsif discount_percent > 0 -%}
@@ -60,4 +98,41 @@
       {%- render 'price', product: card_product, use_variant: true, show_compare_at_price: true -%}
     </div>
   </a>
+
+  {%- if quick_add -%}
+    <div class="gy-card__action">
+      {%- if card_product.available == false -%}
+        <span class="gy-card__button gy-card__button--muted">{{ 'products.product.sold_out' | t }}</span>
+      {%- elsif single_variant -%}
+        {%- assign card_form_id = 'gy-quick-add-' | append: section_id | append: '-' | append: card_product.id -%}
+        {%- form 'product',
+          card_product,
+          id: card_form_id,
+          class: 'gy-card__form',
+          novalidate: 'novalidate',
+          data-type: 'add-to-cart-form'
+        -%}
+          <input
+            type="hidden"
+            name="id"
+            value="{{ card_product.selected_or_first_available_variant.id }}"
+            disabled
+          >
+          <button
+            class="gy-card__button"
+            type="submit"
+            name="add"
+            aria-label="{{ 'products.product.add_to_cart' | t }}: {{ card_product.title | escape }}"
+          >
+            {{ 'products.product.add_to_cart' | t }}
+          </button>
+        {%- endform -%}
+      {%- else -%}
+        <a class="gy-card__button gy-card__button--options" href="{{ card_product.url }}">
+          {{ 'sections.gy.choose_options' | t }}
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
 </article>
