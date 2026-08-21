@@ -1,46 +1,45 @@
 {%- comment -%}
-  GentleYou premium product hero.
+  GentleYou premium product hero with campaign rotation.
 
-  Every product value shown here is read live from the Shopify product selected
-  in the Theme Editor (`section.settings.product`) — title, featured image,
-  price, compare-at price, availability and URL. Nothing about the product is
-  hardcoded in this file, so an Admin price change is reflected on the next
-  page render.
+  The merchant adds up to six "Hero product" blocks, each pointing at a Shopify
+  product through the native product picker. Every value shown — featured image,
+  title, price, compare-at price, saving, availability and URL — is read live
+  from that product, so an Admin change appears on the next page render and
+  nothing about a product is hardcoded here.
 
-  Price output goes through the existing `snippets/price.liquid` so currency
-  formatting, `settings.currency_code_enabled`, price ranges, volume pricing
-  and sold-out handling stay identical to the rest of the theme.
+  Price output goes through the existing `snippets/price.liquid`, so currency
+  formatting, `settings.currency_code_enabled`, price ranges, volume pricing and
+  sold-out handling stay identical to the rest of the theme.
+
+  All slides are rendered server-side and stacked in one grid cell; JavaScript
+  only toggles which one is active. There is no product data in JavaScript.
 {%- endcomment -%}
 
 {%- liquid
-  assign product = section.settings.product
-  assign variant = product.selected_or_first_available_variant
+  assign product_blocks = section.blocks | where: 'type', 'product_slide'
+  assign trust_blocks = section.blocks | where: 'type', 'trust'
+  assign slide_count = product_blocks.size
+
+  assign first_product = section.settings.product
+  if slide_count > 0
+    assign first_block = product_blocks | first
+    assign first_product = first_block.settings.product
+  endif
 
   assign heading = section.settings.heading
   if heading == blank
-    assign heading = product.title
+    assign heading = first_product.title
   endif
 
-  assign cta_url = product.url | default: section.settings.cta_link
+  assign cta_url = first_product.url | default: section.settings.cta_link
   assign cta_text = section.settings.cta_text | default: 'Shop now'
 
-  assign compare_at = variant.compare_at_price
-  assign current_price = variant.price
-
-  assign show_compare = false
-  if section.settings.show_compare_at_price and compare_at > current_price
-    assign show_compare = true
+  assign caption = section.settings.product_caption
+  if slide_count > 0 and first_block.settings.caption != blank
+    assign caption = first_block.settings.caption
   endif
-
-  assign discount_percent = 0
-  if compare_at > current_price and compare_at > 0
-    assign discount_diff = compare_at | minus: current_price | times: 100.0
-    assign discount_percent = discount_diff | divided_by: compare_at | round
-  endif
-
-  assign show_discount = false
-  if section.settings.show_discount and discount_percent > 0
-    assign show_discount = true
+  if caption == blank
+    assign caption = first_product.title
   endif
 -%}
 
@@ -69,6 +68,13 @@
     class="gy-hero gy-hero--{{ section.settings.desktop_layout }}{% if section.settings.background_image != blank %} gy-hero--has-bg-image{% endif %}"
     data-gy-hero
     data-gy-tilt="{{ section.settings.tilt_strength }}"
+    data-gy-interval="{{ section.settings.rotation_interval }}"
+    data-gy-autoplay="{{ section.settings.enable_rotation }}"
+    {% if slide_count > 1 %}
+      role="group"
+      aria-roledescription="{{ 'sections.hero_product.carousel' | t }}"
+      aria-label="{{ 'sections.hero_product.carousel' | t }}"
+    {% endif %}
     {{ section.shopify_attributes }}
   >
     <div class="gy-hero__backdrop" data-gy-parallax aria-hidden="true"></div>
@@ -100,7 +106,6 @@
       <div class="gy-hero__media">
         <div class="gy-hero__stage" data-gy-stage>
           <span class="gy-hero__glow" aria-hidden="true"></span>
-          <span class="gy-hero__panel" aria-hidden="true"></span>
 
           <div
             class="gy-hero__plate"
@@ -108,100 +113,119 @@
             {% if section.settings.enable_float %}data-gy-float{% endif %}
           >
             <div class="gy-hero__plate-inner">
-              {%- if product.featured_image -%}
-                <img
-                  class="gy-hero__product-image"
-                  src="{{ product.featured_image | image_url: width: 1400 }}"
-                  srcset="
-                    {{ product.featured_image | image_url: width: 500 }} 500w,
-                    {{ product.featured_image | image_url: width: 800 }} 800w,
-                    {{ product.featured_image | image_url: width: 1100 }} 1100w,
-                    {{ product.featured_image | image_url: width: 1400 }} 1400w
-                  "
-                  sizes="(min-width: 990px) 36rem, (min-width: 750px) 70vw, 92vw"
-                  width="{{ product.featured_image.width }}"
-                  height="{{ product.featured_image.height }}"
-                  alt="{{ product.featured_image.alt | escape | default: product.title | escape }}"
-                  loading="eager"
-                  fetchpriority="high"
-                  decoding="async"
-                >
-              {%- else -%}
-                <div class="gy-hero__product-placeholder">
-                  {{ 'product-apparel-2' | placeholder_svg_tag }}
-                </div>
-              {%- endif -%}
+              <div class="gy-hero__slides">
+                {%- if slide_count > 0 -%}
+                  {%- for block in product_blocks -%}
+                    {%- render 'gy-hero-media',
+                      product: block.settings.product,
+                      index: forloop.index0
+                    -%}
+                  {%- endfor -%}
+                {%- else -%}
+                  {%- render 'gy-hero-media', product: section.settings.product, index: 0 -%}
+                {%- endif -%}
+              </div>
               <span class="gy-hero__sheen" aria-hidden="true"></span>
             </div>
           </div>
+
+          {%- if slide_count > 1 -%}
+            <button
+              class="gy-hero__nav gy-hero__nav--prev"
+              type="button"
+              data-gy-prev
+              aria-label="{{ 'general.slider.previous_slide' | t }}"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7"/></svg>
+            </button>
+            <button
+              class="gy-hero__nav gy-hero__nav--next"
+              type="button"
+              data-gy-next
+              aria-label="{{ 'general.slider.next_slide' | t }}"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5 16 12l-6.5 7"/></svg>
+            </button>
+          {%- endif -%}
         </div>
 
-        {%- if product != blank and section.settings.show_product_title -%}
-          {%- liquid
-            assign caption = section.settings.product_caption
-            if caption == blank
-              assign caption = product.title
-            endif
-          -%}
-          <p class="gy-hero__product-title"><span>{{ caption | escape }}</span></p>
+        {%- if section.settings.show_product_title -%}
+          <div class="gy-hero__captions">
+            {%- if slide_count > 0 -%}
+              {%- for block in product_blocks -%}
+                {%- liquid
+                  assign block_caption = block.settings.caption
+                  if block_caption == blank
+                    assign block_caption = block.settings.product.title
+                  endif
+                -%}
+                <p
+                  class="gy-hero__product-title{% if forloop.first %} is-active{% endif %}"
+                  data-gy-caption="{{ forloop.index0 }}"
+                  {% unless forloop.first %}aria-hidden="true"{% endunless %}
+                >
+                  <span>{{ block_caption | escape }}</span>
+                </p>
+              {%- endfor -%}
+            {%- else -%}
+              <p class="gy-hero__product-title is-active" data-gy-caption="0">
+                <span>{{ caption | escape }}</span>
+              </p>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if slide_count > 1 -%}
+          <div class="gy-hero__rotation">
+            <p class="gy-hero__counter">
+              <span data-gy-counter>01</span>
+              <span class="gy-hero__counter-sep" aria-hidden="true">/</span>
+              <span class="gy-hero__counter-total">{{ slide_count | prepend: '0' | slice: -2, 2 }}</span>
+            </p>
+            <span class="gy-hero__progress" aria-hidden="true">
+              <span class="gy-hero__progress-bar" data-gy-progress></span>
+            </span>
+          </div>
         {%- endif -%}
       </div>
 
       <div class="gy-hero__content">
-        {%- if section.settings.eyebrow != blank -%}
-          <p class="gy-hero__eyebrow">{{ section.settings.eyebrow | escape }}</p>
-        {%- endif -%}
-
         <h2 class="gy-hero__heading">{{ heading | escape | newline_to_br }}</h2>
 
-        {%- if product != blank -%}
-          <div class="gy-hero__price-block">
-            <div class="gy-hero__price-row">
-              <div class="gy-hero__price">
-                {%- render 'price', product: product, use_variant: true, price_class: 'gy-hero__price-render' -%}
-              </div>
-
-              {%- if show_compare or show_discount -%}
-                <div class="gy-hero__price-meta">
-                  {%- if show_compare -%}
-                    <span class="gy-hero__compare">
-                      <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
-                      {%- if settings.currency_code_enabled -%}
-                        {{ compare_at | money_with_currency }}
-                      {%- else -%}
-                        {{ compare_at | money }}
-                      {%- endif -%}
-                    </span>
-                  {%- endif -%}
-
-                  {%- if show_discount -%}
-                    <span class="gy-hero__discount">
-                      {{ 'sections.hero_product.discount_html' | t: percent: discount_percent }}
-                    </span>
-                  {%- endif -%}
-                </div>
-              {%- endif -%}
-            </div>
-          </div>
-
-          <p class="gy-hero__status{% unless product.available %} gy-hero__status--sold-out{% endunless %}">
-            {%- if product.available -%}
-              {{ 'sections.hero_product.in_stock' | t }}
-            {%- else -%}
-              {{ 'products.product.sold_out' | t }}
-            {%- endif -%}
-          </p>
-        {%- endif -%}
-
-        {%- if section.settings.text != blank -%}
-          <div class="gy-hero__text rte">{{ section.settings.text }}</div>
-        {%- endif -%}
+        <div class="gy-hero__states" data-gy-states>
+          {%- if slide_count > 0 -%}
+            {%- for block in product_blocks -%}
+              {%- liquid
+                assign block_eyebrow = block.settings.eyebrow | default: section.settings.eyebrow
+                assign block_text = block.settings.text | default: section.settings.text
+              -%}
+              {%- render 'gy-hero-state',
+                product: block.settings.product,
+                index: forloop.index0,
+                eyebrow: block_eyebrow,
+                text: block_text,
+                show_compare_at_price: section.settings.show_compare_at_price,
+                show_discount: section.settings.show_discount
+              -%}
+            {%- endfor -%}
+          {%- else -%}
+            {%- render 'gy-hero-state',
+              product: section.settings.product,
+              index: 0,
+              eyebrow: section.settings.eyebrow,
+              text: section.settings.text,
+              show_compare_at_price: section.settings.show_compare_at_price,
+              show_discount: section.settings.show_discount
+            -%}
+          {%- endif -%}
+        </div>
 
         <div class="gy-hero__actions">
           {%- if cta_url != blank -%}
             <a
-              class="gy-hero__cta{% if product != blank and product.available == false %} gy-hero__cta--soft{% endif %}"
+              class="gy-hero__cta{% if first_product != blank and first_product.available == false %} gy-hero__cta--soft{% endif %}"
               href="{{ cta_url }}"
+              data-gy-cta
             >
               {{ cta_text | escape }}
               <span class="gy-hero__cta-arrow" aria-hidden="true">&rarr;</span>
@@ -217,10 +241,10 @@
           {%- endif -%}
         </div>
 
-        {%- if section.blocks.size > 0 -%}
+        {%- if trust_blocks.size > 0 -%}
           <ul class="gy-hero__trust" role="list">
-            {%- for block in section.blocks -%}
-              {%- if block.type == 'trust' and block.settings.text != blank -%}
+            {%- for block in trust_blocks -%}
+              {%- if block.settings.text != blank -%}
                 <li class="gy-hero__trust-item" {{ block.shopify_attributes }}>
                   <span class="gy-hero__trust-icon" aria-hidden="true">
                     {%- case block.settings.icon -%}
@@ -262,6 +286,10 @@
       "content": "t:sections.hero-product.settings.product_header.content"
     },
     {
+      "type": "paragraph",
+      "content": "t:sections.hero-product.settings.product_paragraph.content"
+    },
+    {
       "type": "product",
       "id": "product",
       "label": "t:sections.hero-product.settings.product.label",
@@ -290,6 +318,27 @@
       "id": "show_discount",
       "label": "t:sections.hero-product.settings.show_discount.label",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:sections.hero-product.settings.rotation_header.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_rotation",
+      "label": "t:sections.hero-product.settings.enable_rotation.label",
+      "info": "t:sections.hero-product.settings.enable_rotation.info",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "rotation_interval",
+      "min": 4000,
+      "max": 12000,
+      "step": 500,
+      "unit": "ms",
+      "label": "t:sections.hero-product.settings.rotation_interval.label",
+      "default": 7500
     },
     {
       "type": "header",
@@ -328,8 +377,7 @@
     {
       "type": "text",
       "id": "secondary_text",
-      "label": "t:sections.hero-product.settings.secondary_text.label",
-      "default": "Free shipping · COD available"
+      "label": "t:sections.hero-product.settings.secondary_text.label"
     },
     {
       "type": "header",
@@ -393,7 +441,7 @@
       "unit": "deg",
       "label": "t:sections.hero-product.settings.tilt_strength.label",
       "info": "t:sections.hero-product.settings.tilt_strength.info",
-      "default": 5
+      "default": 4
     },
     {
       "type": "range",
@@ -418,8 +466,40 @@
   ],
   "blocks": [
     {
+      "type": "product_slide",
+      "name": "t:sections.hero-product.blocks.product_slide.name",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "t:sections.hero-product.settings.product.label",
+          "info": "t:sections.hero-product.settings.product.info"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "t:sections.hero-product.blocks.product_slide.settings.caption.label",
+          "info": "t:sections.hero-product.blocks.product_slide.settings.caption.info"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "t:sections.hero-product.blocks.product_slide.settings.eyebrow.label",
+          "info": "t:sections.hero-product.blocks.product_slide.settings.eyebrow.info"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:sections.hero-product.blocks.product_slide.settings.text.label",
+          "info": "t:sections.hero-product.blocks.product_slide.settings.text.info"
+        }
+      ]
+    },
+    {
       "type": "trust",
       "name": "t:sections.hero-product.blocks.trust.name",
+      "limit": 4,
       "settings": [
         {
           "type": "select",
@@ -455,10 +535,15 @@
       ]
     }
   ],
-  "max_blocks": 4,
+  "max_blocks": 10,
   "presets": [
     {
-      "name": "t:sections.hero-product.presets.name"
+      "name": "t:sections.hero-product.presets.name",
+      "blocks": [
+        {
+          "type": "product_slide"
+        }
+      ]
     }
   ]
 }

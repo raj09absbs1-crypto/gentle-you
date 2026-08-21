@@ -370,6 +370,23 @@
         "name": "Hero product"
       },
       "blocks": {
+        "product_slide": {
+          "name": "Hero product",
+          "settings": {
+            "caption": {
+              "label": "Caption override",
+              "info": "Presentation text only. Leave blank to show the Shopify product title."
+            },
+            "eyebrow": {
+              "label": "Eyebrow override",
+              "info": "Leave blank to use the section eyebrow."
+            },
+            "text": {
+              "label": "Supporting text override",
+              "info": "Leave blank to use the section supporting text."
+            }
+          }
+        },
         "trust": {
           "name": "Trust point",
           "settings": {
@@ -402,6 +419,9 @@
         "product_header": {
           "content": "Hero product"
         },
+        "product_paragraph": {
+          "content": "Add up to six hero product blocks below to rotate between campaigns. The product picked here is used only when no product blocks are added."
+        },
         "product": {
           "label": "Hero product",
           "info": "Title, image, price, compare-at price and availability are pulled live from this product."
@@ -418,6 +438,16 @@
         },
         "show_discount": {
           "label": "Show discount badge"
+        },
+        "rotation_header": {
+          "content": "Rotation"
+        },
+        "enable_rotation": {
+          "label": "Rotate between hero products",
+          "info": "Applies when two or more product blocks are added. Rotation is switched off automatically for visitors who prefer reduced motion."
+        },
+        "rotation_interval": {
+          "label": "Time on each product"
         },
         "content_header": {
           "content": "Content"

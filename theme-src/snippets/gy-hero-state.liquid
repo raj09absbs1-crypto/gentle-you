@@ -1,0 +1,94 @@
+{%- comment -%}
+  One content state of the GentleYou hero rotation: eyebrow, price, compare-at,
+  saving, availability and supporting copy for a single product.
+
+  Every value is read from the Shopify product passed in. Price rendering goes
+  through the theme's existing snippets/price.liquid, so currency formatting,
+  price ranges and sold-out handling are identical to the rest of the store.
+
+  Accepts:
+  - product, index, eyebrow, text
+  - show_compare_at_price, show_discount: {Boolean} section settings
+{%- endcomment -%}
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign compare_at = variant.compare_at_price
+  assign current_price = variant.price
+
+  assign is_first = false
+  if index == 0
+    assign is_first = true
+  endif
+
+  assign show_compare = false
+  if show_compare_at_price and compare_at > current_price
+    assign show_compare = true
+  endif
+
+  assign discount_percent = 0
+  if compare_at > current_price and compare_at > 0
+    assign discount_diff = compare_at | minus: current_price | times: 100.0
+    assign discount_percent = discount_diff | divided_by: compare_at | round
+  endif
+
+  assign show_saving = false
+  if show_discount and discount_percent > 0
+    assign show_saving = true
+  endif
+-%}
+
+<div
+  class="gy-hero__state{% if is_first %} is-active{% endif %}"
+  data-gy-state="{{ index }}"
+  data-gy-url="{{ product.url }}"
+  data-gy-available="{{ product.available }}"
+  {% unless is_first %}aria-hidden="true"{% endunless %}
+>
+  {%- if eyebrow != blank -%}
+    <p class="gy-hero__eyebrow">{{ eyebrow | escape }}</p>
+  {%- endif -%}
+
+  {%- if product != blank -%}
+    <div class="gy-hero__price-block">
+      <div class="gy-hero__price-row">
+        <div class="gy-hero__price">
+          {%- render 'price', product: product, use_variant: true, price_class: 'gy-hero__price-render' -%}
+        </div>
+
+        {%- if show_compare or show_saving -%}
+          <div class="gy-hero__price-meta">
+            {%- if show_compare -%}
+              <span class="gy-hero__compare">
+                <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                {%- if settings.currency_code_enabled -%}
+                  {{ compare_at | money_with_currency }}
+                {%- else -%}
+                  {{ compare_at | money }}
+                {%- endif -%}
+              </span>
+            {%- endif -%}
+
+            {%- if show_saving -%}
+              <span class="gy-hero__discount">
+                {{ 'sections.hero_product.discount_html' | t: percent: discount_percent }}
+              </span>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <p class="gy-hero__status{% unless product.available %} gy-hero__status--sold-out{% endunless %}">
+      {%- if product.available -%}
+        {{ 'sections.hero_product.in_stock' | t }}
+      {%- else -%}
+        {{ 'products.product.sold_out' | t }}
+      {%- endif -%}
+    </p>
+  {%- endif -%}
+
+  {%- if text != blank -%}
+    <div class="gy-hero__text rte">{{ text }}</div>
+  {%- endif -%}
+</div>
