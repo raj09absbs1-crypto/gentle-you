@@ -1,0 +1,108 @@
+{% comment %}
+Landing Slider Section (Starter)
+Requires adding your own Swiper library or extending JS if desired.
+This starter creates clickable slides managed from Theme Editor.
+{% endcomment %}
+
+<section class="landing-slider">
+  <div class="landing-slider__track">
+    {% for block in section.blocks %}
+      <a class="landing-slider__slide" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
+        {% if block.settings.image %}
+          <img
+            src="{{ block.settings.image | image_url: width: 2000 }}"
+            alt="{{ block.settings.image.alt | escape }}"
+            loading="lazy"
+            width=""
+            height=""
+          >
+        {% else %}
+          {{ 'lifestyle-1' | placeholder_svg_tag }}
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
+
+  {% if section.settings.show_dots %}
+    <div class="landing-slider__dots"></div>
+  {% endif %}
+</section>
+
+<style>
+.landing-slider{overflow:hidden;width:100%}
+.landing-slider__track{display:flex;transition:transform .5s ease}
+.landing-slider__slide{min-width:100%;display:block}
+.landing-slider__slide img{display:block;width:100%;height:auto}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+ const track=document.querySelector('.landing-slider__track');
+ if(!track) return;
+ const slides=track.children;
+ let i=0;
+ const total=slides.length;
+ function go(n){
+   track.style.transform='translateX(-'+(n*100)+'%)';
+ }
+ if(total>1 && {{ section.settings.autoplay | json }}){
+   setInterval(()=>{
+      i=(i+1)%total;
+      go(i);
+   }, {{ section.settings.speed }});
+ }
+});
+</script>
+
+{% schema %}
+{
+  "name":"Landing Slider",
+  "settings":[
+    {
+      "type":"checkbox",
+      "id":"autoplay",
+      "label":"Enable autoplay",
+      "default":true
+    },
+    {
+      "type":"range",
+      "id":"speed",
+      "label":"Autoplay speed (ms)",
+      "min":2000,
+      "max":8000,
+      "step":500,
+      "default":3000
+    },
+    {
+      "type":"checkbox",
+      "id":"show_dots",
+      "label":"Show dots",
+      "default":true
+    }
+  ],
+  "blocks":[
+    {
+      "type":"slide",
+      "name":"Slide",
+      "settings":[
+        {
+          "type":"image_picker",
+          "id":"image",
+          "label":"Image"
+        },
+        {
+          "type":"url",
+          "id":"link",
+          "label":"Link"
+        }
+      ]
+    }
+  ],
+  "max_blocks":20,
+  "presets":[
+    {
+      "name":"Landing Slider"
+    }
+  ]
+}
+{% endschema %}
