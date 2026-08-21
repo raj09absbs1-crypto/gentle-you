@@ -1102,3 +1102,130 @@ body.gy-no-scroll { overflow: hidden; }
     translate: 0 0;
   }
 }
+
+/* ---- Size chart ---------------------------------------------------------
+   Real, selectable, responsive table content — never an image. */
+
+.gy-chart__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gy-space-sm);
+  margin-bottom: var(--gy-space-sm);
+}
+
+.gy-chart__title {
+  margin: 0;
+  font-family: var(--gy-font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-blush-deep));
+}
+
+.gy-chart__category {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: rgb(var(--gy-ink));
+}
+
+/* The table scrolls inside its own container; the page never does. */
+.gy-chart__scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid rgb(var(--gy-ink) / 0.1);
+  border-radius: var(--gy-radius-sm);
+  background-color: rgb(var(--gy-canvas));
+}
+
+.gy-chart__scroll:focus-visible {
+  outline: 2px solid rgb(var(--gy-lavender-deep));
+  outline-offset: 2px;
+}
+
+.gy-chart__table {
+  width: 100%;
+  min-width: 30rem;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.gy-chart__table th,
+.gy-chart__table td {
+  padding: 0.62rem 0.7rem;
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.07);
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 400;
+  white-space: nowrap;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-chart__table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-block: 0.7rem;
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.16);
+  background-color: rgb(var(--gy-canvas-warm));
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-chart__table tbody th {
+  font-weight: 600;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-chart__table tbody tr:last-child th,
+.gy-chart__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.gy-chart__table tbody tr:hover th,
+.gy-chart__table tbody tr:hover td {
+  background-color: rgb(var(--gy-canvas-warm) / 0.7);
+}
+
+/* The row matching the shopper's selected band and cup. */
+.gy-chart__table tbody tr.is-current th,
+.gy-chart__table tbody tr.is-current td {
+  background-color: rgb(var(--gy-lavender) / 0.45);
+  color: rgb(var(--gy-ink));
+}
+
+.gy-chart__table tbody tr.is-current th {
+  box-shadow: inset 2px 0 0 rgb(var(--gy-lavender-deep));
+}
+
+.gy-guide__footnote p {
+  margin: 0 0 0.4rem;
+}
+
+.gy-guide__footnote p:last-child {
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 749px) {
+  .gy-chart__table {
+    min-width: 26rem;
+  }
+
+  .gy-chart__table th,
+  .gy-chart__table td {
+    padding: 0.6rem 0.55rem;
+    font-size: 0.76rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gy-chart__table tbody tr:hover th,
+  .gy-chart__table tbody tr:hover td {
+    transition: none !important;
+  }
+}

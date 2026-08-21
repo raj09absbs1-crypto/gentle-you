@@ -494,9 +494,13 @@
 /* ---- Mobile ---- */
 
 @media screen and (max-width: 749px) {
+  /* Not sticky on small screens: a pinned bar keeps whatever row happens to be
+     scrolling past directly beneath it, which made card buttons read as a
+     toolbar row above the grid. The controls simply scroll with the page. */
   .gy-collection__bar {
-    top: 3.9rem;
+    position: static;
     flex-wrap: wrap;
+    box-shadow: none;
   }
 
   .gy-collection__tools { flex: 1 1 100%; }

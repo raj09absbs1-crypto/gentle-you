@@ -323,7 +323,7 @@
       </header>
 
       <div class="gy-pdp__drawer-body">
-        {%- if band_option != blank -%}
+        {%- if band_option != blank and section.settings.size_measurements != blank -%}
           <section class="gy-guide__block">
             <h3 class="gy-guide__label">{{ band_option.name }}</h3>
             <table class="gy-guide__table">
@@ -362,7 +362,7 @@
           </section>
         {%- endif -%}
 
-        {%- if cup_option != blank -%}
+        {%- if cup_option != blank and section.settings.size_chart_rows == blank -%}
           <section class="gy-guide__block">
             <h3 class="gy-guide__label">{{ cup_option.name }}</h3>
             <ul class="gy-guide__cups" role="list">
@@ -376,6 +376,68 @@
         {%- if metafield_chart != blank -%}
           <section class="gy-guide__block gy-guide__metafield rte">
             {{ metafield_chart | metafield_tag }}
+          </section>
+        {%- endif -%}
+
+        {%- comment -%}
+          Size chart. Rows are merchant content from the Theme Editor (one row
+          per line, columns separated by |), so the numbers are whatever the
+          merchant published and the theme never derives or converts them.
+          When the shopper's selected band and cup match a row's size code the
+          row is highlighted; the Shopify variant picker is untouched.
+        {%- endcomment -%}
+        {%- if section.settings.size_chart_rows != blank -%}
+          {%- liquid
+            assign chart_headers = section.settings.size_chart_columns | split: '|'
+            assign chart_rows = section.settings.size_chart_rows | newline_to_br | split: '<br />'
+
+            assign selected_band = ''
+            assign selected_cup = ''
+            if band_option != blank
+              assign selected_band = band_option.selected_value.name | default: ''
+            endif
+            if cup_option != blank
+              assign selected_cup = cup_option.selected_value.name | default: ''
+            endif
+            assign current_code = selected_band | append: selected_cup | upcase | strip
+          -%}
+
+          <section class="gy-guide__block gy-chart">
+            <header class="gy-chart__head">
+              <h3 class="gy-chart__title">{{ section.settings.size_chart_heading | default: 'Size chart' | escape }}</h3>
+              {%- if section.settings.size_chart_category != blank -%}
+                <p class="gy-chart__category">{{ section.settings.size_chart_category | escape }}</p>
+              {%- endif -%}
+            </header>
+
+            <div class="gy-chart__scroll" tabindex="0" role="group" aria-label="{{ section.settings.size_chart_heading | default: 'Size chart' | escape }}">
+              <table class="gy-chart__table">
+                <thead>
+                  <tr>
+                    {%- for header in chart_headers -%}
+                      <th scope="col">{{ header | strip }}</th>
+                    {%- endfor -%}
+                  </tr>
+                </thead>
+                <tbody>
+                  {%- for row in chart_rows -%}
+                    {%- assign cells = row | strip | split: '|' -%}
+                    {%- if cells.size > 0 and row != blank -%}
+                      {%- assign row_code = cells[0] | strip | upcase -%}
+                      <tr {% if current_code != blank and row_code == current_code %}class="is-current" aria-current="true"{% endif %}>
+                        {%- for cell in cells -%}
+                          {%- if forloop.first -%}
+                            <th scope="row">{{ cell | strip }}</th>
+                          {%- else -%}
+                            <td>{{ cell | strip }}</td>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </tr>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            </div>
           </section>
         {%- endif -%}
 
@@ -412,8 +474,15 @@
           </section>
         {%- endif -%}
 
-        {%- if section.settings.size_note != blank -%}
-          <p class="gy-guide__footnote">{{ section.settings.size_note | escape }}</p>
+        {%- if section.settings.size_note != blank or section.settings.size_contact != blank -%}
+          <div class="gy-guide__footnote">
+            {%- if section.settings.size_note != blank -%}
+              <p>{{ section.settings.size_note | escape }}</p>
+            {%- endif -%}
+            {%- if section.settings.size_contact != blank -%}
+              <p>{{ section.settings.size_contact | escape }}</p>
+            {%- endif -%}
+          </div>
         {%- endif -%}
 
         {%- if section.settings.size_guide_text != blank -%}
@@ -467,6 +536,10 @@
     { "type": "text", "id": "cup_option_name", "label": "Cup option name contains", "info": "Which product option holds the cup size. Lower case.", "default": "cup" },
     { "type": "text", "id": "measurement_label", "label": "Measurement column heading", "default": "Underbust" },
     { "type": "textarea", "id": "size_measurements", "label": "Measurements", "info": "One per line as \"size: measurement\", for example \"32: 68-72 cm\". Sizes with nothing here show an empty cell — the theme never invents a measurement. A product metafield custom.size_chart is also rendered when set." },
+    { "type": "text", "id": "size_chart_heading", "label": "Size chart heading", "default": "Size chart" },
+    { "type": "text", "id": "size_chart_category", "label": "Size chart category", "default": "Bras" },
+    { "type": "text", "id": "size_chart_columns", "label": "Size chart column headings", "info": "Separated by |.", "default": "Size|Underbust (inch)|Bust (inch)|UK size|EU size" },
+    { "type": "textarea", "id": "size_chart_rows", "label": "Size chart rows", "info": "One row per line, columns separated by |. The first column is matched against the selected band and cup to highlight a row." },
     { "type": "text", "id": "measure_heading", "label": "How to measure heading", "default": "How to measure" },
     { "type": "text", "id": "measure_step_1_title", "label": "Step 1 title", "default": "Measure your band" },
     { "type": "textarea", "id": "measure_step_1", "label": "Step 1 text", "default": "Wrap the measuring tape firmly around your ribcage, directly underneath your bust." },
@@ -475,6 +548,7 @@
     { "type": "text", "id": "between_sizes_heading", "label": "Between sizes heading", "default": "Between sizes?" },
     { "type": "textarea", "id": "between_sizes", "label": "Between sizes text", "default": "If you're between sizes, we recommend choosing the larger size for a more comfortable everyday fit." },
     { "type": "textarea", "id": "size_note", "label": "Size note", "default": "Fit can vary slightly by style and fabric. Please check the available options on the product page before ordering." },
+    { "type": "text", "id": "size_contact", "label": "Help line", "info": "Optional. Shown under the size note." },
     { "type": "richtext", "id": "size_guide_text", "label": "Extra content", "info": "Optional. Appears at the end of the panel." },
     { "type": "header", "content": "Mobile" },
     { "type": "checkbox", "id": "enable_sticky_bar", "label": "Sticky purchase bar on mobile", "default": true },
