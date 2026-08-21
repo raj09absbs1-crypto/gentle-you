@@ -51,7 +51,7 @@
 .gy-pdp__frame {
   grid-area: 1 / 1;
   opacity: 0;
-  transform: scale(1.01);
+  transform: scale(0.98);
   pointer-events: none;
 }
 
@@ -59,7 +59,7 @@
   opacity: 1;
   transform: scale(1);
   pointer-events: auto;
-  transition: opacity 0.6s var(--gy-ease-out), transform 0.9s var(--gy-ease-out);
+  transition: opacity 420ms var(--gy-ease-out), transform 480ms var(--gy-ease-out);
 }
 
 .gy-pdp__image,
@@ -246,6 +246,17 @@
   display: none;
 }
 
+/* Quiet fade when the selected variant changes the figures. */
+.gy-pdp__price-block.is-updating .gy-pdp__price,
+.gy-pdp__price-block.is-updating .gy-pdp__price-meta {
+  animation: gy-price-swap 480ms var(--gy-ease-out);
+}
+
+@keyframes gy-price-swap {
+  0% { opacity: 0.25; translate: 0 6px; }
+  100% { opacity: 1; translate: 0 0; }
+}
+
 .gy-pdp__price-meta {
   display: flex;
   align-items: center;
@@ -304,33 +315,305 @@
   color: rgb(var(--gy-ink-soft));
 }
 
-/* Variant picker: Dawn's markup, GentleYou surface. */
+/* ---- Variant selectors -------------------------------------------------
+   Dawn's markup, GentleYou surface. Every option, value and availability
+   state comes from Shopify — these rules only change how they look. */
+
 .gy-pdp__variants {
   position: relative;
-  margin-bottom: var(--gy-space-md);
+  margin-bottom: var(--gy-space-lg);
 }
 
+.gy-pdp__variants-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--gy-space-md);
+  margin-bottom: var(--gy-space-md);
+  padding-bottom: var(--gy-space-sm);
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
+}
+
+.gy-pdp__variants-title {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.gy-pdp__variants-sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-pdp__size-link {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-soft));
+  transition: color var(--gy-duration-fast) var(--gy-ease);
+}
+
+.gy-pdp__size-link span {
+  display: inline-block;
+  transition: transform var(--gy-duration-fast) var(--gy-ease);
+}
+
+.gy-pdp__size-link:hover { color: rgb(var(--gy-ink)); }
+.gy-pdp__size-link:hover span { transform: translateX(3px); }
+
+/* Size and cup: compact rounded rectangles, not pills. */
 .gy-pdp .product-form__input--pill input[type='radio'] + label,
 .gy-pdp .product-form__input--swatch input[type='radio'] + label {
-  border-radius: var(--gy-radius-pill);
-  border-color: rgb(var(--gy-ink) / 0.18);
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.1rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.95rem;
+  margin: 0 0.45rem 0.45rem 0;
+  border: 1px solid rgb(var(--gy-ink) / 0.16);
+  border-radius: 10px;
+  background-color: rgb(var(--gy-canvas-warm));
+  color: rgb(var(--gy-ink));
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   transition:
-    border-color var(--gy-duration-fast) var(--gy-ease),
-    background-color var(--gy-duration-fast) var(--gy-ease),
-    color var(--gy-duration-fast) var(--gy-ease);
+    border-color 200ms var(--gy-ease),
+    background-color 200ms var(--gy-ease),
+    color 200ms var(--gy-ease),
+    transform 200ms var(--gy-ease);
 }
 
-.gy-pdp .product-form__input--pill input[type='radio']:checked + label {
+.gy-pdp .product-form__input--pill input[type='radio'] + label:hover,
+.gy-pdp .product-form__input--swatch input[type='radio'] + label:hover {
+  border-color: rgb(var(--gy-lavender-deep) / 0.65);
+  background-color: rgb(var(--gy-lavender) / 0.35);
+}
+
+.gy-pdp .product-form__input--pill input[type='radio'] + label:active {
+  transform: scale(0.97);
+}
+
+.gy-pdp .product-form__input--pill input[type='radio']:checked + label,
+.gy-pdp .product-form__input--swatch input[type='radio']:checked + label {
   background-color: rgb(var(--gy-ink));
   border-color: rgb(var(--gy-ink));
   color: rgb(var(--gy-canvas));
 }
 
-.gy-pdp .product-form__input--pill input[type='radio']:disabled + label,
-.gy-pdp .product-form__input--pill input[type='radio'].disabled + label {
-  opacity: 0.4;
+.gy-pdp .product-form__input input[type='radio']:focus-visible + label {
+  outline: 2px solid rgb(var(--gy-lavender-deep));
+  outline-offset: 2px;
+}
+
+/* Unavailable combinations: clearly not selectable. Availability itself is
+   Shopify's, computed by Dawn's variant picker. */
+.gy-pdp .product-form__input input[type='radio']:disabled + label,
+.gy-pdp .product-form__input input[type='radio'].disabled + label {
+  position: relative;
+  opacity: 0.38;
+  cursor: not-allowed;
+  color: rgb(var(--gy-ink-muted));
+  background-color: transparent;
+}
+
+.gy-pdp .product-form__input input[type='radio']:disabled + label::after,
+.gy-pdp .product-form__input input[type='radio'].disabled + label::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  height: 1px;
+  background-color: currentColor;
+  rotate: -14deg;
+  opacity: 0.6;
+}
+
+.gy-pdp .product-form__input input[type='radio']:disabled + label:hover,
+.gy-pdp .product-form__input input[type='radio'].disabled + label:hover {
+  border-color: rgb(var(--gy-ink) / 0.16);
+  background-color: transparent;
+}
+
+/* Colour: swatch dot plus the real option name, when Shopify supplies swatch
+   data for the option values. Without swatches the same label styling applies,
+   showing the colour name alone — the theme never invents a colour. */
+.gy-pdp .product-form__input--swatch input[type='radio'] + label {
+  gap: 0.6rem;
+  min-width: 0;
+  padding-inline: 0.85rem 1.1rem;
+  justify-content: flex-start;
+}
+
+.gy-pdp .product-form__input--swatch .swatch {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--gy-ink) / 0.15);
+  box-shadow: 0 0 0 3px rgb(var(--gy-canvas));
+}
+
+.gy-pdp .product-form__input--swatch input[type='radio']:checked + label .swatch {
+  box-shadow:
+    0 0 0 2px rgb(var(--gy-canvas)),
+    0 0 0 4px rgb(var(--gy-lavender-deep));
+}
+
+.gy-pdp .product-form__input--swatch input[type='radio']:checked + label {
+  background-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+}
+
+/* Selected value shown beside the option name, as Dawn renders it. */
+.gy-pdp .form__label .gy-selected,
+.gy-pdp .product-form__input legend span {
+  color: rgb(var(--gy-ink-muted));
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* ---- Size guide drawer ---- */
+
+.gy-pdp__drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+}
+
+.gy-pdp__drawer-scrim {
+  position: absolute;
+  inset: 0;
+  background-color: rgb(var(--gy-ink) / 0.45);
+  opacity: 0;
+  transition: opacity 320ms var(--gy-ease);
+}
+
+.gy-pdp__drawer.is-open .gy-pdp__drawer-scrim { opacity: 1; }
+
+.gy-pdp__drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(28rem, 92vw);
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  background-color: rgb(var(--gy-canvas));
+  box-shadow: var(--gy-elevation-3);
+  translate: 100% 0;
+  transition: translate 380ms var(--gy-ease-out);
+  overflow-y: auto;
+}
+
+.gy-pdp__drawer.is-open .gy-pdp__drawer-panel { translate: 0 0; }
+
+.gy-pdp__drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gy-space-sm);
+  padding-bottom: var(--gy-space-md);
+  margin-bottom: var(--gy-space-md);
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.1);
+}
+
+.gy-pdp__drawer-title {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.gy-pdp__drawer-close {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgb(var(--gy-ink) / 0.12);
+  border-radius: 50%;
+  background-color: rgb(var(--gy-canvas-warm));
+  color: rgb(var(--gy-ink));
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gy-pdp__drawer-body {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-pdp__drawer-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--gy-space-sm);
+}
+
+.gy-pdp__drawer-body th,
+.gy-pdp__drawer-body td {
+  padding: 0.6rem 0.4rem;
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+body.gy-no-scroll { overflow: hidden; }
+
+/* ---- Highlights ---- */
+
+.gy-pdp__highlights {
+  margin: 0 0 var(--gy-space-lg);
+  padding: var(--gy-space-md) 0 0;
+  border-top: 1px solid rgb(var(--gy-ink) / 0.08);
+}
+
+.gy-pdp__highlights-heading {
+  margin: 0 0 var(--gy-space-sm);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-pdp__highlights ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gy-pdp__highlights li {
+  position: relative;
+  padding-left: 1.35rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-pdp__highlights li::before {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  top: 0.62em;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background-color: rgb(var(--gy-lavender-deep) / 0.75);
 }
 
 .gy-pdp .form__label {
@@ -341,51 +624,29 @@
   color: rgb(var(--gy-ink));
 }
 
-.gy-pdp__size-guide {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 3;
-}
-
-.gy-pdp__size-guide > summary {
-  list-style: none;
-  cursor: pointer;
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgb(var(--gy-ink-muted));
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
-}
-
-.gy-pdp__size-guide > summary::-webkit-details-marker { display: none; }
-
-.gy-pdp__size-guide-body {
-  position: absolute;
-  right: 0;
-  top: 2rem;
-  z-index: 4;
-  width: min(24rem, 78vw);
-  padding: var(--gy-space-md);
-  border: 1px solid rgb(var(--gy-ink) / 0.08);
-  border-radius: var(--gy-radius-md);
-  background-color: rgb(var(--gy-canvas));
-  box-shadow: var(--gy-elevation-2);
-  font-size: 0.85rem;
-  line-height: 1.6;
-}
-
 /* Quantity + purchase */
 .gy-pdp__quantity {
   margin-bottom: var(--gy-space-md);
 }
 
 .gy-pdp .quantity {
-  border-radius: var(--gy-radius-pill);
-  border: 1px solid rgb(var(--gy-ink) / 0.18);
+  border-radius: 10px;
+  border: 1px solid rgb(var(--gy-ink) / 0.16);
+  background-color: rgb(var(--gy-canvas-warm));
   overflow: hidden;
   width: 9rem;
+}
+
+.gy-pdp .quantity__button {
+  transition: background-color 180ms var(--gy-ease), transform 180ms var(--gy-ease);
+}
+
+.gy-pdp .quantity__button:hover {
+  background-color: rgb(var(--gy-lavender) / 0.4);
+}
+
+.gy-pdp .quantity__button:active {
+  transform: scale(0.92);
 }
 
 .gy-pdp .quantity::before,
@@ -402,10 +663,41 @@
 }
 
 .gy-pdp__buy .product-form__submit {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
   background-color: rgb(var(--gy-ink));
   color: rgb(var(--gy-canvas));
   box-shadow: var(--gy-elevation-1);
-  transition: transform var(--gy-duration-fast) var(--gy-ease), box-shadow var(--gy-duration-fast) var(--gy-ease);
+  transition:
+    transform 200ms var(--gy-ease),
+    box-shadow 200ms var(--gy-ease),
+    background-color 200ms var(--gy-ease);
+}
+
+/* One slow light sweep on hover — no looping shimmer. */
+.gy-pdp__buy .product-form__submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  translate: -110% 0;
+  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 0.2) 50%, transparent 80%);
+  transition: translate 900ms var(--gy-ease-out);
+  pointer-events: none;
+}
+
+.gy-pdp__buy .product-form__submit:not([disabled]):hover::after {
+  translate: 110% 0;
+}
+
+.gy-pdp__buy .product-form__submit:not([disabled]):active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Dawn adds .loading while the add-to-cart request is in flight. */
+.gy-pdp__buy .product-form__submit.loading {
+  opacity: 0.8;
+  cursor: progress;
 }
 
 .gy-pdp__buy .product-form__submit:not([disabled]):hover {
@@ -415,6 +707,9 @@
 
 .gy-pdp__buy .product-form__submit[disabled] {
   opacity: 0.45;
+  background-color: rgb(var(--gy-ink) / 0.55);
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .gy-pdp__trust {
@@ -577,8 +872,17 @@
 .gy-pdp__sticky-button {
   flex: 0 0 auto;
   min-height: 3rem;
-  padding-inline: 1.4rem;
+  padding-inline: 1.5rem;
+  border-radius: 12px;
   font-size: 0.68rem;
+  transition: transform 180ms var(--gy-ease);
+}
+
+.gy-pdp__sticky-button:active { transform: scale(0.97); }
+
+.gy-pdp__sticky-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media screen and (min-width: 750px) {
@@ -612,8 +916,19 @@
   .gy-pdp__sticky,
   .gy-pdp__accordion-icon::before,
   .gy-pdp__accordion-icon::after,
-  .gy-pdp__buy .product-form__submit {
+  .gy-pdp__buy .product-form__submit,
+  .gy-pdp__buy .product-form__submit::after,
+  .gy-pdp .product-form__input label,
+  .gy-pdp .quantity__button,
+  .gy-pdp__drawer-panel,
+  .gy-pdp__drawer-scrim {
     transition: none !important;
     transform: none !important;
+    animation: none !important;
+  }
+
+  .gy-pdp__price-block.is-updating .gy-pdp__price,
+  .gy-pdp__price-block.is-updating .gy-pdp__price-meta {
+    animation: none !important;
   }
 }

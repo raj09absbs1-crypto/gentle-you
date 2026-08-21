@@ -76,7 +76,7 @@
                 {%- render 'price', product: product, use_variant: true, show_badges: false, price_class: 'price--large' -%}
               </div>
 
-              <div class="gy-pdp__price-meta">
+              <div class="gy-pdp__price-meta" id="PriceMeta-{{ section.id }}">
                 {%- if compare_at > current_price -%}
                   <span class="gy-pdp__compare">
                     <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
@@ -120,12 +120,23 @@
 
           {%- when 'variant_picker' -%}
             <div class="gy-pdp__variants">
-              {%- if block.settings.show_size_guide and section.settings.size_guide_text != blank -%}
-                <details class="gy-pdp__size-guide" data-gy-size-guide>
-                  <summary>{{ section.settings.size_guide_label | default: 'Size guide' | escape }}</summary>
-                  <div class="gy-pdp__size-guide-body rte">{{ section.settings.size_guide_text }}</div>
-                </details>
-              {%- endif -%}
+              <div class="gy-pdp__variants-head">
+                <div>
+                  {%- if block.settings.heading != blank -%}
+                    <p class="gy-pdp__variants-title">{{ block.settings.heading | escape }}</p>
+                  {%- endif -%}
+                  {%- if block.settings.subheading != blank -%}
+                    <p class="gy-pdp__variants-sub">{{ block.settings.subheading | escape }}</p>
+                  {%- endif -%}
+                </div>
+
+                {%- if block.settings.show_size_guide and section.settings.size_guide_text != blank -%}
+                  <button class="gy-pdp__size-link" type="button" data-gy-size-guide-open aria-haspopup="dialog">
+                    {{ section.settings.size_guide_label | default: 'Size guide' | escape }}
+                    <span aria-hidden="true">&rarr;</span>
+                  </button>
+                {%- endif -%}
+              </div>
 
               {%- render 'product-variant-picker',
                 product: product,
@@ -186,6 +197,36 @@
               -%}
             </div>
 
+          {%- when 'highlights' -%}
+            {%- comment -%}
+              Editorial presentation of the product's own Shopify description.
+              The lines below are the merchant's own text split on the bullet
+              glyphs already used in Admin — nothing is added or rewritten.
+            {%- endcomment -%}
+            {%- liquid
+              assign source = product.description | replace: '<br>', '✔' | replace: '<br/>', '✔' | replace: '<br />', '✔'
+              assign source = source | replace: '</p>', '✔' | replace: '</li>', '✔'
+              assign source = source | strip_html | replace: '&nbsp;', ' ' | replace: '&amp;', '&'
+              assign source = source | replace: 'Product Description:', '' | replace: 'Product description:', ''
+              assign source = source | replace: '✓', '✔' | replace: '•', '✔'
+              assign lines = source | split: '✔'
+            -%}
+            {%- assign printed = 0 -%}
+            <div class="gy-pdp__highlights" {{ block.shopify_attributes }}>
+              {%- if block.settings.heading != blank -%}
+                <p class="gy-pdp__highlights-heading">{{ block.settings.heading | escape }}</p>
+              {%- endif -%}
+              <ul role="list">
+                {%- for line in lines -%}
+                  {%- assign clean = line | strip -%}
+                  {%- if clean != blank and clean.size > 2 and printed < block.settings.max_lines -%}
+                    <li>{{ clean }}</li>
+                    {%- assign printed = printed | plus: 1 -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            </div>
+
           {%- when 'short_description' -%}
             {%- liquid
               assign words = block.settings.words | default: 32
@@ -226,6 +267,19 @@
       {%- endfor -%}
     </div>
   </div>
+
+  {%- if section.settings.size_guide_text != blank -%}
+    <div class="gy-pdp__drawer" data-gy-size-guide-drawer hidden>
+      <div class="gy-pdp__drawer-scrim" data-gy-size-guide-close></div>
+      <aside class="gy-pdp__drawer-panel" role="dialog" aria-modal="true" aria-label="{{ section.settings.size_guide_label | default: 'Size guide' | escape }}">
+        <header class="gy-pdp__drawer-head">
+          <p class="gy-pdp__drawer-title">{{ section.settings.size_guide_label | default: 'Size guide' | escape }}</p>
+          <button class="gy-pdp__drawer-close" type="button" data-gy-size-guide-close aria-label="{{ 'accessibility.close' | t }}">&times;</button>
+        </header>
+        <div class="gy-pdp__drawer-body rte">{{ section.settings.size_guide_text }}</div>
+      </aside>
+    </div>
+  {%- endif -%}
 
   {%- if section.settings.enable_sticky_bar -%}
     <div class="gy-pdp__sticky" data-gy-sticky-bar hidden>
@@ -285,6 +339,14 @@
       ]
     },
     {
+      "type": "highlights", "name": "Highlights", "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "Lists the product's own Shopify description, split on the bullets already used in Admin. Nothing is written by the theme." },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Why you'll love it" },
+        { "type": "range", "id": "max_lines", "min": 2, "max": 10, "step": 1, "label": "Maximum lines", "default": 6 }
+      ]
+    },
+    {
       "type": "short_description", "name": "Short description", "limit": 1,
       "settings": [
         { "type": "paragraph", "content": "Uses the product's own Shopify description, shortened." },
@@ -302,7 +364,9 @@
           "type": "select", "id": "swatch_shape", "label": "Swatch shape", "default": "circle",
           "options": [ { "value": "circle", "label": "Circle" }, { "value": "square", "label": "Square" }, { "value": "none", "label": "None" } ]
         },
-        { "type": "checkbox", "id": "show_size_guide", "label": "Show size guide link", "default": true }
+        { "type": "checkbox", "id": "show_size_guide", "label": "Show size guide link", "default": true },
+        { "type": "text", "id": "heading", "label": "Heading above options", "default": "Find your fit." },
+        { "type": "text", "id": "subheading", "label": "Small line under the heading", "default": "Choose your size, cup & colour." }
       ]
     },
     { "type": "quantity_selector", "name": "Quantity selector", "limit": 1 },

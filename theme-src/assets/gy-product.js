@@ -153,8 +153,81 @@
     }
   }
 
+  /* ---- Size guide drawer ---- */
+
+  function initSizeGuide(scope) {
+    const root = (scope || document).querySelector('[data-gy-size-guide-drawer]');
+    if (!root || root.dataset.gyReady === 'true') return;
+    root.dataset.gyReady = 'true';
+
+    const panel = root.querySelector('.gy-pdp__drawer-panel');
+    let lastFocused = null;
+
+    const open = (trigger) => {
+      lastFocused = trigger || document.activeElement;
+      root.hidden = false;
+      requestAnimationFrame(() => root.classList.add('is-open'));
+      document.body.classList.add('gy-no-scroll');
+      panel?.querySelector('button')?.focus();
+      document.addEventListener('keydown', onKey);
+    };
+
+    const close = () => {
+      root.classList.remove('is-open');
+      document.body.classList.remove('gy-no-scroll');
+      document.removeEventListener('keydown', onKey);
+      const done = () => { root.hidden = true; };
+      if (reduce.matches) done();
+      else window.setTimeout(done, 320);
+      lastFocused?.focus();
+    };
+
+    function onKey(event) {
+      if (event.key === 'Escape') close();
+    }
+
+    document.querySelectorAll('[data-gy-size-guide-open]').forEach((btn) => {
+      btn.addEventListener('click', () => open(btn));
+    });
+    root.querySelectorAll('[data-gy-size-guide-close]').forEach((btn) => {
+      btn.addEventListener('click', close);
+    });
+  }
+
+  /* ---- Compare-at price and saving follow the selected variant ----
+     Dawn refreshes the price node itself; the compare-at and saving line are
+     GentleYou markup, so they are re-read from the very same section HTML Dawn
+     already fetched. No product data is stored or computed in JavaScript. */
+
+  function initPriceSync(scope) {
+    const info = (scope || document).querySelector('product-info');
+    if (!info || info.dataset.gyPriceSync === 'true' || typeof subscribe !== 'function') return;
+    info.dataset.gyPriceSync = 'true';
+
+    subscribe('variant-change', (event) => {
+      const sectionId = event?.data?.sectionId;
+      const html = event?.data?.html;
+      if (!sectionId || !html) return;
+
+      const meta = info.querySelector(`#PriceMeta-${info.dataset.section}`);
+      const source = html.getElementById?.(`PriceMeta-${sectionId}`);
+      if (meta && source) meta.innerHTML = source.innerHTML;
+
+      // A quiet fade rather than a ticker; the figures themselves come from Liquid.
+      if (reduce.matches) return;
+      const priceBlock = info.querySelector('.gy-pdp__price-block');
+      if (!priceBlock) return;
+      priceBlock.classList.remove('is-updating');
+      void priceBlock.offsetWidth;
+      priceBlock.classList.add('is-updating');
+      window.setTimeout(() => priceBlock.classList.remove('is-updating'), 500);
+    });
+  }
+
   function init(scope) {
     initStickyBar(scope);
+    initSizeGuide(scope);
+    initPriceSync(scope);
     if (reduce.matches) {
       document.querySelectorAll('.gy-pdp [data-gy-reveal]').forEach((el) => el.classList.add('is-static'));
     }
