@@ -124,12 +124,12 @@
   top: 46%;
   translate: -50% -50%;
   font-family: var(--gy-font-heading);
-  font-size: clamp(7rem, 21vw, 20rem);
+  font-size: clamp(6rem, 15vw, 14rem);
   font-weight: 300;
   letter-spacing: -0.05em;
   line-height: 1;
   white-space: nowrap;
-  color: rgb(var(--gy-ink) / 0.03);
+  color: rgb(var(--gy-ink) / 0.02);
   pointer-events: none;
   user-select: none;
   overflow: hidden;
@@ -179,13 +179,23 @@
 }
 
 .gy-hero__heading {
-  margin: 0 0 var(--gy-space-lg);
+  margin: 0 0 var(--gy-space-xl);
+  max-width: 20ch;
   font-family: var(--gy-font-heading);
   font-size: var(--gy-text-heading);
   font-weight: 300;
-  line-height: 1.06;
-  letter-spacing: var(--gy-tracking-tight);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
   text-wrap: balance;
+}
+
+/* Merchant line breaks are honoured, so the campaign statement sits exactly
+   where it was written rather than wherever the column happens to wrap. The
+   headline is sized from the column for the same reason. */
+@supports (font-size: 1cqw) {
+  .gy-hero__heading {
+    font-size: clamp(2.1rem, 9.4cqw, 3.6rem);
+  }
 }
 
 .gy-hero__heading em {
@@ -200,9 +210,16 @@
 
 .gy-hero__price-block {
   position: relative;
-  margin-block: var(--gy-space-lg) var(--gy-space-md);
+  margin-block: var(--gy-space-lg) var(--gy-space-lg);
   padding-top: var(--gy-space-md);
-  border-top: 1px solid rgb(var(--gy-ink) / 0.12);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.1);
+}
+
+.gy-hero__price-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--gy-space-xs) var(--gy-space-lg);
 }
 
 .gy-hero__price {
@@ -219,7 +236,7 @@
 
 @supports (font-size: 1cqw) {
   .gy-hero__price {
-    font-size: clamp(3.25rem, 19cqw, 7.5rem);
+    font-size: clamp(3.5rem, 21cqw, 8rem);
   }
 }
 
@@ -270,10 +287,10 @@
 
 .gy-hero__price-meta {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   flex-wrap: wrap;
-  gap: var(--gy-space-sm) var(--gy-space-md);
-  margin-top: var(--gy-space-sm);
+  gap: var(--gy-space-2xs) var(--gy-space-md);
+  padding-bottom: 0.35em;
 }
 
 .gy-hero__compare {
@@ -293,11 +310,12 @@
   border-radius: var(--gy-radius-pill);
   background-color: rgb(var(--gy-lavender) / 0.5);
   color: rgb(var(--gy-ink));
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   white-space: nowrap;
+  translate: 0 -0.15em;
 }
 
 .gy-hero__status {
@@ -440,7 +458,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-block: var(--gy-space-md);
+  padding-block: var(--gy-space-lg);
   perspective: 1400px;
 }
 
@@ -714,8 +732,8 @@
 
 @media screen and (min-width: 990px) {
   .gy-hero__inner {
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    gap: clamp(3rem, 6vw, 7rem);
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    gap: clamp(3.5rem, 7vw, 8rem);
   }
 
   /* Desktop: editorial split — copy left, campaign plate right. */
@@ -733,7 +751,7 @@
   .gy-hero--center .gy-hero__media { order: 1; }
 
   .gy-hero__plate {
-    max-width: 36rem;
+    max-width: 40rem;
   }
 
   .gy-hero__watermark {
@@ -781,5 +799,74 @@
   .gy-hero__product-image {
     transition: none !important;
     transform: none !important;
+  }
+}
+
+/* ---- Trust row -----------------------------------------------------------
+   Purchase reassurance under the CTA. Deliberately quiet: hairline icons,
+   small caps, generous spacing, no colour badges. Every line is merchant text
+   from a Theme Editor block, so no claim is baked into the theme. It sits in
+   the copy column, so two calm columns read better than four cramped ones;
+   the centred layout, which spans the full width, gets a single row. */
+
+.gy-hero__trust {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gy-space-md) var(--gy-space-lg);
+  margin: var(--gy-space-xl) 0 0;
+  padding-top: var(--gy-space-md);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.08);
+  list-style: none;
+}
+
+.gy-hero__trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-hero__trust-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 50%;
+  background-color: rgb(var(--gy-lavender) / 0.45);
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-hero__trust-icon svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.gy-hero__trust-text {
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  line-height: 1.45;
+}
+
+@media screen and (max-width: 749px) {
+  .gy-hero__trust {
+    gap: var(--gy-space-md) var(--gy-space-sm);
+    margin-top: var(--gy-space-lg);
+  }
+
+  .gy-hero__trust-text {
+    font-size: 0.62rem;
+    letter-spacing: 0.11em;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .gy-hero--center .gy-hero__trust {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    justify-items: center;
   }
 }

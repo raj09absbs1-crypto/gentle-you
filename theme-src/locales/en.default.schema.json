@@ -369,6 +369,32 @@
       "presets": {
         "name": "Hero product"
       },
+      "blocks": {
+        "trust": {
+          "name": "Trust point",
+          "settings": {
+            "icon": {
+              "label": "Icon",
+              "options__1": {
+                "label": "Package"
+              },
+              "options__2": {
+                "label": "Exchange"
+              },
+              "options__3": {
+                "label": "Shield"
+              },
+              "options__4": {
+                "label": "Delivery"
+              }
+            },
+            "text": {
+              "label": "Text",
+              "info": "Keep it to what the store actually offers — this appears as a promise to the customer."
+            }
+          }
+        }
+      },
       "settings": {
         "enable_section": {
           "label": "Enable hero section"
@@ -382,6 +408,10 @@
         },
         "show_product_title": {
           "label": "Show product name under the image"
+        },
+        "product_caption": {
+          "label": "Caption override",
+          "info": "Presentation text only. Leave blank to show the Shopify product title. This never changes the product itself."
         },
         "show_compare_at_price": {
           "label": "Show compare-at price"

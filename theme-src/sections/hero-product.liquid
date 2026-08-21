@@ -137,7 +137,13 @@
         </div>
 
         {%- if product != blank and section.settings.show_product_title -%}
-          <p class="gy-hero__product-title"><span>{{ product.title }}</span></p>
+          {%- liquid
+            assign caption = section.settings.product_caption
+            if caption == blank
+              assign caption = product.title
+            endif
+          -%}
+          <p class="gy-hero__product-title"><span>{{ caption | escape }}</span></p>
         {%- endif -%}
       </div>
 
@@ -146,34 +152,36 @@
           <p class="gy-hero__eyebrow">{{ section.settings.eyebrow | escape }}</p>
         {%- endif -%}
 
-        <h2 class="gy-hero__heading">{{ heading }}</h2>
+        <h2 class="gy-hero__heading">{{ heading | escape | newline_to_br }}</h2>
 
         {%- if product != blank -%}
           <div class="gy-hero__price-block">
-            <div class="gy-hero__price">
-              {%- render 'price', product: product, use_variant: true, price_class: 'gy-hero__price-render' -%}
-            </div>
-
-            {%- if show_compare or show_discount -%}
-              <div class="gy-hero__price-meta">
-                {%- if show_compare -%}
-                  <span class="gy-hero__compare">
-                    <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
-                    {%- if settings.currency_code_enabled -%}
-                      {{ compare_at | money_with_currency }}
-                    {%- else -%}
-                      {{ compare_at | money }}
-                    {%- endif -%}
-                  </span>
-                {%- endif -%}
-
-                {%- if show_discount -%}
-                  <span class="gy-hero__discount">
-                    {{ 'sections.hero_product.discount_html' | t: percent: discount_percent }}
-                  </span>
-                {%- endif -%}
+            <div class="gy-hero__price-row">
+              <div class="gy-hero__price">
+                {%- render 'price', product: product, use_variant: true, price_class: 'gy-hero__price-render' -%}
               </div>
-            {%- endif -%}
+
+              {%- if show_compare or show_discount -%}
+                <div class="gy-hero__price-meta">
+                  {%- if show_compare -%}
+                    <span class="gy-hero__compare">
+                      <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                      {%- if settings.currency_code_enabled -%}
+                        {{ compare_at | money_with_currency }}
+                      {%- else -%}
+                        {{ compare_at | money }}
+                      {%- endif -%}
+                    </span>
+                  {%- endif -%}
+
+                  {%- if show_discount -%}
+                    <span class="gy-hero__discount">
+                      {{ 'sections.hero_product.discount_html' | t: percent: discount_percent }}
+                    </span>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
           </div>
 
           <p class="gy-hero__status{% unless product.available %} gy-hero__status--sold-out{% endunless %}">
@@ -208,6 +216,30 @@
             <p class="gy-hero__secondary">{{ section.settings.secondary_text | escape }}</p>
           {%- endif -%}
         </div>
+
+        {%- if section.blocks.size > 0 -%}
+          <ul class="gy-hero__trust" role="list">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'trust' and block.settings.text != blank -%}
+                <li class="gy-hero__trust-item" {{ block.shopify_attributes }}>
+                  <span class="gy-hero__trust-icon" aria-hidden="true">
+                    {%- case block.settings.icon -%}
+                      {%- when 'package' -%}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8.5v7a1 1 0 0 1-.55.9l-7.5 3.9a2 2 0 0 1-1.9 0l-7.5-3.9a1 1 0 0 1-.55-.9v-7"/><path d="M3.2 7.6 11.05 3.7a2 2 0 0 1 1.9 0l7.85 3.9-8.35 4.2a1 1 0 0 1-.9 0z"/><path d="M12 11.9V20"/></svg>
+                      {%- when 'exchange' -%}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 0 1-13.3 6"/><path d="M4 12a8 8 0 0 1 13.3-6"/><path d="M17.3 2.6V6h-3.4"/><path d="M6.7 21.4V18h3.4"/></svg>
+                      {%- when 'truck' -%}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5h11v10H2z"/><path d="M13 9.5h4l3 3.2v3.8h-7z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>
+                      {%- else -%}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 4.8 5.6v5.5c0 4.2 2.9 7.9 7.2 9.1 4.3-1.2 7.2-4.9 7.2-9.1V5.6z"/><path d="m9 12 2.1 2.2L15.2 10"/></svg>
+                    {%- endcase -%}
+                  </span>
+                  <span class="gy-hero__trust-text">{{ block.settings.text | escape }}</span>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
       </div>
     </div>
   </div>
@@ -242,6 +274,12 @@
       "default": true
     },
     {
+      "type": "text",
+      "id": "product_caption",
+      "label": "t:sections.hero-product.settings.product_caption.label",
+      "info": "t:sections.hero-product.settings.product_caption.info"
+    },
+    {
       "type": "checkbox",
       "id": "show_compare_at_price",
       "label": "t:sections.hero-product.settings.show_compare_at_price.label",
@@ -264,7 +302,7 @@
       "default": "Soft. Confident. You."
     },
     {
-      "type": "text",
+      "type": "textarea",
       "id": "heading",
       "label": "t:sections.hero-product.settings.heading.label",
       "info": "t:sections.hero-product.settings.heading.info"
@@ -301,7 +339,7 @@
       "type": "checkbox",
       "id": "show_watermark",
       "label": "t:sections.hero-product.settings.show_watermark.label",
-      "default": true
+      "default": false
     },
     {
       "type": "text",
@@ -378,6 +416,46 @@
       "default": 72
     }
   ],
+  "blocks": [
+    {
+      "type": "trust",
+      "name": "t:sections.hero-product.blocks.trust.name",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "t:sections.hero-product.blocks.trust.settings.icon.label",
+          "options": [
+            {
+              "value": "package",
+              "label": "t:sections.hero-product.blocks.trust.settings.icon.options__1.label"
+            },
+            {
+              "value": "exchange",
+              "label": "t:sections.hero-product.blocks.trust.settings.icon.options__2.label"
+            },
+            {
+              "value": "shield",
+              "label": "t:sections.hero-product.blocks.trust.settings.icon.options__3.label"
+            },
+            {
+              "value": "truck",
+              "label": "t:sections.hero-product.blocks.trust.settings.icon.options__4.label"
+            }
+          ],
+          "default": "package"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "t:sections.hero-product.blocks.trust.settings.text.label",
+          "info": "t:sections.hero-product.blocks.trust.settings.text.info",
+          "default": "Cash on delivery"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 4,
   "presets": [
     {
       "name": "t:sections.hero-product.presets.name"
