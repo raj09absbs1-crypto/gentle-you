@@ -415,6 +415,13 @@
         "layout_header": {
           "content": "Layout"
         },
+        "show_watermark": {
+          "label": "Show background brand word"
+        },
+        "watermark_text": {
+          "label": "Background brand word",
+          "info": "Rendered very faintly behind the hero for depth. Leave blank to hide."
+        },
         "background_image": {
           "label": "Background image",
           "info": "Optional. Sits behind the hero at low opacity."

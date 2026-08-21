@@ -92,42 +92,52 @@
       >
     {%- endif -%}
 
+    {%- if section.settings.show_watermark and section.settings.watermark_text != blank -%}
+      <span class="gy-hero__watermark" aria-hidden="true">{{ section.settings.watermark_text | escape }}</span>
+    {%- endif -%}
+
     <div class="gy-hero__inner">
       <div class="gy-hero__media">
         <div class="gy-hero__stage" data-gy-stage>
+          <span class="gy-hero__glow" aria-hidden="true"></span>
+          <span class="gy-hero__panel" aria-hidden="true"></span>
+
           <div
-            class="gy-hero__product"
+            class="gy-hero__plate"
             data-gy-product
             {% if section.settings.enable_float %}data-gy-float{% endif %}
           >
-            {%- if product.featured_image -%}
-              <img
-                class="gy-hero__product-image"
-                src="{{ product.featured_image | image_url: width: 1400 }}"
-                srcset="
-                  {{ product.featured_image | image_url: width: 500 }} 500w,
-                  {{ product.featured_image | image_url: width: 800 }} 800w,
-                  {{ product.featured_image | image_url: width: 1100 }} 1100w,
-                  {{ product.featured_image | image_url: width: 1400 }} 1400w
-                "
-                sizes="(min-width: 990px) 40rem, (min-width: 750px) 70vw, 92vw"
-                width="{{ product.featured_image.width }}"
-                height="{{ product.featured_image.height }}"
-                alt="{{ product.featured_image.alt | escape | default: product.title | escape }}"
-                loading="eager"
-                fetchpriority="high"
-                decoding="async"
-              >
-            {%- else -%}
-              <div class="gy-hero__product-placeholder">
-                {{ 'product-apparel-2' | placeholder_svg_tag }}
-              </div>
-            {%- endif -%}
+            <div class="gy-hero__plate-inner">
+              {%- if product.featured_image -%}
+                <img
+                  class="gy-hero__product-image"
+                  src="{{ product.featured_image | image_url: width: 1400 }}"
+                  srcset="
+                    {{ product.featured_image | image_url: width: 500 }} 500w,
+                    {{ product.featured_image | image_url: width: 800 }} 800w,
+                    {{ product.featured_image | image_url: width: 1100 }} 1100w,
+                    {{ product.featured_image | image_url: width: 1400 }} 1400w
+                  "
+                  sizes="(min-width: 990px) 36rem, (min-width: 750px) 70vw, 92vw"
+                  width="{{ product.featured_image.width }}"
+                  height="{{ product.featured_image.height }}"
+                  alt="{{ product.featured_image.alt | escape | default: product.title | escape }}"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                >
+              {%- else -%}
+                <div class="gy-hero__product-placeholder">
+                  {{ 'product-apparel-2' | placeholder_svg_tag }}
+                </div>
+              {%- endif -%}
+              <span class="gy-hero__sheen" aria-hidden="true"></span>
+            </div>
           </div>
         </div>
 
         {%- if product != blank and section.settings.show_product_title -%}
-          <p class="gy-hero__product-title">{{ product.title }}</p>
+          <p class="gy-hero__product-title"><span>{{ product.title }}</span></p>
         {%- endif -%}
       </div>
 
@@ -251,7 +261,7 @@
       "type": "text",
       "id": "eyebrow",
       "label": "t:sections.hero-product.settings.eyebrow.label",
-      "default": "Soft on you"
+      "default": "Soft. Confident. You."
     },
     {
       "type": "text",
@@ -286,6 +296,19 @@
     {
       "type": "header",
       "content": "t:sections.hero-product.settings.layout_header.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_watermark",
+      "label": "t:sections.hero-product.settings.show_watermark.label",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "watermark_text",
+      "label": "t:sections.hero-product.settings.watermark_text.label",
+      "info": "t:sections.hero-product.settings.watermark_text.info",
+      "default": "GentleYou"
     },
     {
       "type": "image_picker",

@@ -14,6 +14,7 @@
       this.root = root;
       this.stage = root.querySelector('[data-gy-stage]');
       this.product = root.querySelector('[data-gy-product]');
+      this.image = root.querySelector('.gy-hero__product-image');
       this.backdrop = root.querySelector('[data-gy-parallax]');
       this.maxTilt = parseFloat(root.dataset.gyTilt || '5');
       this.frame = null;
@@ -67,15 +68,28 @@
         const bounds = this.stage.getBoundingClientRect();
         if (!bounds.width || !bounds.height) return;
 
-        const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-        const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+        const rx = (event.clientX - bounds.left) / bounds.width;
+        const ry = (event.clientY - bounds.top) / bounds.height;
+        const x = rx - 0.5;
+        const y = ry - 0.5;
 
         this.product.style.transform =
-          'perspective(1200px) rotateY(' +
+          'perspective(1400px) rotateY(' +
           (x * this.maxTilt).toFixed(2) +
           'deg) rotateX(' +
           (-y * this.maxTilt).toFixed(2) +
           'deg) translateZ(0)';
+
+        // Sheen follows the pointer across the plate.
+        this.product.style.setProperty('--gy-px', (rx * 100).toFixed(1) + '%');
+        this.product.style.setProperty('--gy-py', (ry * 100).toFixed(1) + '%');
+
+        // The photograph drifts a few pixels against the frame, which reads as
+        // depth between the glass and the print behind it.
+        if (this.image) {
+          this.image.style.transform =
+            'scale(1.03) translate3d(' + (-x * 8).toFixed(2) + 'px, ' + (-y * 8).toFixed(2) + 'px, 0)';
+        }
       });
     }
 
@@ -85,6 +99,7 @@
         this.frame = null;
       }
       this.product.style.transform = '';
+      if (this.image) this.image.style.transform = '';
     }
 
     onScroll() {

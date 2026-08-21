@@ -66,6 +66,17 @@
   --gy-duration-slow: 900ms;
 }
 
+/* Additional tokens introduced with the hero polish. */
+:root {
+  --gy-blush-mist: 250 240 238;
+  --gy-lavender-mist: 243 238 250;
+  --gy-frame: 255 255 255;
+  --gy-elevation-plate:
+    0 2px 4px rgb(var(--gy-ink) / 0.04),
+    0 24px 48px -24px rgb(var(--gy-ink) / 0.18),
+    0 64px 120px -60px rgb(var(--gy-blush-deep) / 0.6);
+}
+
 /* ==========================================================================
    Hero — premium product hero (sections/hero-product.liquid)
    ========================================================================== */
@@ -79,19 +90,20 @@
   font-family: var(--gy-font-body);
 }
 
-.gy-hero--has-bg-image {
-  background-color: rgb(var(--gy-canvas-warm));
-}
+/* ---- Atmosphere ---------------------------------------------------------
+   Three quiet layers: a warm vertical wash, two wide colour fields, and a
+   grain-free vignette. No hard gradient edges, nothing saturated. */
 
-/* Layered background: warm canvas + two soft colour fields. Purely decorative. */
 .gy-hero__backdrop {
   position: absolute;
-  inset: 0;
+  inset: -10% -5%;
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(60% 55% at 78% 28%, rgb(var(--gy-blush) / 0.85) 0%, rgb(var(--gy-blush) / 0) 70%),
-    radial-gradient(52% 60% at 12% 82%, rgb(var(--gy-lavender) / 0.8) 0%, rgb(var(--gy-lavender) / 0) 72%);
+    radial-gradient(46% 44% at 76% 18%, rgb(var(--gy-blush) / 0.75) 0%, rgb(var(--gy-blush) / 0) 72%),
+    radial-gradient(44% 48% at 10% 78%, rgb(var(--gy-lavender) / 0.7) 0%, rgb(var(--gy-lavender) / 0) 74%),
+    linear-gradient(180deg, rgb(var(--gy-canvas)) 0%, rgb(var(--gy-blush-mist)) 55%, rgb(var(--gy-lavender-mist)) 100%);
+  will-change: transform;
 }
 
 .gy-hero__bg-image {
@@ -101,7 +113,26 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.28;
+  opacity: 0.2;
+}
+
+/* Oversized brand word, barely there — depth without competing with the product. */
+.gy-hero__watermark {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 46%;
+  translate: -50% -50%;
+  font-family: var(--gy-font-heading);
+  font-size: clamp(7rem, 21vw, 20rem);
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  white-space: nowrap;
+  color: rgb(var(--gy-ink) / 0.03);
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
 }
 
 .gy-hero__inner {
@@ -116,20 +147,22 @@
   padding-inline: clamp(1.25rem, 4vw, 4rem);
 }
 
-.gy-hero__media {
-  order: 1;
-}
+.gy-hero__media { order: 1; }
 
 .gy-hero__content {
   order: 2;
-  max-width: 34rem;
+  container-type: inline-size;
+  container-name: gy-hero-content;
+  max-width: 36rem;
 }
 
 /* ---- Content ---- */
 
 .gy-hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--gy-space-sm);
   margin: 0 0 var(--gy-space-md);
-  font-family: var(--gy-font-body);
   font-size: var(--gy-text-eyebrow);
   font-weight: 500;
   letter-spacing: var(--gy-tracking-eyebrow);
@@ -137,47 +170,69 @@
   color: rgb(var(--gy-ink-muted));
 }
 
+.gy-hero__eyebrow::after {
+  content: '';
+  flex: 0 0 auto;
+  width: clamp(1.5rem, 4vw, 3rem);
+  height: 1px;
+  background-color: rgb(var(--gy-ink) / 0.22);
+}
+
 .gy-hero__heading {
-  margin: 0 0 var(--gy-space-md);
+  margin: 0 0 var(--gy-space-lg);
   font-family: var(--gy-font-heading);
   font-size: var(--gy-text-heading);
-  font-weight: 400;
-  line-height: 1.02;
+  font-weight: 300;
+  line-height: 1.06;
   letter-spacing: var(--gy-tracking-tight);
   text-wrap: balance;
 }
 
-.gy-hero__price-block {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gy-space-2xs);
-  margin-block: var(--gy-space-lg);
+.gy-hero__heading em {
+  font-style: italic;
+  font-weight: 300;
 }
 
-/* The price is the loudest element on the page — set in the heading face,
-   optically tightened, with the currency symbol scaled back. */
+/* ---- Price ---------------------------------------------------------------
+   Sized from the content column, not the viewport, so long money formats
+   ("Rs. 1,299.00") stay on one line at every breakpoint. Shopify's own money
+   output is never reformatted here. */
+
+.gy-hero__price-block {
+  position: relative;
+  margin-block: var(--gy-space-lg) var(--gy-space-md);
+  padding-top: var(--gy-space-md);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.12);
+}
+
 .gy-hero__price {
   display: flex;
   align-items: baseline;
-  gap: var(--gy-space-xs);
   font-family: var(--gy-font-heading);
   font-size: var(--gy-text-price);
   font-weight: 300;
-  line-height: 0.84;
-  letter-spacing: -0.045em;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
   color: rgb(var(--gy-ink));
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+@supports (font-size: 1cqw) {
+  .gy-hero__price {
+    font-size: clamp(3.25rem, 19cqw, 7.5rem);
+  }
 }
 
 .gy-hero__price .price {
   font-size: inherit;
   line-height: inherit;
   letter-spacing: inherit;
+  color: inherit;
 }
 
-/* Re-lay-out Dawn's price markup inside the hero without editing component-price.css.
-   Dawn's own regular/sale visibility rules are mirrored here so only one figure
-   ever shows — the sale price when the product is on sale, the regular price
-   otherwise. */
+/* Re-lay-out Dawn's price markup inside the hero without editing
+   component-price.css. Dawn's regular/sale visibility rules are mirrored so
+   exactly one figure ever shows. */
 .gy-hero__price .price__container {
   display: flex;
   align-items: baseline;
@@ -198,15 +253,15 @@
   display: none;
 }
 
-.gy-hero__price .price-item--regular,
-.gy-hero__price .price-item--sale {
+.gy-hero__price .price-item {
+  margin: 0;
   font-size: inherit;
   line-height: inherit;
   letter-spacing: inherit;
 }
 
-/* Dawn renders the compare-at inline; the hero shows its own, so hide the
-   duplicate and keep the sale figure at full scale. */
+/* Dawn prints its own compare-at inside the sale block; the hero shows a
+   styled one below, so the duplicate and Dawn's badges are hidden. */
 .gy-hero__price .price__sale s.price-item--regular,
 .gy-hero__price .price__badge-sale,
 .gy-hero__price .price__badge-sold-out {
@@ -217,8 +272,8 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--gy-space-sm);
-  min-height: 1.75rem;
+  gap: var(--gy-space-sm) var(--gy-space-md);
+  margin-top: var(--gy-space-sm);
 }
 
 .gy-hero__compare {
@@ -227,19 +282,20 @@
   color: rgb(var(--gy-ink-muted));
   text-decoration: line-through;
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.1em;
+  text-underline-offset: 0.12em;
 }
 
 .gy-hero__discount {
   display: inline-flex;
   align-items: center;
-  padding: 0.4em 0.85em;
+  padding: 0.5em 0.9em;
+  border: 1px solid rgb(var(--gy-lavender-deep) / 0.45);
   border-radius: var(--gy-radius-pill);
-  background-color: rgb(var(--gy-lavender) / 0.85);
+  background-color: rgb(var(--gy-lavender) / 0.5);
   color: rgb(var(--gy-ink));
-  font-size: var(--gy-text-eyebrow);
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -247,8 +303,8 @@
 .gy-hero__status {
   display: inline-flex;
   align-items: center;
-  gap: var(--gy-space-2xs);
-  margin-bottom: var(--gy-space-md);
+  gap: 0.55em;
+  margin: 0 0 var(--gy-space-lg);
   font-size: var(--gy-text-eyebrow);
   font-weight: 500;
   letter-spacing: 0.16em;
@@ -262,22 +318,26 @@
   height: 0.45em;
   border-radius: 50%;
   background-color: rgb(var(--gy-lavender-deep));
+  box-shadow: 0 0 0 4px rgb(var(--gy-lavender-deep) / 0.16);
 }
 
 .gy-hero__status--sold-out::before {
   background-color: rgb(var(--gy-ink-muted));
+  box-shadow: 0 0 0 4px rgb(var(--gy-ink-muted) / 0.12);
 }
 
 .gy-hero__text {
   margin: 0 0 var(--gy-space-lg);
-  max-width: 42ch;
+  max-width: 44ch;
   font-size: var(--gy-text-body);
-  line-height: 1.65;
+  line-height: 1.7;
   color: rgb(var(--gy-ink-soft));
 }
 
 .gy-hero__text > :first-child { margin-top: 0; }
 .gy-hero__text > :last-child { margin-bottom: 0; }
+
+/* ---- Actions ---- */
 
 .gy-hero__actions {
   display: flex;
@@ -287,24 +347,37 @@
 }
 
 .gy-hero__cta {
+  position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--gy-space-xs);
-  padding: 1.05rem 2.35rem;
+  min-height: 3.5rem;
+  padding: 1rem 2.5rem;
+  overflow: hidden;
   border: 1px solid rgb(var(--gy-ink));
   border-radius: var(--gy-radius-pill);
   background-color: rgb(var(--gy-ink));
   color: rgb(var(--gy-canvas));
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   text-decoration: none;
   box-shadow: var(--gy-elevation-1);
   transition:
     transform var(--gy-duration-fast) var(--gy-ease),
-    box-shadow var(--gy-duration-fast) var(--gy-ease),
-    background-color var(--gy-duration-fast) var(--gy-ease);
+    box-shadow var(--gy-duration-fast) var(--gy-ease);
+}
+
+/* Slow light sweep on hover — one pass, no loop. */
+.gy-hero__cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  translate: -110% 0;
+  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 0.22) 50%, transparent 80%);
+  transition: translate var(--gy-duration-slow) var(--gy-ease-out);
 }
 
 .gy-hero__cta:hover,
@@ -312,6 +385,10 @@
   transform: translateY(-2px);
   box-shadow: var(--gy-elevation-2);
   color: rgb(var(--gy-canvas));
+}
+
+.gy-hero__cta:hover::after {
+  translate: 110% 0;
 }
 
 .gy-hero__cta[aria-disabled='true'] {
@@ -322,212 +399,7 @@
   pointer-events: none;
 }
 
-.gy-hero__cta-arrow {
-  transition: transform var(--gy-duration-fast) var(--gy-ease);
-}
-
-.gy-hero__cta:hover .gy-hero__cta-arrow {
-  transform: translateX(4px);
-}
-
-.gy-hero__secondary {
-  margin: 0;
-  font-size: 0.82rem;
-  letter-spacing: 0.06em;
-  color: rgb(var(--gy-ink-muted));
-}
-
-/* ---- Product visual ---- */
-
-.gy-hero__stage {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 1200px;
-}
-
-/* Soft pedestal glow behind the product — gives depth without a filter on the
-   product image itself, so the garment colour stays accurate. */
-.gy-hero__stage::before {
-  content: '';
-  position: absolute;
-  inset: 8% 4% 6%;
-  z-index: 0;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(var(--gy-champagne) / 0.9), rgb(var(--gy-champagne) / 0) 78%);
-  box-shadow: var(--gy-glow-soft);
-}
-
-.gy-hero__product {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 34rem;
-  border-radius: var(--gy-radius-lg);
-  transform-style: preserve-3d;
-  will-change: transform;
-  transition: transform var(--gy-duration) var(--gy-ease-out);
-}
-
-.gy-hero__product-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--gy-radius-lg);
-  box-shadow: var(--gy-elevation-product);
-  /* No filters: the product must stay visually accurate. */
-}
-
-.gy-hero__product-placeholder svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--gy-radius-lg);
-  background-color: rgb(var(--gy-canvas-warm));
-  box-shadow: var(--gy-elevation-2);
-}
-
-/* Contact shadow grounding the product on the stage. */
-.gy-hero__product::after {
-  content: '';
-  position: absolute;
-  left: 12%;
-  right: 12%;
-  bottom: -3.5%;
-  height: 6%;
-  z-index: -1;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(var(--gy-ink) / 0.2), rgb(var(--gy-ink) / 0) 75%);
-  filter: blur(2px);
-}
-
-.gy-hero__product-title {
-  margin: var(--gy-space-md) 0 0;
-  text-align: center;
-  font-family: var(--gy-font-body);
-  font-size: var(--gy-text-eyebrow);
-  font-weight: 500;
-  letter-spacing: var(--gy-tracking-eyebrow);
-  text-transform: uppercase;
-  color: rgb(var(--gy-ink-muted));
-}
-
-/* ---- Alignment variants ---- */
-
-.gy-hero--center .gy-hero__content {
-  max-width: 46rem;
-  margin-inline: auto;
-  text-align: center;
-}
-
-.gy-hero--center .gy-hero__price,
-.gy-hero--center .gy-hero__price-meta,
-.gy-hero--center .gy-hero__actions,
-.gy-hero--center .gy-hero__price .price__container,
-.gy-hero--center .gy-hero__price .price:not(.price--on-sale) .price__regular,
-.gy-hero--center .gy-hero__price .price--on-sale .price__sale {
-  justify-content: center;
-}
-
-.gy-hero--center .gy-hero__text {
-  margin-inline: auto;
-}
-
-/* ---- Motion ---- */
-
-.gy-hero__product[data-gy-float] {
-  animation: gy-float 9s var(--gy-ease) infinite;
-}
-
-@keyframes gy-float {
-  0%, 100% { translate: 0 0; }
-  50% { translate: 0 -12px; }
-}
-
-/* Entrance reveal — only applied once JS confirms motion is allowed. */
-.gy-hero[data-gy-reveal='pending'] .gy-hero__content > *,
-.gy-hero[data-gy-reveal='pending'] .gy-hero__stage {
-  opacity: 0;
-  translate: 0 18px;
-}
-
-.gy-hero[data-gy-reveal='in'] .gy-hero__content > *,
-.gy-hero[data-gy-reveal='in'] .gy-hero__stage {
-  opacity: 1;
-  translate: 0 0;
-  transition:
-    opacity var(--gy-duration-slow) var(--gy-ease-out),
-    translate var(--gy-duration-slow) var(--gy-ease-out);
-}
-
-.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(2) { transition-delay: 60ms; }
-.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(3) { transition-delay: 120ms; }
-.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(4) { transition-delay: 180ms; }
-.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(5) { transition-delay: 240ms; }
-
-/* ---- Desktop ---- */
-
-@media screen and (min-width: 750px) {
-  .gy-hero__inner {
-    gap: var(--gy-space-2xl);
-  }
-
-  .gy-hero__product-title {
-    margin-top: var(--gy-space-lg);
-  }
-}
-
-@media screen and (min-width: 990px) {
-  .gy-hero__inner {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    gap: clamp(3rem, 5vw, 6rem);
-  }
-
-  /* Desktop: copy left, product right — a strong split composition. */
-  .gy-hero__content {
-    order: 1;
-  }
-
-  .gy-hero__media {
-    order: 2;
-  }
-
-  .gy-hero--right .gy-hero__content { order: 2; }
-  .gy-hero--right .gy-hero__media { order: 1; }
-
-  .gy-hero--center .gy-hero__inner {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .gy-hero--center .gy-hero__content { order: 2; }
-  .gy-hero--center .gy-hero__media { order: 1; }
-
-  .gy-hero__product {
-    max-width: 40rem;
-  }
-}
-
-/* ---- Reduced motion ---- */
-
-@media (prefers-reduced-motion: reduce) {
-  .gy-hero__product,
-  .gy-hero__product[data-gy-float],
-  .gy-hero__cta,
-  .gy-hero__cta-arrow {
-    animation: none !important;
-    transition: none !important;
-  }
-
-  .gy-hero[data-gy-reveal] .gy-hero__content > *,
-  .gy-hero[data-gy-reveal] .gy-hero__stage {
-    opacity: 1;
-    translate: none;
-    transition: none;
-  }
-}
-
-/* Sold-out CTA: still navigable, visually stepped back. */
+/* Sold out: still navigable, visually stepped back. */
 .gy-hero__cta--soft {
   background-color: transparent;
   color: rgb(var(--gy-ink));
@@ -540,4 +412,374 @@
   color: rgb(var(--gy-ink));
   border-color: rgb(var(--gy-ink));
   box-shadow: var(--gy-elevation-1);
+}
+
+.gy-hero__cta-arrow {
+  transition: transform var(--gy-duration-fast) var(--gy-ease);
+}
+
+.gy-hero__cta:hover .gy-hero__cta-arrow {
+  transform: translateX(4px);
+}
+
+.gy-hero__secondary {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: rgb(var(--gy-ink-muted));
+}
+
+/* ---- Product presentation -----------------------------------------------
+   The photograph is presented as a campaign plate: an ambient colour field
+   bleeding around it, a soft frame, a real contact shadow beneath, and a
+   tinted panel offset behind for layered depth. No filter, no recolour, no
+   crop — the garment is shown exactly as photographed. */
+
+.gy-hero__stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: var(--gy-space-md);
+  perspective: 1400px;
+}
+
+/* Ambient light pooling behind the plate. */
+.gy-hero__glow {
+  position: absolute;
+  z-index: 0;
+  inset: -6% -10%;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, rgb(var(--gy-blush) / 0.85), rgb(var(--gy-blush) / 0) 70%),
+    radial-gradient(closest-side at 70% 70%, rgb(var(--gy-lavender) / 0.7), rgb(var(--gy-lavender) / 0) 72%);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+/* Offset panel — reads as a second plane behind the photograph. */
+.gy-hero__panel {
+  position: absolute;
+  z-index: 0;
+  inset: 14% 24% 2% 0%;
+  border-radius: var(--gy-radius-lg);
+  background: linear-gradient(150deg, rgb(var(--gy-frame) / 0.75), rgb(var(--gy-lavender) / 0.35));
+  box-shadow: var(--gy-elevation-1);
+  pointer-events: none;
+}
+
+.gy-hero__plate {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 30rem;
+  border-radius: var(--gy-radius-lg);
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform var(--gy-duration) var(--gy-ease-out);
+}
+
+.gy-hero__plate-inner {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--gy-radius-lg);
+  box-shadow: var(--gy-elevation-plate);
+}
+
+/* Hairline frame, drawn over the image so it never affects the photo itself. */
+.gy-hero__plate-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgb(var(--gy-frame) / 0.5);
+  pointer-events: none;
+}
+
+.gy-hero__product-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* No filters, no blend modes: the garment colour stays accurate. */
+}
+
+.gy-hero__product-placeholder svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background-color: rgb(var(--gy-canvas-warm));
+}
+
+/* Pointer-following sheen at very low opacity. */
+.gy-hero__sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: var(--gy-radius-lg);
+  opacity: 0;
+  background: radial-gradient(
+    38% 38% at var(--gy-px, 50%) var(--gy-py, 50%),
+    rgb(255 255 255 / 0.3),
+    rgb(255 255 255 / 0) 70%
+  );
+  transition: opacity var(--gy-duration) var(--gy-ease);
+  pointer-events: none;
+}
+
+.gy-hero__stage:hover .gy-hero__sheen {
+  opacity: 1;
+}
+
+/* Contact shadow grounding the plate. */
+.gy-hero__plate::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -4%;
+  height: 7%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--gy-ink) / 0.24), rgb(var(--gy-ink) / 0) 76%);
+  filter: blur(3px);
+}
+
+.gy-hero__product-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gy-space-md);
+  margin: var(--gy-space-lg) auto 0;
+  max-width: 34rem;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+/* Long Shopify product names stay to two lines rather than pushing the
+   composition around. */
+.gy-hero__product-title span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.gy-hero__product-title::before,
+.gy-hero__product-title::after {
+  content: '';
+  flex: 1 1 auto;
+  height: 1px;
+  background-color: rgb(var(--gy-ink) / 0.14);
+}
+
+/* ---- Alignment variants ---- */
+
+/* A definite width is required here: the content column is a size-query
+   container, and auto margins would otherwise shrink it to zero. */
+.gy-hero--center .gy-hero__content {
+  width: min(48rem, 100%);
+  max-width: none;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.gy-hero--center .gy-hero__eyebrow,
+.gy-hero--center .gy-hero__price,
+.gy-hero--center .gy-hero__price-meta,
+.gy-hero--center .gy-hero__actions,
+.gy-hero--center .gy-hero__price .price__container,
+.gy-hero--center .gy-hero__price .price:not(.price--on-sale) .price__regular,
+.gy-hero--center .gy-hero__price .price--on-sale .price__sale {
+  justify-content: center;
+}
+
+.gy-hero--center .gy-hero__eyebrow::before {
+  content: '';
+  width: clamp(1.5rem, 4vw, 3rem);
+  height: 1px;
+  background-color: rgb(var(--gy-ink) / 0.22);
+}
+
+.gy-hero--center .gy-hero__text {
+  margin-inline: auto;
+}
+
+/* ---- Motion ---- */
+
+.gy-hero__plate[data-gy-float] {
+  animation: gy-float 11s var(--gy-ease) infinite;
+}
+
+@keyframes gy-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -10px; }
+}
+
+/* Entrance reveal — applied only once JS confirms motion is allowed. */
+.gy-hero[data-gy-reveal='pending'] .gy-hero__content > *,
+.gy-hero[data-gy-reveal='pending'] .gy-hero__stage,
+.gy-hero[data-gy-reveal='pending'] .gy-hero__product-title {
+  opacity: 0;
+  translate: 0 20px;
+}
+
+.gy-hero[data-gy-reveal='pending'] .gy-hero__stage {
+  scale: 0.985;
+}
+
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *,
+.gy-hero[data-gy-reveal='in'] .gy-hero__stage,
+.gy-hero[data-gy-reveal='in'] .gy-hero__product-title {
+  opacity: 1;
+  translate: 0 0;
+  scale: 1;
+  transition:
+    opacity var(--gy-duration-slow) var(--gy-ease-out),
+    translate var(--gy-duration-slow) var(--gy-ease-out),
+    scale 1.4s var(--gy-ease-out);
+}
+
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(2) { transition-delay: 80ms; }
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(3) { transition-delay: 160ms; }
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(4) { transition-delay: 240ms; }
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(5) { transition-delay: 320ms; }
+.gy-hero[data-gy-reveal='in'] .gy-hero__content > *:nth-child(6) { transition-delay: 400ms; }
+
+/* ---- Mobile-specific composition ----------------------------------------
+   Not a stacked desktop: the plate runs nearly edge to edge, the caption sits
+   directly under it, and the CTA becomes full width and thumb-sized. */
+
+@media screen and (max-width: 749px) {
+  .gy-hero__inner {
+    gap: var(--gy-space-lg);
+  }
+
+  .gy-hero__stage {
+    padding-block: var(--gy-space-sm);
+  }
+
+  .gy-hero__plate {
+    max-width: none;
+  }
+
+  .gy-hero__panel {
+    inset: 8% 8% 10% 8%;
+  }
+
+  .gy-hero__product-title {
+    margin-top: var(--gy-space-md);
+  }
+
+  .gy-hero__price-block {
+    margin-block: var(--gy-space-md) var(--gy-space-sm);
+  }
+
+  .gy-hero__actions {
+    gap: var(--gy-space-sm);
+  }
+
+  .gy-hero__cta {
+    width: 100%;
+    min-height: 3.75rem;
+  }
+
+  .gy-hero__secondary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .gy-hero__watermark {
+    top: 32%;
+    opacity: 0.7;
+  }
+}
+
+/* ---- Tablet and up ---- */
+
+@media screen and (min-width: 750px) {
+  .gy-hero__inner {
+    gap: var(--gy-space-2xl);
+  }
+
+  .gy-hero__plate {
+    max-width: 34rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .gy-hero__inner {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: clamp(3rem, 6vw, 7rem);
+  }
+
+  /* Desktop: editorial split — copy left, campaign plate right. */
+  .gy-hero__content { order: 1; }
+  .gy-hero__media { order: 2; }
+
+  .gy-hero--right .gy-hero__content { order: 2; }
+  .gy-hero--right .gy-hero__media { order: 1; }
+
+  .gy-hero--center .gy-hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gy-hero--center .gy-hero__content { order: 2; }
+  .gy-hero--center .gy-hero__media { order: 1; }
+
+  .gy-hero__plate {
+    max-width: 36rem;
+  }
+
+  .gy-hero__watermark {
+    left: auto;
+    right: -6%;
+    top: 46%;
+    translate: 0 -50%;
+    font-size: clamp(9rem, 15vw, 17rem);
+  }
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .gy-hero__plate,
+  .gy-hero__plate[data-gy-float],
+  .gy-hero__cta,
+  .gy-hero__cta::after,
+  .gy-hero__cta-arrow,
+  .gy-hero__sheen {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .gy-hero__sheen {
+    display: none;
+  }
+
+  .gy-hero[data-gy-reveal] .gy-hero__content > *,
+  .gy-hero[data-gy-reveal] .gy-hero__stage,
+  .gy-hero[data-gy-reveal] .gy-hero__product-title {
+    opacity: 1;
+    translate: none;
+    scale: 1;
+    transition: none;
+  }
+}
+
+/* Photograph drift inside the frame (set by gentleyou-hero.js). */
+.gy-hero__product-image {
+  transition: transform var(--gy-duration) var(--gy-ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gy-hero__product-image {
+    transition: none !important;
+    transform: none !important;
+  }
 }
