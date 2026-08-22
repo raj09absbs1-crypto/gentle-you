@@ -121,7 +121,7 @@
       addButton.addEventListener('click', () => submit.click());
     }
 
-    if (!submit || !('IntersectionObserver' in window)) {
+    if (!submit) {
       root.hidden = false;
       root.classList.add('is-visible');
       return;
@@ -129,17 +129,23 @@
 
     root.hidden = false;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          // Hidden while the real buy button is on screen, shown once it scrolls away.
-          root.classList.toggle('is-visible', !entry.isIntersecting);
-        });
-      },
-      { rootMargin: '-10% 0px -25% 0px' }
-    );
+    // The bar is a way back to a button the shopper has already passed, so it
+    // appears only once the real one has scrolled off the top. While the button
+    // is still below — the whole way down the gallery and the price — the bar
+    // stays away instead of covering the product. Measured on scroll rather
+    // than observed, so a jump straight down the page is caught too.
+    let frame = null;
+    const update = () => {
+      frame = null;
+      root.classList.toggle('is-visible', submit.getBoundingClientRect().bottom < 0);
+    };
+    const schedule = () => {
+      if (frame === null) frame = window.requestAnimationFrame(update);
+    };
 
-    observer.observe(submit);
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
 
     // Mirror the real button's disabled state (sold out / unavailable variant).
     if (addButton && 'MutationObserver' in window) {

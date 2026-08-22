@@ -284,7 +284,8 @@
       "search_placeholder": "What are you looking for?",
       "search_results_for": "Results for",
       "search_no_results_text": "Try a different word, or explore our everyday essentials below.",
-      "search_no_results_title": "Nothing found for “{{ terms }}”"
+      "search_no_results_title": "Nothing found for “{{ terms }}”",
+      "cart_reassurance": "Cash on delivery | Free prepaid shipping | 3-day size exchange"
     },
     "hero_product": {
       "carousel": "GentleYou campaign",

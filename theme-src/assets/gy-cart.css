@@ -509,3 +509,64 @@ cart-drawer .cart-drawer .cart-items .product-option {
     padding-bottom: calc(var(--gy-space-lg) + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* ---- Reassurance in the drawer ----------------------------------------
+   A quiet line above the checkout button, in the store's own policy wording.
+   Additive only: nothing above this point changes. */
+.gy-cart__reassure {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem var(--gy-space-md);
+  margin: 0 0 var(--gy-space-sm);
+  padding: 0;
+  list-style: none;
+}
+
+.gy-cart__reassure li {
+  position: relative;
+  padding-left: 1.6rem;
+  font-size: 1.056rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-cart__reassure li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 0.56rem;
+  height: 0.56rem;
+  border-radius: 50%;
+  background-color: rgb(var(--gy-lavender-deep) / 0.85);
+}
+
+/* Remove control: Dawn sizes it from its icon, which leaves a target well
+   under the 4.4rem minimum — hard to hit on a phone, and easy to hit by
+   accident next to the stepper. Additive only. */
+cart-remove-button,
+.cart-remove-button {
+  display: inline-flex;
+}
+
+cart-remove-button .button,
+.cart-remove-button .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  min-width: 4.4rem;
+  height: 4.4rem;
+  min-height: 4.4rem;
+  padding: 0;
+}
+
+cart-remove-button .button .svg-wrapper,
+cart-remove-button .button svg,
+.cart-remove-button .button svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}

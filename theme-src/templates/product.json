@@ -210,7 +210,7 @@
         "trust": {
           "type": "trust",
           "settings": {
-            "points": "Cash on delivery | 3-day size exchange | Secure payment | Free prepaid shipping"
+            "points": "Cash on delivery | Free prepaid shipping | 3-day size exchange"
           }
         },
         "details_description": {
@@ -306,7 +306,6 @@
         "vendor",
         "title",
         "price",
-        "short_description",
         "highlights",
         "variant_picker",
         "quantity_selector",

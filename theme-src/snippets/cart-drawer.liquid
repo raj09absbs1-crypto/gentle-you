@@ -572,6 +572,21 @@
           </small>
         </div>
 
+        {%- comment -%}
+          Reassurance where the decision is made. The wording is the store's
+          own published policy, held in a translation string so it is edited
+          in one place — nothing here is a promise the storefront doesn't
+          already make.
+        {%- endcomment -%}
+        {%- assign gy_cart_points = 'sections.gy.cart_reassurance' | t | split: '|' -%}
+        {%- if gy_cart_points.size > 0 -%}
+          <ul class="gy-cart__reassure" role="list">
+            {%- for point in gy_cart_points -%}
+              <li>{{ point | strip }}</li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+
         <!-- CTAs -->
 
         <div class="cart__ctas" {{ block.shopify_attributes }}>
