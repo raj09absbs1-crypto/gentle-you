@@ -43,7 +43,7 @@
 .gy-container {
   max-width: 1400px;
   margin-inline: auto;
-  padding-inline: clamp(1.25rem, 4vw, 4rem);
+  padding-inline: clamp(2rem, 4vw, 6.4rem);
 }
 
 .gy-eyebrow {
@@ -60,21 +60,21 @@
 
 .gy-eyebrow::after {
   content: '';
-  width: clamp(1.5rem, 4vw, 3rem);
+  width: clamp(2.4rem, 4vw, 4.8rem);
   height: 1px;
   background-color: currentColor;
   opacity: 0.45;
 }
 
 .gy-section__head {
-  max-width: 46rem;
-  margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+  max-width: 73.6rem;
+  margin-bottom: clamp(4rem, 5vw, 7.2rem);
 }
 
 .gy-section__heading {
   margin: 0;
   font-family: var(--gy-font-heading);
-  font-size: clamp(1.85rem, 1.1rem + 2.4vw, 3.1rem);
+  font-size: clamp(2.96rem, 1.76rem + 2.4vw, 4.96rem);
   font-weight: 300;
   line-height: 1.08;
   letter-spacing: -0.03em;
@@ -84,7 +84,7 @@
 .gy-section__heading--center {
   text-align: center;
   margin-inline: auto;
-  margin-bottom: clamp(2rem, 4vw, 3rem);
+  margin-bottom: clamp(3.2rem, 4vw, 4.8rem);
 }
 
 .gy-section__text {
@@ -98,11 +98,11 @@
 .gy-section__empty {
   padding: var(--gy-space-xl) 0;
   color: rgb(var(--gy-ink-muted));
-  font-size: 0.9rem;
+  font-size: 1.44rem;
 }
 
 .gy-section__foot {
-  margin-top: clamp(2.5rem, 4vw, 3.5rem);
+  margin-top: clamp(4rem, 4vw, 5.6rem);
 }
 
 /* ---- Buttons ---- */
@@ -112,13 +112,13 @@
   align-items: center;
   justify-content: center;
   gap: var(--gy-space-xs);
-  min-height: 3.25rem;
-  padding: 0.9rem 2.25rem;
+  min-height: 5.2rem;
+  padding: 1.44rem 3.6rem;
   border: 1px solid rgb(var(--gy-ink));
   border-radius: var(--gy-radius-pill);
   background-color: rgb(var(--gy-ink));
   color: rgb(var(--gy-canvas));
-  font-size: 0.76rem;
+  font-size: 1.216rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -178,7 +178,7 @@
 
 .gy-grid {
   display: grid;
-  gap: clamp(1rem, 2vw, 2rem) clamp(0.75rem, 1.6vw, 1.75rem);
+  gap: clamp(1.6rem, 2vw, 3.2rem) clamp(1.2rem, 1.6vw, 2.8rem);
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -195,7 +195,7 @@
   }
 
   .gy-grid-section--showcase .gy-grid__item:first-child .gy-card__title {
-    font-size: 1.05rem;
+    font-size: 1.68rem;
   }
 }
 
@@ -255,7 +255,7 @@
   border-radius: var(--gy-radius-pill);
   background-color: rgb(var(--gy-canvas) / 0.92);
   color: rgb(var(--gy-ink));
-  font-size: 0.6rem;
+  font-size: 0.96rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -269,7 +269,7 @@
   margin: var(--gy-space-sm) 0 var(--gy-space-3xs);
   min-height: calc(2 * 1.45em);
   font-family: var(--gy-font-body);
-  font-size: 0.82rem;
+  font-size: 1.312rem;
   font-weight: 500;
   line-height: 1.45;
   letter-spacing: 0.01em;
@@ -287,13 +287,13 @@
 }
 
 .gy-card__price .price {
-  font-size: 1.05rem;
+  font-size: 1.68rem;
   letter-spacing: 0;
   color: rgb(var(--gy-ink));
 }
 
 .gy-card__price .price__sale .price-item--regular {
-  font-size: 0.82rem;
+  font-size: 1.312rem;
   color: rgb(var(--gy-ink-muted));
 }
 
@@ -305,7 +305,7 @@
 
 .gy-props__body {
   display: grid;
-  gap: clamp(2rem, 4vw, 4rem);
+  gap: clamp(3.2rem, 4vw, 6.4rem);
 }
 
 .gy-props--with_image .gy-props__body {
@@ -328,7 +328,7 @@
 
 .gy-props__list {
   display: grid;
-  gap: clamp(1.75rem, 3vw, 3rem);
+  gap: clamp(2.8rem, 3vw, 4.8rem);
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
   padding: 0;
@@ -347,14 +347,14 @@
 .gy-props__label {
   margin: 0 0 var(--gy-space-2xs);
   font-family: var(--gy-font-heading);
-  font-size: clamp(1.1rem, 0.9rem + 0.6vw, 1.45rem);
+  font-size: clamp(1.76rem, 1.44rem + 0.6vw, 2.32rem);
   font-weight: 400;
   letter-spacing: -0.01em;
 }
 
 .gy-props__text {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 1.472rem;
   line-height: 1.6;
   color: rgb(var(--gy-ink-soft));
 }
@@ -383,7 +383,7 @@
 
 .gy-cols__grid {
   display: grid;
-  gap: clamp(0.75rem, 1.6vw, 1.5rem);
+  gap: clamp(1.2rem, 1.6vw, 2.4rem);
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -435,13 +435,13 @@
 
 .gy-cols__label {
   font-family: var(--gy-font-heading);
-  font-size: clamp(0.95rem, 0.8rem + 0.5vw, 1.4rem);
+  font-size: clamp(1.52rem, 1.28rem + 0.5vw, 2.24rem);
   font-weight: 400;
   letter-spacing: -0.01em;
 }
 
 .gy-cols__text {
-  font-size: 0.66rem;
+  font-size: 1.056rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   opacity: 0.75;
@@ -484,7 +484,7 @@
 
 .gy-story__inner {
   display: grid;
-  gap: clamp(2rem, 4vw, 4.5rem);
+  gap: clamp(3.2rem, 4vw, 7.2rem);
   align-items: center;
 }
 
@@ -505,7 +505,7 @@
 .gy-story__heading {
   margin: 0 0 var(--gy-space-md);
   font-family: var(--gy-font-heading);
-  font-size: clamp(1.9rem, 1.1rem + 2.6vw, 3.4rem);
+  font-size: clamp(3.04rem, 1.76rem + 2.6vw, 5.44rem);
   font-weight: 300;
   line-height: 1.06;
   letter-spacing: -0.03em;
@@ -538,7 +538,7 @@
 .gy-trust-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(1.5rem, 3vw, 2.5rem);
+  gap: clamp(2.4rem, 3vw, 4rem);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -556,8 +556,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 4.4rem;
+  height: 4.4rem;
   margin-bottom: var(--gy-space-2xs);
   border-radius: 50%;
   border: 1px solid rgb(var(--gy-ink) / 0.1);
@@ -566,19 +566,19 @@
 }
 
 .gy-trust-row__icon svg {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.84rem;
+  height: 1.84rem;
 }
 
 .gy-trust-row__label {
-  font-size: 0.68rem;
+  font-size: 1.088rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .gy-trust-row__note {
-  font-size: 0.78rem;
+  font-size: 1.248rem;
   color: rgb(var(--gy-ink-muted));
 }
 
@@ -591,13 +591,13 @@
 /* ---- Reviews ---- */
 
 .gy-reviews__app {
-  min-height: 4rem;
+  min-height: 6.4rem;
 }
 
 /* ---- Newsletter ---- */
 
 .gy-news__inner {
-  max-width: 44rem;
+  max-width: 70.4rem;
   text-align: center;
 }
 
@@ -612,7 +612,7 @@
 .gy-news__heading {
   margin: 0 0 var(--gy-space-md);
   font-family: var(--gy-font-heading);
-  font-size: clamp(1.9rem, 1.2rem + 2.4vw, 3.2rem);
+  font-size: clamp(3.04rem, 1.92rem + 2.4vw, 5.12rem);
   font-weight: 300;
   line-height: 1.08;
   letter-spacing: -0.03em;
@@ -634,14 +634,14 @@
 }
 
 .gy-news__input {
-  flex: 1 1 18rem;
-  min-height: 3.25rem;
-  padding: 0 1.25rem;
+  flex: 1 1 28.8rem;
+  min-height: 5.2rem;
+  padding: 0 2rem;
   border: 1px solid rgb(var(--gy-canvas) / 0.35);
   border-radius: var(--gy-radius-pill);
   background-color: transparent;
   color: inherit;
-  font-size: 0.95rem;
+  font-size: 1.52rem;
 }
 
 .gy-section--ivory .gy-news__input,
@@ -657,7 +657,7 @@
 .gy-news__message {
   flex: 1 0 100%;
   margin: var(--gy-space-2xs) 0 0;
-  font-size: 0.85rem;
+  font-size: 1.36rem;
 }
 
 .gy-news__message--error {
@@ -693,7 +693,7 @@
   gap: var(--gy-space-md);
   max-width: 1400px;
   margin-inline: auto;
-  padding: 0.9rem clamp(1rem, 3vw, 3rem);
+  padding: 1.44rem clamp(1.6rem, 3vw, 4.8rem);
 }
 
 .gy-header__logo {
@@ -711,7 +711,7 @@
 
 .gy-header__wordmark {
   font-family: var(--gy-font-heading);
-  font-size: 1.1rem;
+  font-size: 1.76rem;
   letter-spacing: 0.02em;
 }
 
@@ -722,7 +722,7 @@
 .gy-header__list {
   display: flex;
   align-items: center;
-  gap: clamp(1rem, 2vw, 2.25rem);
+  gap: clamp(1.6rem, 2vw, 3.6rem);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -734,8 +734,8 @@
 
 .gy-header__link {
   display: inline-block;
-  padding: 0.5rem 0;
-  font-size: 0.7rem;
+  padding: 0.8rem 0;
+  font-size: 1.12rem;
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -748,7 +748,7 @@
   content: '';
   display: block;
   height: 1px;
-  margin-top: 0.35rem;
+  margin-top: 0.56rem;
   background-color: currentColor;
   scale: 0 1;
   transform-origin: left center;
@@ -770,7 +770,7 @@
   top: 100%;
   left: 50%;
   translate: -50% 0;
-  min-width: 12rem;
+  min-width: 19.2rem;
   padding: var(--gy-space-sm) 0;
   border: 1px solid rgb(var(--gy-ink) / 0.07);
   border-radius: var(--gy-radius-sm);
@@ -795,8 +795,8 @@
 
 .gy-header__submenu a {
   display: block;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.82rem;
+  padding: 0.8rem 2rem;
+  font-size: 1.312rem;
   text-decoration: none;
   color: rgb(var(--gy-ink-soft));
 }
@@ -809,7 +809,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: clamp(0.5rem, 1.5vw, 1.1rem);
+  gap: clamp(0.8rem, 1.5vw, 1.76rem);
 }
 
 .gy-header__icon {
@@ -817,8 +817,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 4rem;
+  height: 4rem;
   border-radius: 50%;
   color: rgb(var(--gy-ink));
   cursor: pointer;
@@ -835,8 +835,8 @@
 }
 
 .gy-header__icon svg {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 2rem;
+  height: 2rem;
 }
 
 .gy-header__icon--account {
@@ -845,16 +845,16 @@
 
 .gy-header__count {
   position: absolute;
-  top: 0.3rem;
-  right: 0.25rem;
-  min-width: 1.05rem;
-  height: 1.05rem;
-  padding: 0 0.2rem;
+  top: 0.48rem;
+  right: 0.4rem;
+  min-width: 1.68rem;
+  height: 1.68rem;
+  padding: 0 0.32rem;
   border-radius: var(--gy-radius-pill);
   background-color: rgb(var(--gy-ink));
   color: rgb(var(--gy-canvas));
-  font-size: 0.6rem;
-  line-height: 1.05rem;
+  font-size: 0.96rem;
+  line-height: 1.68rem;
   text-align: center;
 }
 
@@ -863,7 +863,7 @@
   left: 0;
   right: 0;
   top: 100%;
-  padding: var(--gy-space-lg) clamp(1rem, 3vw, 3rem) var(--gy-space-xl);
+  padding: var(--gy-space-lg) clamp(1.6rem, 3vw, 4.8rem) var(--gy-space-xl);
   background-color: rgb(var(--gy-canvas));
   border-bottom: 1px solid rgb(var(--gy-ink) / 0.07);
   box-shadow: var(--gy-elevation-2);
@@ -878,9 +878,9 @@
 
 .gy-header__drawer-link {
   display: block;
-  padding: 0.75rem 0;
+  padding: 1.2rem 0;
   font-family: var(--gy-font-heading);
-  font-size: 1.25rem;
+  font-size: 2rem;
   font-weight: 300;
   text-decoration: none;
   color: rgb(var(--gy-ink));
@@ -889,8 +889,8 @@
 
 .gy-header__drawer-sub a {
   display: block;
-  padding: 0.4rem 0 0.4rem 1rem;
-  font-size: 0.85rem;
+  padding: 0.64rem 0 0.64rem 1.6rem;
+  font-size: 1.36rem;
   text-decoration: none;
   color: rgb(var(--gy-ink-muted));
 }
@@ -914,12 +914,12 @@
   background-color: rgb(var(--gy-canvas-warm));
   color: rgb(var(--gy-ink));
   font-family: var(--gy-font-body);
-  padding-top: clamp(3rem, 6vw, 5rem);
+  padding-top: clamp(4.8rem, 6vw, 8rem);
 }
 
 .gy-footer__inner {
   display: grid;
-  gap: clamp(2rem, 4vw, 3.5rem);
+  gap: clamp(3.2rem, 4vw, 5.6rem);
 }
 
 .gy-footer__logo {
@@ -930,13 +930,13 @@
 .gy-footer__wordmark {
   margin: 0;
   font-family: var(--gy-font-heading);
-  font-size: 1.35rem;
+  font-size: 2.16rem;
 }
 
 .gy-footer__text {
   margin-top: var(--gy-space-sm);
   max-width: 34ch;
-  font-size: 0.88rem;
+  font-size: 1.408rem;
   line-height: 1.65;
   color: rgb(var(--gy-ink-soft));
 }
@@ -951,7 +951,7 @@
 }
 
 .gy-footer__social a {
-  font-size: 0.7rem;
+  font-size: 1.12rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
@@ -961,12 +961,12 @@
 .gy-footer__columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(1.75rem, 3vw, 3rem);
+  gap: clamp(2.8rem, 3vw, 4.8rem);
 }
 
 .gy-footer__heading {
   margin: 0 0 var(--gy-space-sm);
-  font-size: 0.68rem;
+  font-size: 1.088rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -981,8 +981,8 @@
 
 .gy-footer__links a {
   display: block;
-  padding: 0.3rem 0;
-  font-size: 0.88rem;
+  padding: 0.48rem 0;
+  font-size: 1.408rem;
   text-decoration: none;
   color: rgb(var(--gy-ink-soft));
 }
@@ -997,7 +997,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--gy-space-sm) var(--gy-space-lg);
-  margin-top: clamp(2.5rem, 5vw, 4rem);
+  margin-top: clamp(4rem, 5vw, 6.4rem);
   padding-top: var(--gy-space-md);
   padding-bottom: var(--gy-space-lg);
   border-top: 1px solid rgb(var(--gy-ink) / 0.08);
@@ -1006,7 +1006,7 @@
 .gy-footer__copy,
 .gy-footer__policies {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 1.152rem;
   letter-spacing: 0.06em;
   color: rgb(var(--gy-ink-muted));
 }

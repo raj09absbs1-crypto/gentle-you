@@ -180,6 +180,7 @@
           const overflow = scroller.scrollWidth - scroller.clientWidth;
           wrap.classList.toggle('is-scrollable', overflow > 2);
           wrap.classList.toggle('is-scrolled-end', overflow <= 2);
+          wrap.classList.toggle('is-scrolled-away', scroller.scrollLeft > 2);
         });
       }, 60);
     };
@@ -269,7 +270,10 @@
       const update = () => {
         const overflow = scroller.scrollWidth - scroller.clientWidth;
         wrap.classList.toggle('is-scrollable', overflow > 2);
+        // Right edge while content remains, left edge once scrolled away from
+        // the start; both derived from the live scroll position.
         wrap.classList.toggle('is-scrolled-end', overflow <= 2 || scroller.scrollLeft >= overflow - 2);
+        wrap.classList.toggle('is-scrolled-away', scroller.scrollLeft > 2);
       };
 
       scroller.addEventListener('scroll', update, { passive: true });

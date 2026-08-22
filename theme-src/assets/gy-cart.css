@@ -1,0 +1,436 @@
+/*
+  GentleYou cart layer.
+
+  Pure presentation over Dawn's own cart drawer, cart page and cart items —
+  every element styled here is markup Dawn renders and Dawn's cart.js updates.
+  No cart behaviour, endpoint, form or quantity rule is touched.
+*/
+
+/* ---- Cart drawer ---- */
+
+
+cart-drawer .drawer__inner {
+  background-color: rgb(var(--gy-canvas));
+  color: rgb(var(--gy-ink));
+  font-family: var(--gy-font-body);
+  padding: 0;
+}
+
+cart-drawer .cart-drawer__overlay {
+  background-color: rgb(var(--gy-ink) / 0.45);
+}
+
+cart-drawer .drawer__header {
+  align-items: baseline;
+  padding: var(--gy-space-lg) var(--gy-space-lg) var(--gy-space-md);
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.1);
+}
+
+cart-drawer .drawer__heading {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: 1.84rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: rgb(var(--gy-ink));
+}
+
+cart-drawer .drawer__close {
+  width: 4rem;
+  height: 4rem;
+  border: 1px solid rgb(var(--gy-ink) / 0.12);
+  border-radius: 50%;
+  background-color: rgb(var(--gy-canvas-warm));
+  color: rgb(var(--gy-ink));
+  transition: background-color 200ms var(--gy-ease);
+}
+
+cart-drawer .drawer__close:hover {
+  background-color: rgb(var(--gy-lavender) / 0.4);
+}
+
+cart-drawer .drawer__contents,
+cart-drawer .drawer__cart-items-wrapper {
+  padding-inline: var(--gy-space-lg);
+}
+
+cart-drawer .drawer__footer {
+  padding: var(--gy-space-md) var(--gy-space-lg);
+  padding-bottom: calc(var(--gy-space-md) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgb(var(--gy-ink) / 0.1);
+  background-color: rgb(var(--gy-canvas));
+}
+
+/* Empty state */
+cart-drawer .drawer__inner-empty {
+  padding: var(--gy-space-xl) var(--gy-space-lg);
+  background-color: rgb(var(--gy-canvas));
+}
+
+cart-drawer .cart__empty-text,
+.cart__empty-text {
+  font-family: var(--gy-font-heading);
+  font-size: clamp(2.16rem, 1.76rem + 1vw, 3.04rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: rgb(var(--gy-ink));
+}
+
+/* ---- Cart items (drawer and page share Dawn's markup) ---- */
+
+.cart-items,
+.cart-items td,
+.cart-items th {
+  border: 0;
+  font-family: var(--gy-font-body);
+}
+
+.cart-items thead th {
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.12);
+  font-size: 0.96rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.cart-item {
+  padding-block: var(--gy-space-md);
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
+}
+
+.cart-item:last-child {
+  border-bottom: 0;
+}
+
+.cart-item__image {
+  border-radius: var(--gy-radius-sm);
+  box-shadow: var(--gy-elevation-1);
+}
+
+.cart-item__name {
+  font-family: var(--gy-font-body);
+  font-size: 1.408rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: rgb(var(--gy-ink));
+  text-decoration: none;
+}
+
+.cart-item__name:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Variant options — size, cup, colour — exactly as Shopify records them. */
+.product-option {
+  font-size: 1.248rem;
+  line-height: 1.5;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.cart-item__price-wrapper .price,
+.cart-item__totals .price {
+  font-size: 1.52rem;
+  color: rgb(var(--gy-ink));
+}
+
+.cart-item__old-price {
+  font-size: 1.28rem;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.cart-item__discounted-prices .cart-item__final-price {
+  font-weight: 500;
+}
+
+/* Quantity stepper matched to the product page control. */
+.cart-item .quantity {
+  width: 13.2rem;
+  border: 1px solid rgb(var(--gy-ink) / 0.16);
+  border-radius: 10px;
+  background-color: rgb(var(--gy-canvas-warm));
+  overflow: hidden;
+}
+
+.cart-item .quantity::before,
+.cart-item .quantity::after {
+  display: none;
+}
+
+.cart-item .quantity__button {
+  /* Comfortable touch targets; the harness measured Dawn's defaults at 27px. */
+  min-width: 4.4rem;
+  min-height: 4.4rem;
+  transition: background-color 180ms var(--gy-ease), transform 180ms var(--gy-ease);
+}
+
+.cart-item .quantity__input {
+  min-height: 4.4rem;
+}
+
+.cart-item .quantity__button:hover {
+  background-color: rgb(var(--gy-lavender) / 0.4);
+}
+
+.cart-item .quantity__button:active {
+  transform: scale(0.92);
+}
+
+.cart-item .quantity__button[disabled],
+.cart-item .quantity__button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+cart-remove-button .button,
+.cart-remove-button .button {
+  min-width: 4rem;
+  min-height: 4rem;
+  border-radius: 8px;
+  color: rgb(var(--gy-ink-muted));
+  transition: color 180ms var(--gy-ease), background-color 180ms var(--gy-ease);
+}
+
+cart-remove-button .button:hover {
+  color: rgb(var(--gy-ink));
+  background-color: rgb(var(--gy-lavender) / 0.35);
+}
+
+/* Dawn adds .loading while a cart request is in flight. */
+.cart-item.cart-item--disabled,
+.cart-item .loading__spinner:not(.hidden) ~ * {
+  opacity: 0.6;
+}
+
+/* ---- Totals and checkout ---- */
+
+.totals {
+  align-items: baseline;
+  justify-content: space-between;
+  padding-block: var(--gy-space-sm);
+}
+
+.totals__total {
+  margin: 0;
+  font-family: var(--gy-font-body);
+  font-size: 1.088rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.totals__total-value {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: clamp(2.16rem, 1.76rem + 0.9vw, 2.88rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: rgb(var(--gy-ink));
+}
+
+.tax-note {
+  margin-block: var(--gy-space-2xs) var(--gy-space-md);
+  font-size: 1.216rem;
+  line-height: 1.55;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.cart__checkout-button,
+.cart__dynamic-checkout-buttons button {
+  min-height: 5.6rem;
+  border-radius: 12px;
+  font-size: 1.216rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.cart__checkout-button {
+  position: relative;
+  overflow: hidden;
+  background-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+  box-shadow: var(--gy-elevation-1);
+  transition: transform 200ms var(--gy-ease), box-shadow 200ms var(--gy-ease);
+}
+
+.cart__checkout-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  translate: -110% 0;
+  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 0.2) 50%, transparent 80%);
+  transition: translate 900ms var(--gy-ease-out);
+  pointer-events: none;
+}
+
+.cart__checkout-button:not([disabled]):hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gy-elevation-2);
+}
+
+.cart__checkout-button:not([disabled]):hover::after {
+  translate: 110% 0;
+}
+
+/* ---- Cart page ---- */
+
+.cart-page-gy {
+  background-color: rgb(var(--gy-canvas));
+}
+
+.cart__warnings {
+  padding-block: clamp(4.8rem, 8vw, 9.6rem);
+}
+
+.cart__login-title,
+.cart__login-paragraph {
+  color: rgb(var(--gy-ink-soft));
+}
+
+.cart__items {
+  padding-top: var(--gy-space-md);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.1);
+}
+
+.cart__footer {
+  padding-top: var(--gy-space-lg);
+}
+
+.cart__blocks {
+  border: 1px solid rgb(var(--gy-ink) / 0.1);
+  border-radius: var(--gy-radius-md);
+  background-color: rgb(var(--gy-canvas-warm));
+  padding: var(--gy-space-lg);
+}
+
+@media screen and (min-width: 990px) {
+  /* Items on the left, summary sticky on the right. */
+  .cart__footer-wrapper .cart__footer {
+    position: sticky;
+    top: 10.4rem;
+  }
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  cart-drawer .drawer__close,
+  .cart-item .quantity__button,
+  cart-remove-button .button,
+  .cart__checkout-button,
+  .cart__checkout-button::after {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* Dawn's count bubble inside the GentleYou header icon: keep it inside the
+   icon rather than Dawn's own offset, which sat outside the viewport edge. */
+.gy-header__cart .cart-count-bubble {
+  position: absolute;
+  top: 0.48rem;
+  right: 0.4rem;
+  left: auto;
+  bottom: auto;
+  min-width: 1.68rem;
+  height: 1.68rem;
+  padding: 0 0.32rem;
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+  font-size: 0.96rem;
+  line-height: 1.68rem;
+  text-align: center;
+}
+
+/* A little more room than Dawn's default so long product titles and the
+   variant options breathe. */
+@media screen and (min-width: 750px) {
+  cart-drawer .drawer__inner {
+    max-width: 44rem;
+  }
+}
+
+/* ---- Drawer line items -------------------------------------------------
+   Dawn's three-column table gets cramped in a narrow drawer, so inside the
+   drawer only, each line becomes image + content with the total, quantity and
+   remove control stacked underneath. Markup and behaviour are untouched. */
+
+cart-drawer .cart-items,
+cart-drawer .cart-items tbody,
+cart-drawer .cart-items tr,
+cart-drawer .cart-items td,
+cart-drawer .cart-items th {
+  display: block;
+  width: auto;
+}
+
+cart-drawer .cart-items thead {
+  display: none;
+}
+
+cart-drawer .cart-item {
+  display: grid;
+  grid-template-columns: 8.8rem minmax(0, 1fr);
+  column-gap: 1.6rem;
+  row-gap: 0.8rem;
+  align-items: start;
+  padding-block: 2rem;
+}
+
+cart-drawer .cart-item__media {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 8.8rem;
+}
+
+cart-drawer .cart-item__details {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+cart-drawer .cart-item__quantity {
+  grid-column: 2;
+  grid-row: 2;
+  padding: 0;
+}
+
+cart-drawer .cart-item {
+  grid-template-rows: auto auto;
+}
+
+/* Quantity on the left, line total on the right of the same row. */
+cart-drawer .cart-item__totals {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  align-self: center;
+  padding: 0;
+  text-align: right;
+}
+
+cart-drawer .cart-item__totals .price,
+cart-drawer .cart-item__price-wrapper > * {
+  white-space: nowrap;
+}
+
+cart-drawer .cart-item__quantity-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+cart-drawer .cart-item__name {
+  font-size: 1.4rem;
+}
+
+cart-drawer .product-option {
+  font-size: 1.25rem;
+}

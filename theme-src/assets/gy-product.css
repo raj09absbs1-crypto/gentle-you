@@ -12,7 +12,7 @@
 
 .gy-pdp__inner {
   display: grid;
-  gap: clamp(2rem, 4vw, 4rem);
+  gap: clamp(3.2rem, 4vw, 6.4rem);
   align-items: start;
 }
 
@@ -83,8 +83,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 4.4rem;
+  height: 4.4rem;
   translate: 0 -50%;
   border: 1px solid rgb(var(--gy-ink) / 0.08);
   border-radius: 50%;
@@ -95,9 +95,9 @@
   transition: opacity var(--gy-duration) var(--gy-ease);
 }
 
-.gy-pdp__nav svg { width: 1.1rem; height: 1.1rem; }
-.gy-pdp__nav--prev { left: 0.75rem; }
-.gy-pdp__nav--next { right: 0.75rem; }
+.gy-pdp__nav svg { width: 1.76rem; height: 1.76rem; }
+.gy-pdp__nav--prev { left: 1.2rem; }
+.gy-pdp__nav--next { right: 1.2rem; }
 
 .gy-pdp__stage:hover .gy-pdp__nav,
 .gy-pdp__nav:focus-visible {
@@ -110,14 +110,14 @@
 
 .gy-pdp__counter {
   position: absolute;
-  right: 0.9rem;
-  bottom: 0.9rem;
+  right: 1.44rem;
+  bottom: 1.44rem;
   z-index: 2;
   margin: 0;
   padding: 0.35em 0.75em;
   border-radius: var(--gy-radius-pill);
   background-color: rgb(var(--gy-frame) / 0.85);
-  font-size: 0.66rem;
+  font-size: 1.056rem;
   letter-spacing: 0.12em;
   color: rgb(var(--gy-ink-soft));
   font-variant-numeric: tabular-nums;
@@ -127,9 +127,9 @@
 
 .gy-pdp__thumbs {
   display: flex;
-  gap: 0.6rem;
-  margin: 0.75rem 0 0;
-  padding: 0.25rem 0;
+  gap: 0.96rem;
+  margin: 1.2rem 0 0;
+  padding: 0.4rem 0;
   list-style: none;
   overflow-x: auto;
   scrollbar-width: none;
@@ -139,7 +139,7 @@
 
 .gy-pdp__thumb {
   display: block;
-  width: 4.5rem;
+  width: 7.2rem;
   padding: 0;
   border: 1px solid transparent;
   border-radius: var(--gy-radius-sm);
@@ -173,7 +173,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(1rem, 4vw, 3rem);
+  padding: clamp(1.6rem, 4vw, 4.8rem);
   border: 0;
   background-color: rgb(var(--gy-ink) / 0.88);
 }
@@ -187,22 +187,22 @@
 
 .gy-pdp__lightbox-close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 2.75rem;
-  height: 2.75rem;
+  top: 1.6rem;
+  right: 1.6rem;
+  width: 4.4rem;
+  height: 4.4rem;
   border: 0;
   border-radius: 50%;
   background-color: rgb(var(--gy-canvas));
   color: rgb(var(--gy-ink));
-  font-size: 1.1rem;
+  font-size: 1.76rem;
   cursor: pointer;
 }
 
 /* ---- Info column ---- */
 
 .gy-pdp__info {
-  max-width: 34rem;
+  max-width: 54.4rem;
 }
 
 .gy-pdp__vendor {
@@ -217,7 +217,7 @@
 .gy-pdp__title {
   margin: 0 0 var(--gy-space-md);
   font-family: var(--gy-font-heading);
-  font-size: clamp(1.5rem, 1.1rem + 1.3vw, 2.25rem);
+  font-size: clamp(2.4rem, 1.76rem + 1.3vw, 3.6rem);
   font-weight: 300;
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -231,7 +231,7 @@
 
 .gy-pdp__price .price {
   font-family: var(--gy-font-heading);
-  font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
+  font-size: clamp(3.2rem, 2.24rem + 2vw, 4.8rem);
   font-weight: 300;
   line-height: 1;
   letter-spacing: -0.03em;
@@ -266,7 +266,7 @@
 }
 
 .gy-pdp__compare {
-  font-size: 1.05rem;
+  font-size: 1.68rem;
   color: rgb(var(--gy-ink-muted));
   text-decoration: line-through;
 }
@@ -276,7 +276,7 @@
   border: 1px solid rgb(var(--gy-lavender-deep) / 0.45);
   border-radius: var(--gy-radius-pill);
   background-color: rgb(var(--gy-lavender) / 0.5);
-  font-size: 0.62rem;
+  font-size: 0.992rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -284,7 +284,7 @@
 
 .gy-pdp__tax,
 .gy-pdp__stock {
-  font-size: 0.75rem;
+  font-size: 1.2rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgb(var(--gy-ink-muted));
@@ -337,14 +337,14 @@
 .gy-pdp__variants-title {
   margin: 0;
   font-family: var(--gy-font-heading);
-  font-size: 1.05rem;
+  font-size: 1.68rem;
   font-weight: 400;
   letter-spacing: -0.01em;
 }
 
 .gy-pdp__variants-sub {
-  margin: 0.15rem 0 0;
-  font-size: 0.78rem;
+  margin: 0.24rem 0 0;
+  font-size: 1.248rem;
   color: rgb(var(--gy-ink-muted));
 }
 
@@ -355,7 +355,7 @@
   background: none;
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.66rem;
+  font-size: 1.056rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -377,15 +377,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 3.1rem;
-  min-height: 2.75rem;
-  padding: 0.55rem 0.95rem;
-  margin: 0 0.45rem 0.45rem 0;
+  min-width: 4.96rem;
+  min-height: 4.4rem;
+  padding: 0.88rem 1.52rem;
+  margin: 0 0.72rem 0.72rem 0;
   border: 1px solid rgb(var(--gy-ink) / 0.16);
   border-radius: 10px;
   background-color: rgb(var(--gy-canvas-warm));
   color: rgb(var(--gy-ink));
-  font-size: 0.82rem;
+  font-size: 1.312rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   transition:
@@ -451,15 +451,15 @@
    data for the option values. Without swatches the same label styling applies,
    showing the colour name alone — the theme never invents a colour. */
 .gy-pdp .product-form__input--swatch input[type='radio'] + label {
-  gap: 0.6rem;
+  gap: 0.96rem;
   min-width: 0;
-  padding-inline: 0.85rem 1.1rem;
+  padding-inline: 1.36rem 1.76rem;
   justify-content: flex-start;
 }
 
 .gy-pdp .product-form__input--swatch .swatch {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.84rem;
+  height: 1.84rem;
   border-radius: 50%;
   border: 1px solid rgb(var(--gy-ink) / 0.15);
   box-shadow: 0 0 0 3px rgb(var(--gy-canvas));
@@ -509,10 +509,10 @@
   right: 0;
   bottom: 0;
   /* Wide enough for the full five-column size chart on desktop. */
-  width: min(36rem, 94vw);
+  width: min(57.6rem, 94vw);
   display: flex;
   flex-direction: column;
-  padding: clamp(1.25rem, 3vw, 2rem);
+  padding: clamp(2rem, 3vw, 3.2rem);
   background-color: rgb(var(--gy-canvas));
   box-shadow: var(--gy-elevation-3);
   translate: 100% 0;
@@ -535,24 +535,24 @@
 .gy-pdp__drawer-title {
   margin: 0;
   font-family: var(--gy-font-heading);
-  font-size: 1.15rem;
+  font-size: 1.84rem;
   font-weight: 400;
 }
 
 .gy-pdp__drawer-close {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 4rem;
+  height: 4rem;
   border: 1px solid rgb(var(--gy-ink) / 0.12);
   border-radius: 50%;
   background-color: rgb(var(--gy-canvas-warm));
   color: rgb(var(--gy-ink));
-  font-size: 1.2rem;
+  font-size: 1.92rem;
   line-height: 1;
   cursor: pointer;
 }
 
 .gy-pdp__drawer-body {
-  font-size: 0.92rem;
+  font-size: 1.472rem;
   line-height: 1.75;
   color: rgb(var(--gy-ink-soft));
 }
@@ -565,10 +565,10 @@
 
 .gy-pdp__drawer-body th,
 .gy-pdp__drawer-body td {
-  padding: 0.6rem 0.4rem;
+  padding: 0.96rem 0.64rem;
   border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
   text-align: left;
-  font-size: 0.85rem;
+  font-size: 1.36rem;
 }
 
 body.gy-no-scroll { overflow: hidden; }
@@ -583,7 +583,7 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-pdp__highlights-heading {
   margin: 0 0 var(--gy-space-sm);
-  font-size: 0.66rem;
+  font-size: 1.056rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -592,7 +592,7 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-pdp__highlights ul {
   display: grid;
-  gap: 0.5rem;
+  gap: 0.8rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -600,8 +600,8 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-pdp__highlights li {
   position: relative;
-  padding-left: 1.35rem;
-  font-size: 0.95rem;
+  padding-left: 2.16rem;
+  font-size: 1.52rem;
   line-height: 1.6;
   color: rgb(var(--gy-ink-soft));
 }
@@ -609,16 +609,16 @@ body.gy-no-scroll { overflow: hidden; }
 .gy-pdp__highlights li::before {
   content: '';
   position: absolute;
-  left: 0.25rem;
+  left: 0.4rem;
   top: 0.62em;
-  width: 0.4rem;
-  height: 0.4rem;
+  width: 0.64rem;
+  height: 0.64rem;
   border-radius: 50%;
   background-color: rgb(var(--gy-lavender-deep) / 0.75);
 }
 
 .gy-pdp .form__label {
-  font-size: 0.68rem;
+  font-size: 1.088rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -635,7 +635,7 @@ body.gy-no-scroll { overflow: hidden; }
   border: 1px solid rgb(var(--gy-ink) / 0.16);
   background-color: rgb(var(--gy-canvas-warm));
   overflow: hidden;
-  width: 9rem;
+  width: 14.4rem;
 }
 
 .gy-pdp .quantity__button {
@@ -655,9 +655,9 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-pdp__buy .product-form__submit,
 .gy-pdp__buy .shopify-payment-button__button {
-  min-height: 3.5rem;
+  min-height: 5.6rem;
   border-radius: var(--gy-radius-pill);
-  font-size: 0.78rem;
+  font-size: 1.248rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -725,8 +725,8 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-pdp__trust li {
   position: relative;
-  padding-left: 1.1rem;
-  font-size: 0.68rem;
+  padding-left: 1.76rem;
+  font-size: 1.088rem;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -738,8 +738,8 @@ body.gy-no-scroll { overflow: hidden; }
   position: absolute;
   left: 0;
   top: 0.45em;
-  width: 0.4rem;
-  height: 0.4rem;
+  width: 0.64rem;
+  height: 0.64rem;
   border-radius: 50%;
   background-color: rgb(var(--gy-lavender-deep) / 0.8);
 }
@@ -759,10 +759,10 @@ body.gy-no-scroll { overflow: hidden; }
   align-items: center;
   justify-content: space-between;
   gap: var(--gy-space-sm);
-  padding: 1.1rem 0;
+  padding: 1.76rem 0;
   list-style: none;
   cursor: pointer;
-  font-size: 0.72rem;
+  font-size: 1.152rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -772,8 +772,8 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-pdp__accordion-icon {
   position: relative;
-  width: 0.85rem;
-  height: 0.85rem;
+  width: 1.36rem;
+  height: 1.36rem;
   flex: 0 0 auto;
 }
 
@@ -796,13 +796,13 @@ body.gy-no-scroll { overflow: hidden; }
 }
 
 .gy-pdp__accordion-body {
-  padding-bottom: 1.25rem;
-  font-size: 0.92rem;
+  padding-bottom: 2rem;
+  font-size: 1.472rem;
   line-height: 1.75;
   color: rgb(var(--gy-ink-soft));
 }
 
-.gy-pdp__accordion-body ul { padding-left: 1.1rem; }
+.gy-pdp__accordion-body ul { padding-left: 1.76rem; }
 
 .gy-pdp__app {
   margin-bottom: var(--gy-space-sm);
@@ -816,8 +816,8 @@ body.gy-no-scroll { overflow: hidden; }
   right: 0;
   bottom: 0;
   z-index: 30;
-  padding: 0.7rem clamp(0.75rem, 3vw, 1.5rem);
-  padding-bottom: calc(0.7rem + env(safe-area-inset-bottom, 0px));
+  padding: 1.12rem clamp(1.2rem, 3vw, 2.4rem);
+  padding-bottom: calc(1.12rem + env(safe-area-inset-bottom, 0px));
   background-color: rgb(var(--gy-canvas) / 0.96);
   backdrop-filter: blur(14px);
   border-top: 1px solid rgb(var(--gy-ink) / 0.08);
@@ -832,12 +832,12 @@ body.gy-no-scroll { overflow: hidden; }
 .gy-pdp__sticky-inner {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1.2rem;
 }
 
 .gy-pdp__sticky-media img {
-  width: 2.75rem;
-  height: 3.4rem;
+  width: 4.4rem;
+  height: 5.44rem;
   object-fit: cover;
   border-radius: var(--gy-radius-sm);
 }
@@ -849,7 +849,7 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-pdp__sticky-title {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 1.152rem;
   line-height: 1.3;
   color: rgb(var(--gy-ink-soft));
   display: -webkit-box;
@@ -860,11 +860,11 @@ body.gy-no-scroll { overflow: hidden; }
 }
 
 .gy-pdp__sticky-price {
-  margin: 0.15rem 0 0;
+  margin: 0.24rem 0 0;
 }
 
 .gy-pdp__sticky-price .price {
-  font-size: 0.95rem;
+  font-size: 1.52rem;
   color: rgb(var(--gy-ink));
 }
 
@@ -872,10 +872,10 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-pdp__sticky-button {
   flex: 0 0 auto;
-  min-height: 3rem;
-  padding-inline: 1.5rem;
+  min-height: 4.8rem;
+  padding-inline: 2.4rem;
   border-radius: 12px;
-  font-size: 0.68rem;
+  font-size: 1.088rem;
   transition: transform 180ms var(--gy-ease);
 }
 
@@ -895,16 +895,16 @@ body.gy-no-scroll { overflow: hidden; }
 @media screen and (min-width: 990px) {
   .gy-pdp__inner {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: clamp(2.5rem, 5vw, 5rem);
+    gap: clamp(4rem, 5vw, 8rem);
   }
 
   .gy-pdp__info {
     position: sticky;
-    top: 6rem;
+    top: 9.6rem;
   }
 
-  .gy-pdp__thumbs { margin-top: 1rem; }
-  .gy-pdp__thumb { width: 5.5rem; }
+  .gy-pdp__thumbs { margin-top: 1.6rem; }
+  .gy-pdp__thumb { width: 8.8rem; }
 }
 
 /* ---- Reduced motion ---- */
@@ -941,9 +941,9 @@ body.gy-no-scroll { overflow: hidden; }
 }
 
 .gy-pdp__drawer-intro {
-  margin: 0.35rem 0 0;
+  margin: 0.56rem 0 0;
   max-width: 32ch;
-  font-size: 0.85rem;
+  font-size: 1.36rem;
   line-height: 1.6;
   color: rgb(var(--gy-ink-muted));
 }
@@ -955,7 +955,7 @@ body.gy-no-scroll { overflow: hidden; }
 .gy-guide__label {
   margin: 0 0 var(--gy-space-sm);
   font-family: var(--gy-font-body);
-  font-size: 0.66rem;
+  font-size: 1.056rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -969,18 +969,18 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-guide__table th,
 .gy-guide__table td {
-  padding: 0.7rem 0.25rem;
+  padding: 1.12rem 0.4rem;
   border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 1.44rem;
   font-weight: 400;
   color: rgb(var(--gy-ink-soft));
 }
 
 .gy-guide__table thead th {
-  padding-bottom: 0.45rem;
+  padding-bottom: 0.72rem;
   border-bottom-color: rgb(var(--gy-ink) / 0.16);
-  font-size: 0.62rem;
+  font-size: 0.992rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1006,20 +1006,20 @@ body.gy-no-scroll { overflow: hidden; }
 .gy-guide__cups {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.8rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .gy-guide__cups li {
-  min-width: 2.75rem;
-  padding: 0.55rem 0.85rem;
+  min-width: 4.4rem;
+  padding: 0.88rem 1.36rem;
   border: 1px solid rgb(var(--gy-ink) / 0.14);
   border-radius: 10px;
   background-color: rgb(var(--gy-canvas-warm));
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 1.36rem;
   color: rgb(var(--gy-ink-soft));
 }
 
@@ -1046,21 +1046,21 @@ body.gy-no-scroll { overflow: hidden; }
 .gy-guide__step-number {
   flex: 0 0 auto;
   font-family: var(--gy-font-heading);
-  font-size: 0.95rem;
+  font-size: 1.52rem;
   color: rgb(var(--gy-lavender-deep));
   letter-spacing: 0.02em;
 }
 
 .gy-guide__step-title {
-  margin: 0 0 0.2rem;
-  font-size: 0.92rem;
+  margin: 0 0 0.32rem;
+  font-size: 1.472rem;
   font-weight: 500;
   color: rgb(var(--gy-ink));
 }
 
 .gy-guide__step-text {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 1.408rem;
   line-height: 1.65;
   color: rgb(var(--gy-ink-soft));
 }
@@ -1073,7 +1073,7 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-guide__note p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 1.44rem;
   line-height: 1.65;
   color: rgb(var(--gy-ink-soft));
 }
@@ -1082,7 +1082,7 @@ body.gy-no-scroll { overflow: hidden; }
   margin: 0;
   padding-top: var(--gy-space-md);
   border-top: 1px solid rgb(var(--gy-ink) / 0.08);
-  font-size: 0.78rem;
+  font-size: 1.248rem;
   line-height: 1.6;
   color: rgb(var(--gy-ink-muted));
 }
@@ -1117,7 +1117,7 @@ body.gy-no-scroll { overflow: hidden; }
 .gy-chart__title {
   margin: 0;
   font-family: var(--gy-font-body);
-  font-size: 0.68rem;
+  font-size: 1.088rem;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -1127,7 +1127,7 @@ body.gy-no-scroll { overflow: hidden; }
 .gy-chart__category {
   margin: 0;
   font-family: var(--gy-font-heading);
-  font-size: 0.95rem;
+  font-size: 1.52rem;
   font-weight: 400;
   color: rgb(var(--gy-ink));
 }
@@ -1149,27 +1149,48 @@ body.gy-no-scroll { overflow: hidden; }
   position: relative;
 }
 
-.gy-chart__wrap.is-scrollable::after {
+/* Soft edges that say "there is more table this way". Each one is present only
+   while there is actually content past it, and neither ever covers a value the
+   shopper has scrolled to. */
+.gy-chart__wrap::before,
+.gy-chart__wrap::after {
   content: '';
   position: absolute;
   top: 1px;
-  right: 1px;
   bottom: 1px;
-  width: 2.5rem;
-  border-radius: 0 var(--gy-radius-sm) var(--gy-radius-sm) 0;
-  background: linear-gradient(90deg, rgb(var(--gy-canvas) / 0), rgb(var(--gy-canvas)));
+  width: 3.6rem;
+  opacity: 0;
   pointer-events: none;
-  transition: opacity var(--gy-duration) var(--gy-ease);
+  transition: opacity 240ms var(--gy-ease);
 }
 
-.gy-chart__wrap.is-scrolled-end::after {
-  opacity: 0;
+.gy-chart__wrap::after {
+  right: 1px;
+  border-radius: 0 var(--gy-radius-sm) var(--gy-radius-sm) 0;
+  background: linear-gradient(90deg, rgb(var(--gy-canvas) / 0), rgb(var(--gy-canvas)) 82%);
+}
+
+.gy-chart__wrap::before {
+  left: 1px;
+  z-index: 2;
+  border-radius: var(--gy-radius-sm) 0 0 var(--gy-radius-sm);
+  background: linear-gradient(270deg, rgb(var(--gy-canvas) / 0), rgb(var(--gy-canvas)) 82%);
+}
+
+/* Right edge: shown while more table remains to the right. */
+.gy-chart__wrap.is-scrollable:not(.is-scrolled-end)::after {
+  opacity: 1;
+}
+
+/* Left edge: shown only once the shopper has scrolled away from the start. */
+.gy-chart__wrap.is-scrollable.is-scrolled-away::before {
+  opacity: 1;
 }
 
 .gy-chart__hint {
   display: none;
-  margin: 0.5rem 0 0;
-  font-size: 0.66rem;
+  margin: 0.8rem 0 0;
+  font-size: 1.056rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgb(var(--gy-ink-muted));
@@ -1199,10 +1220,10 @@ body.gy-no-scroll { overflow: hidden; }
 
 .gy-chart__table th,
 .gy-chart__table td {
-  padding: 0.62rem 0.7rem;
+  padding: 0.992rem 1.12rem;
   border-bottom: 1px solid rgb(var(--gy-ink) / 0.07);
   text-align: left;
-  font-size: 0.8rem;
+  font-size: 1.28rem;
   font-weight: 400;
   white-space: nowrap;
   color: rgb(var(--gy-ink-soft));
@@ -1212,10 +1233,10 @@ body.gy-no-scroll { overflow: hidden; }
   position: sticky;
   top: 0;
   z-index: 1;
-  padding-block: 0.7rem;
+  padding-block: 1.12rem;
   border-bottom: 1px solid rgb(var(--gy-ink) / 0.16);
   background-color: rgb(var(--gy-canvas-warm));
-  font-size: 0.58rem;
+  font-size: 0.928rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1249,7 +1270,7 @@ body.gy-no-scroll { overflow: hidden; }
 }
 
 .gy-guide__footnote p {
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.64rem;
 }
 
 .gy-guide__footnote p:last-child {
@@ -1259,14 +1280,15 @@ body.gy-no-scroll { overflow: hidden; }
 @media screen and (max-width: 749px) {
   .gy-chart__table th,
   .gy-chart__table td {
-    padding: 0.58rem 0.5rem;
-    font-size: 0.74rem;
+    padding: 0.928rem 0.8rem;
+    font-size: 1.184rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .gy-chart__table tbody tr:hover th,
   .gy-chart__table tbody tr:hover td,
+  .gy-chart__wrap::before,
   .gy-chart__wrap::after {
     transition: none !important;
   }

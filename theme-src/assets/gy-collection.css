@@ -8,14 +8,14 @@
 
 .gy-colhead__inner {
   display: grid;
-  gap: clamp(1.5rem, 4vw, 3.5rem);
+  gap: clamp(2.4rem, 4vw, 5.6rem);
   align-items: end;
 }
 
 .gy-colhead__title {
   margin: 0;
   font-family: var(--gy-font-heading);
-  font-size: clamp(2rem, 1.3rem + 2.6vw, 3.4rem);
+  font-size: clamp(3.2rem, 2.08rem + 2.6vw, 5.44rem);
   font-weight: 300;
   line-height: 1.04;
   letter-spacing: -0.03em;
@@ -53,13 +53,13 @@
 
 .gy-collection__bar {
   position: sticky;
-  top: 4.5rem;
+  top: 7.2rem;
   z-index: 12;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--gy-space-md);
-  padding: 0.85rem 0;
+  padding: 1.36rem 0;
   margin-bottom: var(--gy-space-lg);
   border-bottom: 1px solid rgb(var(--gy-ink) / 0.1);
   background-color: rgb(var(--gy-canvas));
@@ -70,7 +70,7 @@
 
 .gy-collection__count {
   margin: 0;
-  font-size: 0.7rem;
+  font-size: 1.12rem;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -80,21 +80,21 @@
 .gy-collection__tools {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.96rem;
 }
 
 .gy-collection__tool {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  min-height: 2.75rem;
-  padding: 0 1.1rem;
+  gap: 0.8rem;
+  min-height: 4.4rem;
+  padding: 0 1.76rem;
   border: 1px solid rgb(var(--gy-ink) / 0.16);
   border-radius: 10px;
   background-color: rgb(var(--gy-canvas-warm));
   color: rgb(var(--gy-ink));
   font-family: inherit;
-  font-size: 0.7rem;
+  font-size: 1.12rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -109,26 +109,26 @@
 }
 
 .gy-collection__badge {
-  min-width: 1.1rem;
-  height: 1.1rem;
-  padding: 0 0.3rem;
+  min-width: 1.76rem;
+  height: 1.76rem;
+  padding: 0 0.48rem;
   border-radius: var(--gy-radius-pill);
   background-color: rgb(var(--gy-ink));
   color: rgb(var(--gy-canvas));
-  font-size: 0.6rem;
-  line-height: 1.1rem;
+  font-size: 0.96rem;
+  line-height: 1.76rem;
   text-align: center;
 }
 
 .gy-collection__sort select {
-  min-height: 2.75rem;
-  padding: 0 2rem 0 1rem;
+  min-height: 4.4rem;
+  padding: 0 3.2rem 0 1.6rem;
   border: 1px solid rgb(var(--gy-ink) / 0.16);
   border-radius: 10px;
   background-color: rgb(var(--gy-canvas-warm));
   color: rgb(var(--gy-ink));
   font-family: inherit;
-  font-size: 0.7rem;
+  font-size: 1.12rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -136,7 +136,7 @@
   appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, rgb(var(--gy-ink)) 50%),
     linear-gradient(135deg, rgb(var(--gy-ink)) 50%, transparent 50%);
-  background-position: calc(100% - 1.05rem) 55%, calc(100% - 0.75rem) 55%;
+  background-position: calc(100% - 1.68rem) 55%, calc(100% - 1.2rem) 55%;
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
 }
@@ -146,7 +146,7 @@
 .gy-collection__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.8rem;
   margin: 0 0 var(--gy-space-lg);
   padding: 0;
   list-style: none;
@@ -155,14 +155,14 @@
 .gy-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  min-height: 2.25rem;
-  padding: 0 0.85rem;
+  gap: 0.8rem;
+  min-height: 3.6rem;
+  padding: 0 1.36rem;
   border: 1px solid rgb(var(--gy-lavender-deep) / 0.4);
   border-radius: var(--gy-radius-pill);
   background-color: rgb(var(--gy-lavender) / 0.35);
   color: rgb(var(--gy-ink));
-  font-size: 0.72rem;
+  font-size: 1.152rem;
   text-decoration: none;
   transition: background-color 200ms var(--gy-ease);
 }
@@ -175,7 +175,7 @@
   color: rgb(var(--gy-ink-muted));
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-size: 0.66rem;
+  font-size: 1.056rem;
 }
 
 /* ---- Filter panel ---- */
@@ -203,7 +203,7 @@
   bottom: 0;
   display: flex;
   flex-direction: column;
-  width: min(24rem, 92vw);
+  width: min(38.4rem, 92vw);
   background-color: rgb(var(--gy-canvas));
   box-shadow: var(--gy-elevation-3);
   translate: 100% 0;
@@ -223,17 +223,17 @@
 .gy-filters__title {
   margin: 0;
   font-family: var(--gy-font-heading);
-  font-size: 1.05rem;
+  font-size: 1.68rem;
   font-weight: 400;
 }
 
 .gy-filters__close {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 4rem;
+  height: 4rem;
   border: 1px solid rgb(var(--gy-ink) / 0.12);
   border-radius: 50%;
   background-color: rgb(var(--gy-canvas-warm));
-  font-size: 1.2rem;
+  font-size: 1.92rem;
   line-height: 1;
   cursor: pointer;
 }
@@ -252,10 +252,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
+  padding: 1.6rem 0;
   list-style: none;
   cursor: pointer;
-  font-size: 0.7rem;
+  font-size: 1.12rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -265,8 +265,8 @@
 
 .gy-filters__icon {
   position: relative;
-  width: 0.75rem;
-  height: 0.75rem;
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .gy-filters__icon::before,
@@ -284,17 +284,17 @@
 
 .gy-filters__values {
   margin: 0;
-  padding: 0 0 1rem;
+  padding: 0 0 1.6rem;
   list-style: none;
 }
 
 .gy-filters__value {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  min-height: 2.75rem;
+  gap: 1.04rem;
+  min-height: 4.4rem;
   cursor: pointer;
-  font-size: 0.88rem;
+  font-size: 1.408rem;
   color: rgb(var(--gy-ink-soft));
 }
 
@@ -302,8 +302,8 @@
 
 .gy-filters__box {
   flex: 0 0 auto;
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1.68rem;
+  height: 1.68rem;
   border: 1px solid rgb(var(--gy-ink) / 0.25);
   border-radius: 4px;
   transition: background-color 180ms var(--gy-ease), border-color 180ms var(--gy-ease);
@@ -323,7 +323,7 @@
 .gy-filters__name { flex: 1 1 auto; }
 
 .gy-filters__count {
-  font-size: 0.75rem;
+  font-size: 1.2rem;
   color: rgb(var(--gy-ink-muted));
 }
 
@@ -332,25 +332,25 @@
 .gy-filters__price {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding-bottom: 1rem;
+  gap: 0.96rem;
+  padding-bottom: 1.6rem;
 }
 
 .gy-filters__price-input {
   width: 100%;
-  min-height: 2.75rem;
-  padding: 0 0.75rem;
+  min-height: 4.4rem;
+  padding: 0 1.2rem;
   border: 1px solid rgb(var(--gy-ink) / 0.16);
   border-radius: 8px;
   background-color: rgb(var(--gy-canvas-warm));
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 1.36rem;
 }
 
 .gy-filters__foot {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1.2rem;
   padding: var(--gy-space-md) var(--gy-space-lg);
   padding-bottom: calc(var(--gy-space-md) + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid rgb(var(--gy-ink) / 0.1);
@@ -364,7 +364,7 @@
   margin-bottom: var(--gy-space-xl);
   /* The gap between rows is deliberately larger than any gap inside a card, so
      a quick-add button always reads as belonging to the card above it. */
-  row-gap: clamp(2.25rem, 5vw, 3rem);
+  row-gap: clamp(3.6rem, 5vw, 4.8rem);
 }
 
 .gy-card__media { position: relative; }
@@ -381,7 +381,7 @@
   opacity: 1;
 }
 
-.gy-card__action { margin-top: 0.55rem; }
+.gy-card__action { margin-top: 0.88rem; }
 
 .gy-card__form { margin: 0; }
 
@@ -389,16 +389,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.64rem;
   width: 100%;
-  min-height: 2.75rem;
-  padding: 0 1rem;
+  min-height: 4.4rem;
+  padding: 0 1.6rem;
   border: 1px solid rgb(var(--gy-ink) / 0.2);
   border-radius: 10px;
   background-color: transparent;
   color: rgb(var(--gy-ink));
   font-family: inherit;
-  font-size: 0.66rem;
+  font-size: 1.056rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -430,7 +430,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
   padding-top: var(--gy-space-lg);
   border-top: 1px solid rgb(var(--gy-ink) / 0.08);
 }
@@ -438,7 +438,7 @@
 .gy-pagination ol {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.4rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -449,10 +449,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 2.5rem;
-  min-height: 2.5rem;
+  min-width: 4rem;
+  min-height: 4rem;
   border-radius: 8px;
-  font-size: 0.8rem;
+  font-size: 1.28rem;
   text-decoration: none;
   color: rgb(var(--gy-ink-soft));
 }
@@ -467,14 +467,14 @@
 /* ---- Empty state ---- */
 
 .gy-collection__empty {
-  padding: clamp(3rem, 8vw, 6rem) 0;
+  padding: clamp(4.8rem, 8vw, 9.6rem) 0;
   text-align: center;
 }
 
 .gy-collection__empty-title {
   margin: 0 0 var(--gy-space-sm);
   font-family: var(--gy-font-heading);
-  font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+  font-size: clamp(2.24rem, 1.76rem + 1vw, 3.2rem);
   font-weight: 300;
 }
 
@@ -487,7 +487,7 @@
 .gy-collection__empty-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 1.2rem;
   justify-content: center;
 }
 

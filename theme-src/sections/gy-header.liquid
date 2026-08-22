@@ -8,6 +8,7 @@
 
 {{ 'gentleyou.css' | asset_url | stylesheet_tag }}
 {{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+{{ 'gy-cart.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
 
 <header
@@ -90,10 +91,20 @@
         </a>
       {%- endif -%}
 
-      <a class="gy-header__icon gy-header__cart" href="{{ routes.cart_url }}" aria-label="{{ 'general.cart.view' | t: count: cart.item_count }}">
+      <a
+        class="gy-header__icon gy-header__cart"
+        href="{{ routes.cart_url }}"
+        id="cart-icon-bubble"
+        aria-label="{{ 'general.cart.view' | t: count: cart.item_count }}"
+      >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 7.5h13l-1.2 12H6.7z"/><path d="M9 7.5V6a3 3 0 0 1 6 0v1.5"/></svg>
         {%- if cart.item_count > 0 -%}
-          <span class="gy-header__count">{{ cart.item_count }}</span>
+          <div class="cart-count-bubble gy-header__count">
+            {%- if cart.item_count < 100 -%}
+              <span aria-hidden="true">{{ cart.item_count }}</span>
+            {%- endif -%}
+            <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+          </div>
         {%- endif -%}
       </a>
     </div>
