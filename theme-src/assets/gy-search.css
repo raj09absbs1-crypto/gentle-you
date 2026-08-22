@@ -463,16 +463,31 @@ predictive-search:not([open]) .gy-psearch__all {
 @media screen and (max-width: 749px) {
   /* The sheet hugs its content and only grows to the full screen once there
      are results to scroll, so an empty search is a compact panel rather than
-     a full page of nothing. */
+     a full page of nothing. It still keeps a floor, so the sheet ends with
+     room under the links instead of stopping hard against whatever control
+     happens to sit behind it on the page. */
   .gy-search__panel {
     display: flex;
     flex-direction: column;
     height: auto;
+    min-height: 42vh;
     max-height: 100%;
+    /* The sheet ends on a soft edge and casts a deep shadow, so it reads as a
+       layer resting over the page. Whatever the page happens to have just
+       below — a button, a heading — is then clearly behind the sheet rather
+       than a second control cut off by it. */
+    border-radius: 0 0 var(--gy-radius-lg) var(--gy-radius-lg);
+    box-shadow: 0 2.4rem 4.8rem -0.8rem rgb(var(--gy-ink) / 0.45);
   }
 
   .gy-search--typing .gy-search__panel {
     height: 100%;
+  }
+
+  /* The page behind is context, not something to read: dimmed further on a
+     phone, where the sheet covers only part of the screen. */
+  .gy-search__scrim {
+    background-color: rgb(var(--gy-ink) / 0.62);
   }
 
   .gy-search__inner {
@@ -480,7 +495,8 @@ predictive-search:not([open]) .gy-psearch__all {
     flex-direction: column;
     flex: 1 1 auto;
     min-height: 0;
-    padding: var(--gy-space-sm) var(--gy-space-sm) var(--gy-space-md);
+    /* Room under the links, so the sheet's edge is spacing rather than a cut. */
+    padding: var(--gy-space-sm) var(--gy-space-sm) var(--gy-space-xl);
   }
 
   .gy-search__head {
