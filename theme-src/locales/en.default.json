@@ -283,7 +283,8 @@
       "add_review_app": "Add your review app block to show real reviews here.",
       "search_placeholder": "What are you looking for?",
       "search_results_for": "Results for",
-      "search_no_results_text": "Try a different word, or explore our everyday essentials below."
+      "search_no_results_text": "Try a different word, or explore our everyday essentials below.",
+      "search_no_results_title": "Nothing found for “{{ terms }}”"
     },
     "hero_product": {
       "carousel": "GentleYou campaign",

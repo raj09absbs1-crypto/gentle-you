@@ -15,8 +15,14 @@
 <script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
 
 {%- paginate search.results by section.settings.results_per_page -%}
+  {%- liquid
+    assign has_results = false
+    if search.performed and search.results_count > 0
+      assign has_results = true
+    endif
+  -%}
   <section
-    class="gy-searchpage"
+    class="gy-searchpage{% unless has_results %} gy-searchpage--lean{% endunless %}"
     style="--gy-section-top: {{ section.settings.padding_top }}px; --gy-section-bottom: {{ section.settings.padding_bottom }}px;"
     {{ section.shopify_attributes }}
   >
@@ -53,14 +59,18 @@
           </button>
         </form>
 
-        {%- if search.performed -%}
+        {%- comment -%}
+          Only alongside results: with none, the empty state below already
+          says so, in better words.
+        {%- endcomment -%}
+        {%- if has_results -%}
           <p class="gy-searchpage__count" aria-live="polite">
             {{ 'templates.search.results_with_count' | t: count: search.results_count }}
           </p>
         {%- endif -%}
       </header>
 
-      {%- if search.performed and search.results_count > 0 -%}
+      {%- if has_results -%}
         <div class="gy-grid gy-grid--{{ section.settings.columns }} gy-searchpage__grid">
           {%- for item in search.results -%}
             {%- liquid
@@ -123,7 +133,7 @@
         <div class="gy-searchpage__empty">
           {%- if search.performed -%}
             <p class="gy-searchpage__empty-title">
-              {{ 'templates.search.no_results' | t: terms: search.terms }}
+              {{ 'sections.gy.search_no_results_title' | t: terms: search.terms }}
             </p>
             <p class="gy-searchpage__empty-text">{{ 'sections.gy.search_no_results_text' | t }}</p>
           {%- else -%}

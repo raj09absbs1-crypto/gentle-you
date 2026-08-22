@@ -56,7 +56,7 @@
 }
 
 .gy-search__inner {
-  width: min(96rem, 100%);
+  width: min(78rem, 100%);
   margin-inline: auto;
   padding: var(--gy-space-md) var(--gy-space-md) var(--gy-space-lg);
 }
@@ -66,7 +66,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--gy-space-sm);
-  margin-bottom: var(--gy-space-sm);
+  margin-bottom: var(--gy-space-md);
 }
 
 .gy-search__title {
@@ -120,7 +120,9 @@
   display: flex;
   align-items: center;
   gap: var(--gy-space-xs);
-  padding: 0 var(--gy-space-sm);
+  /* No padding on the right: the reset button is 4.4rem wide, so its glyph
+     then sits the same distance from the edge as the close button's. */
+  padding-inline: var(--gy-space-md) 0;
   border: 1px solid rgb(var(--gy-ink) / 0.14);
   border-radius: var(--gy-radius-pill);
   background-color: rgb(var(--gy-canvas-warm));
@@ -139,19 +141,19 @@
 }
 
 .gy-search__field-icon svg {
-  width: 2rem;
-  height: 2rem;
+  width: 1.8rem;
+  height: 1.8rem;
 }
 
 .gy-search__input {
   flex: 1 1 auto;
   min-width: 0;
-  height: 6.4rem;
+  height: 6rem;
   padding: 0;
   border: 0;
   background: none;
   font-family: var(--gy-font-heading);
-  font-size: clamp(1.92rem, 1.6rem + 0.8vw, 2.56rem);
+  font-size: clamp(1.76rem, 1.6rem + 0.5vw, 2.24rem);
   font-weight: 300;
   letter-spacing: -0.01em;
   color: rgb(var(--gy-ink));
@@ -201,7 +203,7 @@
 /* ---- Suggestions before typing ---------------------------------------- */
 
 .gy-search__suggest {
-  margin-top: var(--gy-space-md);
+  margin-top: var(--gy-space-lg);
 }
 
 .gy-search--typing .gy-search__suggest {
@@ -209,7 +211,7 @@
 }
 
 .gy-search__suggest-heading {
-  margin: 0 0 var(--gy-space-xs);
+  margin: 0 0 var(--gy-space-sm);
   font-size: 1.088rem;
   font-weight: 600;
   letter-spacing: 0.2em;
@@ -220,7 +222,7 @@
 .gy-search__suggest-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--gy-space-2xs);
+  gap: var(--gy-space-xs) var(--gy-space-2xs);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -248,7 +250,7 @@
 /* ---- Predictive results ----------------------------------------------- */
 
 .gy-search__results {
-  margin-top: var(--gy-space-md);
+  margin-top: var(--gy-space-lg);
 }
 
 .gy-search__results:empty {
@@ -288,18 +290,25 @@ predictive-search:not([open]) .gy-psearch__all {
 
 .gy-psearch__group + .gy-psearch__group {
   padding-top: var(--gy-space-md);
-  border-top: 1px solid rgb(var(--gy-ink) / 0.08);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.07);
+}
+
+.gy-psearch__group--compact .gy-psearch__list {
+  gap: 0;
 }
 
 .gy-psearch__list {
   display: grid;
-  gap: var(--gy-space-3xs);
+  gap: var(--gy-space-2xs);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* The row bleeds a little past the content column so the highlight reads as
+   a row, while the image still lines up with the field above it. */
 .gy-psearch__item {
+  margin-inline: calc(var(--gy-space-2xs) * -1);
   border-radius: var(--gy-radius-sm);
   transition: background-color 200ms var(--gy-ease);
 }
@@ -342,27 +351,28 @@ predictive-search:not([open]) .gy-psearch__all {
 
 .gy-psearch__flag {
   position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  padding: 0.32rem 0;
-  background-color: rgb(var(--gy-ink) / 0.72);
-  color: rgb(var(--gy-canvas));
-  font-size: 0.832rem;
+  left: 0.4rem;
+  bottom: 0.4rem;
+  padding: 0.24rem 0.56rem;
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-canvas) / 0.92);
+  color: rgb(var(--gy-ink-soft));
+  font-size: 0.768rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  text-align: center;
+  white-space: nowrap;
 }
 
 .gy-psearch__body {
   display: grid;
-  gap: 0.32rem;
+  gap: 0.48rem;
 }
 
 .gy-psearch__title {
-  font-size: 1.472rem;
+  font-size: 1.44rem;
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.4;
   color: rgb(var(--gy-ink));
 }
 
@@ -373,13 +383,13 @@ predictive-search:not([open]) .gy-psearch__all {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.64rem;
-  font-size: 1.408rem;
+  font-size: 1.472rem;
   color: rgb(var(--gy-ink));
 }
 
 .gy-psearch__price .price__sale .price-item--regular,
 .gy-psearch__price s {
-  font-size: 1.216rem;
+  font-size: 1.184rem;
   color: rgb(var(--gy-ink-muted));
 }
 
@@ -392,6 +402,7 @@ predictive-search:not([open]) .gy-psearch__all {
   align-items: center;
   min-height: 4.4rem;
   padding: 0 var(--gy-space-2xs);
+  font-weight: 400;
   font-size: 1.472rem;
   color: rgb(var(--gy-ink-soft));
   text-decoration: none;
@@ -450,11 +461,18 @@ predictive-search:not([open]) .gy-psearch__all {
 /* ---- Mobile: a full-height sheet -------------------------------------- */
 
 @media screen and (max-width: 749px) {
+  /* The sheet hugs its content and only grows to the full screen once there
+     are results to scroll, so an empty search is a compact panel rather than
+     a full page of nothing. */
   .gy-search__panel {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: auto;
     max-height: 100%;
+  }
+
+  .gy-search--typing .gy-search__panel {
+    height: 100%;
   }
 
   .gy-search__inner {
@@ -465,18 +483,25 @@ predictive-search:not([open]) .gy-psearch__all {
     padding: var(--gy-space-sm) var(--gy-space-sm) var(--gy-space-md);
   }
 
-  .gy-search__engine {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
+  .gy-search__head {
+    margin-bottom: var(--gy-space-sm);
   }
 
+  /* The sheet fills the screen, but the field and the suggestions underneath
+     it sit together at the top: only a list with results in it is allowed to
+     take the space that is left, so an empty search never stretches into a
+     column of dead air. */
+  .gy-search__engine,
   .gy-search__form {
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-height: 0;
+  }
+
+  predictive-search[open].gy-search__engine,
+  predictive-search[open] .gy-search__form {
+    flex: 1 1 auto;
   }
 
   /* Only the results scroll, so the field and the close button stay put. */
@@ -488,12 +513,47 @@ predictive-search:not([open]) .gy-psearch__all {
     -webkit-overflow-scrolling: touch;
   }
 
+  predictive-search:not([open]) .gy-search__results {
+    flex: 0 0 auto;
+  }
+
+  .gy-search__field {
+    padding-inline: var(--gy-space-sm) 0;
+  }
+
   .gy-search__input {
-    height: 5.6rem;
+    height: 5.2rem;
+  }
+
+  .gy-search__suggest {
+    margin-top: var(--gy-space-md);
+  }
+
+  .gy-search__suggest-link {
+    min-height: 4.4rem;
+    padding-inline: var(--gy-space-sm);
+    font-size: 1.344rem;
   }
 
   .gy-psearch__link {
     grid-template-columns: 6.4rem minmax(0, 1fr);
+    gap: var(--gy-space-xs);
+  }
+
+  .gy-psearch__title {
+    font-size: 1.376rem;
+  }
+}
+
+/* Very small handsets: the field and the pills stay comfortable rather than
+   crowding the edges. */
+@media screen and (max-width: 359px) {
+  .gy-search__inner {
+    padding-inline: var(--gy-space-xs);
+  }
+
+  .gy-search__suggest-link {
+    padding-inline: var(--gy-space-xs);
   }
 }
 
@@ -505,8 +565,17 @@ predictive-search:not([open]) .gy-psearch__all {
 }
 
 .gy-searchpage__head {
-  max-width: 72rem;
+  max-width: 68rem;
   margin-bottom: var(--gy-space-xl);
+}
+
+/* Nothing to show: the page keeps its rhythm instead of a screen of air. */
+.gy-searchpage--lean {
+  padding-bottom: var(--gy-space-xl);
+}
+
+.gy-searchpage--lean .gy-searchpage__head {
+  margin-bottom: var(--gy-space-md);
 }
 
 .gy-searchpage__eyebrow {
@@ -520,6 +589,7 @@ predictive-search:not([open]) .gy-psearch__all {
 
 .gy-searchpage__title {
   margin: 0 0 var(--gy-space-md);
+  max-width: 20ch;
   font-family: var(--gy-font-heading);
   font-size: clamp(3.2rem, 2.4rem + 2.4vw, 5.12rem);
   font-weight: 300;
@@ -587,7 +657,7 @@ predictive-search:not([open]) .gy-psearch__all {
 }
 
 .gy-searchpage__count {
-  margin: var(--gy-space-sm) 0 0;
+  margin: var(--gy-space-md) 0 0;
   font-size: 1.408rem;
   letter-spacing: 0.02em;
   color: rgb(var(--gy-ink-muted));
@@ -632,28 +702,30 @@ predictive-search:not([open]) .gy-psearch__all {
 }
 
 .gy-searchpage__empty {
-  max-width: 60rem;
-  padding-block: var(--gy-space-lg) var(--gy-space-xl);
+  max-width: 56rem;
+  padding-block: var(--gy-space-md) 0;
 }
 
 .gy-searchpage__empty-title {
   margin: 0 0 var(--gy-space-2xs);
   font-family: var(--gy-font-heading);
-  font-size: clamp(2.24rem, 1.92rem + 1vw, 2.88rem);
+  font-size: clamp(2.08rem, 1.84rem + 0.8vw, 2.56rem);
   font-weight: 300;
-  line-height: 1.2;
+  line-height: 1.25;
+  letter-spacing: var(--gy-tracking-tight);
   color: rgb(var(--gy-ink));
 }
 
 .gy-searchpage__empty-text {
+  max-width: 44ch;
   margin: 0;
-  font-size: var(--gy-text-body);
+  font-size: 1.6rem;
   line-height: 1.6;
   color: rgb(var(--gy-ink-soft));
 }
 
 .gy-searchpage__explore {
-  margin-top: var(--gy-space-lg);
+  margin-top: var(--gy-space-md);
 }
 
 .gy-searchpage__explore-heading {
@@ -668,24 +740,45 @@ predictive-search:not([open]) .gy-psearch__all {
 .gy-searchpage__explore-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--gy-space-2xs);
+  gap: var(--gy-space-xs) var(--gy-space-2xs);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 @media screen and (max-width: 749px) {
+  /* The field keeps its own pill and the button sits under it, rather than a
+     button floating inside a box. */
   .gy-searchpage__form {
+    position: relative;
     flex-wrap: wrap;
-    padding: var(--gy-space-2xs) var(--gy-space-sm);
-    border-radius: var(--gy-radius-md);
+    gap: var(--gy-space-xs);
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .gy-searchpage__form-icon {
+    position: absolute;
+    top: 1.8rem;
+    left: var(--gy-space-sm);
+  }
+
+  .gy-searchpage__input {
+    flex: 1 1 100%;
+    height: 5.6rem;
+    padding-inline: 4.6rem var(--gy-space-sm);
+    border: 1px solid rgb(var(--gy-ink) / 0.14);
+    border-radius: var(--gy-radius-pill);
+    background-color: rgb(var(--gy-canvas-warm));
+  }
+
+  .gy-searchpage__input:focus {
+    border-color: rgb(var(--gy-lavender-deep) / 0.7);
+    background-color: rgb(var(--gy-canvas));
   }
 
   .gy-searchpage__submit {
-    width: 100%;
-  }
-
-  .gy-searchpage__explore-list .gy-button {
     width: 100%;
   }
 }
