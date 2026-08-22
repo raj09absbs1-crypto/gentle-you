@@ -9,7 +9,9 @@
 {{ 'gentleyou.css' | asset_url | stylesheet_tag }}
 {{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
 {{ 'gy-cart.css' | asset_url | stylesheet_tag }}
+{{ 'gy-search.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'gy-search.js' | asset_url }}" defer="defer"></script>
 
 <header
   class="gy-header{% if section.settings.sticky %} gy-header--sticky{% endif %}"
@@ -81,7 +83,17 @@
     </nav>
 
     <div class="gy-header__actions">
-      <a class="gy-header__icon" href="{{ routes.search_url }}" aria-label="{{ 'general.search.search' | t }}">
+      {%- comment -%}
+        Still a real link to Shopify's search page, so search works with no
+        JavaScript; gy-search.js takes it over to open the overlay instead.
+      {%- endcomment -%}
+      <a
+        class="gy-header__icon"
+        href="{{ routes.search_url }}"
+        data-gy-search-open
+        aria-controls="GySearchOverlay"
+        aria-label="{{ 'general.search.search' | t }}"
+      >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.2"/><path d="m15.6 15.6 4.1 4.1"/></svg>
       </a>
 
@@ -111,6 +123,12 @@
   </div>
 </header>
 
+{%- render 'gy-header-search',
+  input_id: 'GySearchInput',
+  suggestions: section.settings.search_suggestions,
+  suggestions_heading: section.settings.search_suggestions_heading
+-%}
+
 {% schema %}
 {
   "name": "GentleYou header",
@@ -118,7 +136,10 @@
     { "type": "image_picker", "id": "logo", "label": "Logo" },
     { "type": "range", "id": "logo_width", "min": 80, "max": 260, "step": 10, "unit": "px", "label": "Logo width", "default": 140 },
     { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
-    { "type": "checkbox", "id": "sticky", "label": "Sticky on scroll", "default": true }
+    { "type": "checkbox", "id": "sticky", "label": "Sticky on scroll", "default": true },
+    { "type": "header", "content": "Search" },
+    { "type": "text", "id": "search_suggestions_heading", "label": "Suggestions heading", "default": "Popular right now" },
+    { "type": "link_list", "id": "search_suggestions", "label": "Suggested destinations", "info": "Shown in the search overlay before the shopper types. Only the links you choose here appear, so every destination is one that exists.", "default": "main-menu" }
   ],
   "enabled_on": { "groups": ["header"] }
 }

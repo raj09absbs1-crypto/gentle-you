@@ -109,7 +109,22 @@ class PredictiveSearch extends SearchForm {
     const searchForTextElement = this.querySelector('[data-predictive-search-search-for-text]');
     const currentButtonText = searchForTextElement?.innerText;
     if (currentButtonText) {
-      if (currentButtonText.match(new RegExp(previousTerm, 'g')).length > 1) {
+      // A shopper who pastes or retypes the whole field leaves a previous term
+      // that is no longer in the button text, and a term containing a regular
+      // expression character would throw here, so both are handled before the
+      // match rather than crashing the search.
+      if (!previousTerm) return;
+
+      let occurrences;
+      try {
+        occurrences = currentButtonText.match(new RegExp(previousTerm, 'g'));
+      } catch (error) {
+        return;
+      }
+
+      if (!occurrences) return;
+
+      if (occurrences.length > 1) {
         // The new term matches part of the button text and not just the search term, do not replace to avoid mistakes
         return;
       }
