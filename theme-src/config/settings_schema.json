@@ -1451,5 +1451,17 @@
         "default": "scheme-1"
       }
     ]
+  },
+  {
+    "name": "GentleYou",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "gy_cart_recommendations",
+        "label": "Suggest a product in the cart drawer",
+        "info": "Uses Shopify's own recommendations for the first product in the cart. Nothing is shown when Shopify has nothing to suggest.",
+        "default": true
+      }
+    ]
   }
 ]

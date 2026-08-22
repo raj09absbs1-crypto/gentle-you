@@ -1,0 +1,75 @@
+{%- comment -%}
+  GentleYou complementary products.
+
+  Shopify's own recommendations endpoint with intent=complementary, which
+  returns the pairings the merchant has curated in Search & Discovery. When
+  nothing is curated for a product Shopify returns nothing and the section
+  renders nothing — the theme never guesses which pieces go together.
+
+  The fetch is handled by <product-recommendations> in global.js, already
+  loaded by the layout, so this adds no JavaScript.
+{%- endcomment -%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+
+<product-recommendations
+  class="gy-section gy-section--{{ section.settings.tone }} gy-related gy-related--complementary"
+  style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
+  data-section-id="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-url="{{ routes.product_recommendations_url }}?limit={{ section.settings.products_to_show }}&intent=complementary"
+  data-gy-reveal-scope
+  {{ section.shopify_attributes }}
+>
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    <div class="gy-container">
+      <header class="gy-section__head" data-gy-reveal>
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="gy-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="gy-section__heading">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+      </header>
+
+      <div class="gy-grid gy-grid--{{ section.settings.columns }}">
+        {%- for recommendation in recommendations.products -%}
+          <div class="gy-grid__item" data-gy-reveal style="--gy-reveal-delay: {{ forloop.index0 | times: 70 }}ms">
+            {%- render 'gy-card-product', card_product: recommendation, ratio: section.settings.image_ratio -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+</product-recommendations>
+
+{% schema %}
+{
+  "name": "GentleYou complete the set",
+  "tag": "section",
+  "settings": [
+    { "type": "paragraph", "content": "Shows the products paired with this one in Shopify's Search & Discovery app. Nothing is shown until pairings are set there, so the theme never suggests a combination that isn't real." },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Complete the look" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Make it an everyday set." },
+    { "type": "range", "id": "products_to_show", "min": 2, "max": 6, "step": 1, "label": "Products to show", "default": 3 },
+    {
+      "type": "select", "id": "columns", "label": "Desktop columns", "default": "3",
+      "options": [ { "value": "2", "label": "2" }, { "value": "3", "label": "3" }, { "value": "4", "label": "4" } ]
+    },
+    {
+      "type": "select", "id": "image_ratio", "label": "Image shape", "default": "portrait",
+      "options": [ { "value": "portrait", "label": "Portrait" }, { "value": "square", "label": "Square" } ]
+    },
+    {
+      "type": "select", "id": "tone", "label": "Background", "default": "canvas",
+      "options": [ { "value": "canvas", "label": "Ivory" }, { "value": "warm", "label": "Warm" }, { "value": "lavender", "label": "Lavender" } ]
+    },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 88 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 24 }
+  ],
+  "enabled_on": { "templates": ["product"] }
+}
+{% endschema %}

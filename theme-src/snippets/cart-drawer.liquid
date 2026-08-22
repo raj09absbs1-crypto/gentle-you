@@ -573,6 +573,22 @@
         </div>
 
         {%- comment -%}
+          One quiet suggestion before checkout, based on Shopify's own
+          recommendations for the first product in the cart. The element is
+          <product-recommendations> from global.js, so this adds no JavaScript
+          and no second source of product data; it fetches once the drawer is
+          on screen and renders nothing when Shopify has nothing to suggest.
+        {%- endcomment -%}
+        {%- if cart.item_count > 0 and settings.gy_cart_recommendations -%}
+          <product-recommendations
+            class="gy-cart-rec-slot"
+            data-section-id="gy-cart-recommendations"
+            data-product-id="{{ cart.items.first.product_id }}"
+            data-url="{{ routes.product_recommendations_url }}?limit=6&intent=related"
+          ></product-recommendations>
+        {%- endif -%}
+
+        {%- comment -%}
           Reassurance where the decision is made. The wording is the store's
           own published policy, held in a translation string so it is edited
           in one place — nothing here is a promise the storefront doesn't

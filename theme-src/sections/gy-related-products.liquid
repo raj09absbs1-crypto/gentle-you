@@ -2,14 +2,18 @@
   GentleYou related products.
 
   Uses Shopify's own product recommendations. The <product-recommendations>
-  element (Dawn's related-products.js) fetches this same section for the current
+  element defined in global.js fetches this same section for the current
   product, so every card is real Shopify data.
 {%- endcomment -%}
 
 {{ 'gentleyou.css' | asset_url | stylesheet_tag }}
 {{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
-<script src="{{ 'related-products.js' | asset_url }}" defer="defer"></script>
+{%- comment -%}
+  <product-recommendations> is defined in global.js, which the layout already
+  loads on every page. The theme has no related-products.js, so asking for one
+  only cost a 404 on every product page.
+{%- endcomment -%}
 <script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
 
 <product-recommendations
@@ -17,7 +21,11 @@
   style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
   data-section-id="{{ section.id }}"
   data-product-id="{{ product.id }}"
-  data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.products_to_show }}"
+  {%- comment -%}
+    global.js appends product_id and section_id itself; passing them here too
+    just duplicated them in the request.
+  {%- endcomment -%}
+  data-url="{{ routes.product_recommendations_url }}?limit={{ section.settings.products_to_show }}&intent=related"
   data-gy-reveal-scope
   {{ section.shopify_attributes }}
 >

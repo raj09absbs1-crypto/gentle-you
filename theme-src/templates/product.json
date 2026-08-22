@@ -359,11 +359,25 @@
         "padding_top": 96,
         "padding_bottom": 96
       }
+    },
+    "gy_complementary": {
+      "type": "gy-complementary-products",
+      "settings": {
+        "eyebrow": "Complete the look",
+        "heading": "Make it an everyday set.",
+        "products_to_show": 3,
+        "columns": "3",
+        "image_ratio": "portrait",
+        "tone": "canvas",
+        "padding_top": 88,
+        "padding_bottom": 24
+      }
     }
   },
   "order": [
     "gy_main",
     "disclosures",
+    "gy_complementary",
     "gy_related",
     "178308511965ad03cc",
     "17832791928bc348be",

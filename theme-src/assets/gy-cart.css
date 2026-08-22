@@ -570,3 +570,138 @@ cart-remove-button .button svg,
   width: 1.6rem;
   height: 1.6rem;
 }
+
+/* ---- One suggestion before checkout -----------------------------------
+   Two compact cards above the reassurance line. Deliberately quiet: the
+   checkout button stays the only thing that looks like an action. */
+/* The element must keep a box: it fetches when it scrolls into view, and a
+   display:none placeholder would never intersect, so it would never fill.
+   Empty, it is a zero-height block that adds nothing. */
+.gy-cart-rec-slot {
+  display: block;
+}
+
+.gy-cart-rec {
+  margin-bottom: var(--gy-space-md);
+  padding-top: var(--gy-space-sm);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.08);
+}
+
+.gy-cart-rec__heading {
+  margin: 0 0 var(--gy-space-xs);
+  font-size: 1.056rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-cart-rec__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gy-space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gy-cart-rec__item {
+  min-width: 0;
+}
+
+/* The card is the theme's own; only its scale changes in here. */
+.gy-cart-rec .gy-card__title {
+  font-size: 1.216rem;
+  line-height: 1.35;
+}
+
+.gy-cart-rec .gy-card__price .price {
+  font-size: 1.344rem;
+}
+
+.gy-cart-rec .gy-card__price .price__sale .price-item--regular {
+  font-size: 1.088rem;
+}
+
+/* The saving is already visible in the struck compare-at price beside it; a
+   badge as well would be two claims about one number, in a very small card.
+   Sold-out products are filtered out of the section, so the flag has no other
+   job in here. */
+.gy-cart-rec .gy-card__flag {
+  display: none;
+}
+
+/* Shorter crop than a collection card: the drawer has a checkout button to
+   keep above the fold. */
+.gy-cart-rec .gy-card__media {
+  aspect-ratio: 1 / 1;
+}
+
+.gy-cart-rec .gy-card__price .price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.64rem;
+}
+
+/* The card's action styles live in the collection stylesheet, which the cart
+   has no reason to load; these are the few rules the two mini cards need. */
+.gy-cart-rec .gy-card__action {
+  margin-top: var(--gy-space-2xs);
+}
+
+.gy-cart-rec .gy-card__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.48rem;
+  width: 100%;
+  min-height: 4.4rem;
+  padding: 0 1.2rem;
+  border: 1px solid rgb(var(--gy-ink) / 0.2);
+  border-radius: 10px;
+  background-color: transparent;
+  color: rgb(var(--gy-ink));
+  font-family: inherit;
+  font-size: 1.024rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 200ms var(--gy-ease), border-color 200ms var(--gy-ease), color 200ms var(--gy-ease);
+}
+
+.gy-cart-rec .gy-card__button:hover {
+  border-color: rgb(var(--gy-ink));
+  background-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+}
+
+.gy-cart-rec .gy-card__button:focus-visible {
+  outline: 2px solid rgb(var(--gy-lavender-deep));
+  outline-offset: 2px;
+}
+
+/* Two narrow cards rather than one wide one: a single card at full drawer
+   width reads as a product page, and pushes checkout below the fold. */
+@media screen and (max-width: 359px) {
+  .gy-cart-rec__list {
+    gap: var(--gy-space-2xs);
+  }
+
+  .gy-cart-rec .gy-card__title {
+    font-size: 1.12rem;
+  }
+
+  .gy-cart-rec .gy-card__price .price {
+    font-size: 1.216rem;
+  }
+
+  .gy-cart-rec .gy-card__button {
+    padding-inline: 0.4rem;
+    font-size: 0.928rem;
+    letter-spacing: 0.06em;
+  }
+}
