@@ -1341,3 +1341,45 @@ body.gy-no-scroll { overflow: hidden; }
     width: 1.6rem;
   }
 }
+
+/* ---- Small screens: what the shopper sees first ------------------------
+   Measured on the built page: the stage (467px), the thumbnail rail (103px)
+   and the column gap (32px) filled 602px of an 844px first screen, so the
+   product title landed at the fold and the price below it — a shopper had to
+   scroll a full screen to learn what the piece is called and what it costs.
+
+   The photograph is not cropped or shrunk to fix that. The thumbnail rail
+   stands down on phones instead, where the stage already swipes, carries
+   prev/next buttons and shows a "1 / 5" counter, and where the colour
+   selector below changes the image anyway. The rail returns from 750px up. */
+@media screen and (max-width: 749px) {
+  .gy-pdp__thumbs {
+    display: none;
+  }
+
+  .gy-pdp__inner {
+    gap: var(--gy-space-xs);
+  }
+
+  /* Desktop leading between the vendor line, the title and the price costs
+     another 24px of the first screen for no gain at this size. */
+  .gy-pdp__vendor {
+    margin-bottom: var(--gy-space-2xs);
+  }
+
+  .gy-pdp__title {
+    margin-bottom: var(--gy-space-sm);
+  }
+}
+
+/* Between the phone layout and the two-column desktop one the page is still a
+   single column, so a full-width photograph on a portrait tablet is a whole
+   screen on its own and pushes the title 1.3 screens down. Holding the gallery
+   to a sensible measure — the same thing the text column does — brings the
+   title and the price back up without cropping anything. */
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  .gy-pdp__gallery {
+    max-width: 42rem;
+    margin-inline: auto;
+  }
+}
