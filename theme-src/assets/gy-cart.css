@@ -35,7 +35,10 @@ cart-drawer .drawer__heading {
   color: rgb(var(--gy-ink));
 }
 
+/* Dawn hangs the close button 10px past the panel edge, which puts part of
+   it off screen once the drawer is the full width of a phone. */
 cart-drawer .drawer__close {
+  inset-inline-end: 0.8rem;
   width: 4rem;
   height: 4rem;
   border: 1px solid rgb(var(--gy-ink) / 0.12);
@@ -49,9 +52,14 @@ cart-drawer .drawer__close:hover {
   background-color: rgb(var(--gy-lavender) / 0.4);
 }
 
-cart-drawer .drawer__contents,
-cart-drawer .drawer__cart-items-wrapper {
+cart-drawer .drawer__contents {
   padding-inline: var(--gy-space-lg);
+}
+
+/* The wrapper is inside .drawer__contents; padding both would indent every
+   line twice and leave a phone-width drawer with very little room. */
+cart-drawer .drawer__cart-items-wrapper {
+  padding-inline: 0;
 }
 
 cart-drawer .drawer__footer {
@@ -358,79 +366,146 @@ cart-remove-button .button:hover {
 
 /* ---- Drawer line items -------------------------------------------------
    Dawn's three-column table gets cramped in a narrow drawer, so inside the
-   drawer only, each line becomes image + content with the total, quantity and
-   remove control stacked underneath. Markup and behaviour are untouched. */
+   drawer only, each line becomes image + content, with the quantity stepper
+   and the line total sharing the row underneath. Markup and behaviour are
+   untouched. The long selectors are deliberate: Dawn's drawer stylesheet
+   claims `.cart-drawer .cart-items .cart-item__quantity` and friends, which
+   outrank a shorter selector whatever order the stylesheets load in. */
 
-cart-drawer .cart-items,
-cart-drawer .cart-items tbody,
-cart-drawer .cart-items tr,
-cart-drawer .cart-items td,
-cart-drawer .cart-items th {
+cart-drawer .cart-drawer .cart-items,
+cart-drawer .cart-drawer .cart-items tbody,
+cart-drawer .cart-drawer .cart-items tr,
+cart-drawer .cart-drawer .cart-items td,
+cart-drawer .cart-drawer .cart-items th {
   display: block;
   width: auto;
 }
 
-cart-drawer .cart-items thead {
+cart-drawer .cart-drawer .cart-items thead {
   display: none;
 }
 
-cart-drawer .cart-item {
+cart-drawer .cart-drawer .cart-items tr.cart-item {
   display: grid;
-  grid-template-columns: 8.8rem minmax(0, 1fr);
-  column-gap: 1.6rem;
+  /* Image, content, then the line total in a track of its own so it never
+     shares a cell with the quantity stepper. */
+  grid-template-columns: 8.8rem minmax(0, 1fr) max-content;
+  column-gap: 1.2rem;
   row-gap: 0.8rem;
   align-items: start;
   padding-block: 2rem;
 }
 
-cart-drawer .cart-item__media {
+cart-drawer .cart-drawer .cart-items .cart-item__media {
   grid-column: 1;
   grid-row: 1 / span 2;
   width: 8.8rem;
 }
 
-cart-drawer .cart-item__details {
+cart-drawer .cart-drawer .cart-items .cart-item__details {
   grid-column: 2;
   grid-row: 1;
 }
 
-cart-drawer .cart-item__quantity {
-  grid-column: 2;
+cart-drawer .cart-drawer .cart-items .cart-item__quantity {
+  grid-column: 2 / 4;
   grid-row: 2;
   padding: 0;
 }
 
-cart-drawer .cart-item {
+cart-drawer .cart-drawer .cart-items tr.cart-item {
   grid-template-rows: auto auto;
 }
 
-/* Quantity on the left, line total on the right of the same row. */
-cart-drawer .cart-item__totals {
-  grid-column: 2;
-  grid-row: 2;
+/* Line total sits beside the title, where a shopper looks for it, leaving
+   the whole row underneath to the quantity stepper and remove control. */
+cart-drawer .cart-drawer .cart-items .cart-item__totals {
+  grid-column: 3;
+  grid-row: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-end;
-  align-self: center;
+  align-self: start;
   padding: 0;
   text-align: right;
 }
 
-cart-drawer .cart-item__totals .price,
-cart-drawer .cart-item__price-wrapper > * {
+cart-drawer .cart-drawer .cart-items .cart-item__totals .price,
+cart-drawer .cart-drawer .cart-items .cart-item__price-wrapper > * {
   white-space: nowrap;
 }
 
-cart-drawer .cart-item__quantity-wrapper {
+cart-drawer .cart-drawer .cart-items .cart-item__quantity-wrapper {
   display: flex;
   align-items: center;
   gap: 0.8rem;
 }
 
-cart-drawer .cart-item__name {
+cart-drawer .cart-drawer .cart-items .cart-item__name {
   font-size: 1.4rem;
 }
 
-cart-drawer .product-option {
+cart-drawer .cart-drawer .cart-items .product-option {
   font-size: 1.25rem;
+}
+
+/* ---- Cart on small screens ---------------------------------------------
+   The drawer is nearly the width of the phone, so the generous desktop
+   gutters cost the line items room they need for the title and the stepper.
+   Layout, markup and behaviour are unchanged; only the spacing tightens. */
+@media screen and (max-width: 749px) {
+  cart-drawer .drawer__contents {
+    padding-inline: var(--gy-space-sm);
+  }
+
+  cart-drawer .drawer__footer {
+    padding-inline: var(--gy-space-sm);
+  }
+
+  /* On the cart page Dawn gives the line total a quarter-width column, so a
+     price wraps onto two lines. Sizing that column to its content keeps the
+     total on one line and hands the rest of the row to the product. */
+  cart-items .cart-items tr.cart-item {
+    grid-template-columns: 8.8rem minmax(0, 1fr) max-content;
+    column-gap: var(--gy-space-sm);
+    row-gap: var(--gy-space-xs);
+    margin-bottom: 0;
+  }
+
+  cart-items .cart-items .cart-item__media {
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+
+  cart-items .cart-items .cart-item__details {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  cart-items .cart-items .cart-item__totals {
+    grid-column: 3;
+    grid-row: 1;
+    align-items: flex-start;
+  }
+
+  cart-items .cart-items .cart-item__quantity {
+    grid-column: 2 / 4;
+    grid-row: 2;
+  }
+
+  cart-items .cart-items .cart-item__totals .price {
+    white-space: nowrap;
+  }
+
+  /* Dawn's 4rem gap under the column headings and 3.5rem between lines leave
+     a lot of empty space on a phone. */
+  cart-items .cart-items thead tr {
+    margin-bottom: var(--gy-space-sm);
+  }
+
+  /* Room under the checkout button so it never sits against the next
+     section, including on handsets with a home indicator. */
+  .cart__footer {
+    padding-bottom: calc(var(--gy-space-lg) + env(safe-area-inset-bottom, 0px));
+  }
 }

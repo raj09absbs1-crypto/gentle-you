@@ -1293,3 +1293,17 @@ body.gy-no-scroll { overflow: hidden; }
     transition: none !important;
   }
 }
+
+/* ---- Size chart: the edge fades never sit on a value -------------------
+   The fade is an affordance, not a mask. At its full desktop width it reaches
+   about a third of the way into a narrow-screen column, so a size or a
+   measurement at the edge of the scroll looks chopped rather than faded. On
+   small screens it is trimmed to the width of a cell's own padding: it still
+   softens the edge and still says there is more table this way, but every
+   value the shopper scrolls to stays legible. Scrolling itself is unchanged. */
+@media screen and (max-width: 749px) {
+  .gy-chart__wrap::before,
+  .gy-chart__wrap::after {
+    width: 1.6rem;
+  }
+}
