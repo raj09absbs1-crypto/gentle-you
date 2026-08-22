@@ -421,6 +421,11 @@
   pointer-events: none;
 }
 
+/* Two tiles across on a small phone leaves each caption around 130px wide:
+   the label, the note and the arrow cannot share one line there, and without
+   wrapping they overlap each other and get cut off by the tile. Wrapping keeps
+   the single-line arrangement wherever it fits and stacks it where it does
+   not. */
 .gy-cols__caption {
   position: absolute;
   z-index: 1;
@@ -428,9 +433,23 @@
   right: 0;
   bottom: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--gy-space-sm);
+  gap: 0.4rem var(--gy-space-sm);
   padding: var(--gy-space-md);
+}
+
+.gy-cols__label,
+.gy-cols__text {
+  min-width: 0;
+}
+
+/* Desktop padding costs a third of the caption's width on a two-up phone
+   layout, which is what pushed the labels onto three lines. */
+@media screen and (max-width: 479px) {
+  .gy-cols__caption {
+    padding: var(--gy-space-sm);
+  }
 }
 
 .gy-cols__label {
@@ -817,8 +836,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 4rem;
-  height: 4rem;
+  width: 4.4rem;
+  height: 4.4rem;
   border-radius: 50%;
   color: rgb(var(--gy-ink));
   cursor: pointer;
@@ -887,8 +906,11 @@
   border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
 }
 
+/* Submenu rows sat at 28px inside a drawer whose top-level rows are 48px. */
 .gy-header__drawer-sub a {
-  display: block;
+  display: flex;
+  align-items: center;
+  min-height: 4.4rem;
   padding: 0.64rem 0 0.64rem 1.6rem;
   font-size: 1.36rem;
   text-decoration: none;
@@ -979,12 +1001,22 @@
   list-style: none;
 }
 
+/* Stacked policy and shop links on a phone: at 26px tall they sit close
+   enough together to mis-tap. */
 .gy-footer__links a {
-  display: block;
+  display: flex;
+  align-items: center;
+  min-height: 4.4rem;
   padding: 0.48rem 0;
   font-size: 1.408rem;
   text-decoration: none;
   color: rgb(var(--gy-ink-soft));
+}
+
+@media screen and (min-width: 750px) {
+  .gy-footer__links a {
+    min-height: 0;
+  }
 }
 
 .gy-footer__links a:hover {

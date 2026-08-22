@@ -705,3 +705,12 @@ cart-remove-button .button svg,
     letter-spacing: 0.06em;
   }
 }
+
+/* Dawn's "Continue shopping" link on the cart page is an 11px-tall target on
+   a phone. Additive only. */
+.cart__warnings .underlined-link,
+.title-wrapper-with-link .underlined-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 4.4rem;
+}
