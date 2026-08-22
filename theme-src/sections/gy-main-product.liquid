@@ -294,6 +294,104 @@
     assign metafield_chart = product.metafields.custom.size_chart
   -%}
 
+  {%- comment -%}
+    Which size chart belongs to this product.
+
+    Detection uses the product's own Shopify classification only — product
+    type, standard category, tags and the optional custom.size_chart_type
+    metafield. The product title is deliberately not matched, so a combo or
+    bundle never inherits a chart from a word in its name. Each `size_chart`
+    block carries its own keywords, so the merchant decides in the Theme
+    Editor which products get which chart; blocks are tested in editor order
+    and the first match wins. A block with no keywords is the fallback for
+    products nothing else matches, and when no block matches at all the
+    section-level chart settings are used, so existing setups keep working.
+  {%- endcomment -%}
+  {%- liquid
+    assign chart_haystack = product.type
+    if product.category != blank
+      assign chart_haystack = chart_haystack | append: ' | ' | append: product.category.name
+    endif
+    if product.metafields.custom.size_chart_type != blank
+      assign chart_haystack = chart_haystack | append: ' | ' | append: product.metafields.custom.size_chart_type
+    endif
+    for tag in product.tags
+      assign chart_haystack = chart_haystack | append: ' | ' | append: tag
+    endfor
+    assign chart_haystack = chart_haystack | downcase
+
+    assign chart_block = null
+    assign chart_fallback = null
+    for block in section.blocks
+      if block.type != 'size_chart'
+        continue
+      endif
+      if block.settings.match == blank
+        if chart_fallback == null
+          assign chart_fallback = block
+        endif
+        continue
+      endif
+      if chart_block != null
+        continue
+      endif
+
+      assign chart_excluded = false
+      assign exclude_words = block.settings.exclude | downcase | split: ','
+      for word in exclude_words
+        assign word = word | strip
+        if word != blank and chart_haystack contains word
+          assign chart_excluded = true
+        endif
+      endfor
+
+      if chart_excluded == false
+        assign match_words = block.settings.match | downcase | split: ','
+        for word in match_words
+          assign word = word | strip
+          if word != blank and chart_haystack contains word
+            assign chart_block = block
+          endif
+        endfor
+      endif
+    endfor
+    if chart_block == null
+      assign chart_block = chart_fallback
+    endif
+
+    assign chart_rows_raw = section.settings.size_chart_rows
+    assign chart_columns_raw = section.settings.size_chart_columns
+    assign chart_heading = section.settings.size_chart_heading | default: 'Size chart'
+    assign chart_category = section.settings.size_chart_category
+    assign measure_heading = section.settings.measure_heading | default: 'How to measure'
+    assign measure_step_1_title = section.settings.measure_step_1_title
+    assign measure_step_1 = section.settings.measure_step_1
+    assign measure_step_2_title = section.settings.measure_step_2_title
+    assign measure_step_2 = section.settings.measure_step_2
+    assign between_sizes_heading = section.settings.between_sizes_heading | default: 'Between sizes?'
+    assign between_sizes = section.settings.between_sizes
+    assign size_note = section.settings.size_note
+    assign size_contact = section.settings.size_contact
+
+    if chart_block != null and chart_block.settings.rows != blank
+      assign chart_rows_raw = chart_block.settings.rows
+      assign chart_columns_raw = chart_block.settings.columns | default: chart_columns_raw
+      assign chart_heading = chart_block.settings.heading | default: chart_heading
+      assign chart_category = chart_block.settings.category | default: chart_category
+      assign measure_heading = chart_block.settings.measure_heading | default: measure_heading
+      if chart_block.settings.measure_step_1 != blank or chart_block.settings.measure_step_2 != blank
+        assign measure_step_1_title = chart_block.settings.measure_step_1_title
+        assign measure_step_1 = chart_block.settings.measure_step_1
+        assign measure_step_2_title = chart_block.settings.measure_step_2_title
+        assign measure_step_2 = chart_block.settings.measure_step_2
+      endif
+      assign between_sizes_heading = chart_block.settings.between_sizes_heading | default: between_sizes_heading
+      assign between_sizes = chart_block.settings.between_sizes | default: between_sizes
+      assign size_note = chart_block.settings.size_note | default: size_note
+      assign size_contact = chart_block.settings.size_contact | default: size_contact
+    endif
+  -%}
+
   <div class="gy-pdp__drawer" data-gy-size-guide-drawer hidden>
     <div class="gy-pdp__drawer-scrim" data-gy-size-guide-close></div>
     <aside
@@ -323,7 +421,7 @@
       </header>
 
       <div class="gy-pdp__drawer-body">
-        {%- if band_option != blank and section.settings.size_measurements != blank -%}
+        {%- if band_option and section.settings.size_measurements != blank -%}
           <section class="gy-guide__block">
             <h3 class="gy-guide__label">{{ band_option.name }}</h3>
             <table class="gy-guide__table">
@@ -362,7 +460,7 @@
           </section>
         {%- endif -%}
 
-        {%- if cup_option != blank and section.settings.size_chart_rows == blank -%}
+        {%- if cup_option and chart_rows_raw == blank -%}
           <section class="gy-guide__block">
             <h3 class="gy-guide__label">{{ cup_option.name }}</h3>
             <ul class="gy-guide__cups" role="list">
@@ -386,17 +484,17 @@
           When the shopper's selected band and cup match a row's size code the
           row is highlighted; the Shopify variant picker is untouched.
         {%- endcomment -%}
-        {%- if section.settings.size_chart_rows != blank -%}
+        {%- if chart_rows_raw != blank -%}
           {%- liquid
-            assign chart_headers = section.settings.size_chart_columns | split: '|'
-            assign chart_rows = section.settings.size_chart_rows | newline_to_br | split: '<br />'
+            assign chart_headers = chart_columns_raw | split: '|'
+            assign chart_rows = chart_rows_raw | newline_to_br | split: '<br />'
 
             assign selected_band = ''
             assign selected_cup = ''
-            if band_option != blank
+            if band_option
               assign selected_band = band_option.selected_value.name | default: ''
             endif
-            if cup_option != blank
+            if cup_option
               assign selected_cup = cup_option.selected_value.name | default: ''
             endif
             assign current_code = selected_band | append: selected_cup | upcase | strip
@@ -404,14 +502,14 @@
 
           <section class="gy-guide__block gy-chart">
             <header class="gy-chart__head">
-              <h3 class="gy-chart__title">{{ section.settings.size_chart_heading | default: 'Size chart' | escape }}</h3>
-              {%- if section.settings.size_chart_category != blank -%}
-                <p class="gy-chart__category">{{ section.settings.size_chart_category | escape }}</p>
+              <h3 class="gy-chart__title">{{ chart_heading | escape }}</h3>
+              {%- if chart_category != blank -%}
+                <p class="gy-chart__category">{{ chart_category | escape }}</p>
               {%- endif -%}
             </header>
 
             <div class="gy-chart__wrap" data-gy-chart-wrap>
-            <div class="gy-chart__scroll" tabindex="0" role="group" aria-label="{{ section.settings.size_chart_heading | default: 'Size chart' | escape }}" data-gy-chart-scroll>
+            <div class="gy-chart__scroll" tabindex="0" role="group" aria-label="{{ chart_heading | escape }}" data-gy-chart-scroll>
               <table class="gy-chart__table">
                 <thead>
                   <tr>
@@ -444,25 +542,25 @@
           </section>
         {%- endif -%}
 
-        {%- if section.settings.measure_step_1 != blank or section.settings.measure_step_2 != blank -%}
+        {%- if measure_step_1 != blank or measure_step_2 != blank -%}
           <section class="gy-guide__block">
-            <h3 class="gy-guide__label">{{ section.settings.measure_heading | default: 'How to measure' | escape }}</h3>
+            <h3 class="gy-guide__label">{{ measure_heading | escape }}</h3>
             <ol class="gy-guide__steps" role="list">
-              {%- if section.settings.measure_step_1 != blank -%}
+              {%- if measure_step_1 != blank -%}
                 <li>
                   <span class="gy-guide__step-number">01</span>
                   <div>
-                    <p class="gy-guide__step-title">{{ section.settings.measure_step_1_title | escape }}</p>
-                    <p class="gy-guide__step-text">{{ section.settings.measure_step_1 | escape }}</p>
+                    <p class="gy-guide__step-title">{{ measure_step_1_title | escape }}</p>
+                    <p class="gy-guide__step-text">{{ measure_step_1 | escape }}</p>
                   </div>
                 </li>
               {%- endif -%}
-              {%- if section.settings.measure_step_2 != blank -%}
+              {%- if measure_step_2 != blank -%}
                 <li>
                   <span class="gy-guide__step-number">02</span>
                   <div>
-                    <p class="gy-guide__step-title">{{ section.settings.measure_step_2_title | escape }}</p>
-                    <p class="gy-guide__step-text">{{ section.settings.measure_step_2 | escape }}</p>
+                    <p class="gy-guide__step-title">{{ measure_step_2_title | escape }}</p>
+                    <p class="gy-guide__step-text">{{ measure_step_2 | escape }}</p>
                   </div>
                 </li>
               {%- endif -%}
@@ -470,20 +568,20 @@
           </section>
         {%- endif -%}
 
-        {%- if section.settings.between_sizes != blank -%}
+        {%- if between_sizes != blank -%}
           <section class="gy-guide__block gy-guide__note">
-            <h3 class="gy-guide__label">{{ section.settings.between_sizes_heading | default: 'Between sizes?' | escape }}</h3>
-            <p>{{ section.settings.between_sizes | escape }}</p>
+            <h3 class="gy-guide__label">{{ between_sizes_heading | escape }}</h3>
+            <p>{{ between_sizes | escape }}</p>
           </section>
         {%- endif -%}
 
-        {%- if section.settings.size_note != blank or section.settings.size_contact != blank -%}
+        {%- if size_note != blank or size_contact != blank -%}
           <div class="gy-guide__footnote">
-            {%- if section.settings.size_note != blank -%}
-              <p>{{ section.settings.size_note | escape }}</p>
+            {%- if size_note != blank -%}
+              <p>{{ size_note | escape }}</p>
             {%- endif -%}
-            {%- if section.settings.size_contact != blank -%}
-              <p>{{ section.settings.size_contact | escape }}</p>
+            {%- if size_contact != blank -%}
+              <p>{{ size_contact | escape }}</p>
             {%- endif -%}
           </div>
         {%- endif -%}
@@ -614,6 +712,27 @@
       "type": "trust", "name": "Reassurance line", "limit": 1,
       "settings": [
         { "type": "text", "id": "points", "label": "Points", "info": "Separate with |. Use the store's own published policy wording.", "default": "Cash on delivery | 3-day size exchange | Secure payment | Free prepaid shipping" }
+      ]
+    },
+    {
+      "type": "size_chart", "name": "Size chart",
+      "settings": [
+        { "type": "paragraph", "content": "Shown inside the size guide only when this product matches the keywords below. Keywords are checked against the product's Shopify type, category, tags and the custom.size_chart_type metafield \u2014 never its title \u2014 so combos and bundles do not pick up a chart by accident. Blocks are checked in the order they appear here and the first match wins. Leave the keywords empty to make this the chart for products nothing else matches." },
+        { "type": "text", "id": "match", "label": "Show when type, category or tags contain", "info": "Separated by commas, for example: panty, panties, brief, briefs.", "default": "" },
+        { "type": "text", "id": "exclude", "label": "But never when they contain", "info": "Optional. Separated by commas, for example: combo, set.", "default": "" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Size chart" },
+        { "type": "text", "id": "category", "label": "Product type label", "info": "Shown under the heading, for example \"High-Waist Briefs\"." },
+        { "type": "text", "id": "columns", "label": "Column headings", "info": "Separated by |.", "default": "Size|Waist (inch)|Hip (inch)|UK size|EU size" },
+        { "type": "textarea", "id": "rows", "label": "Rows", "info": "One row per line, columns separated by |. Enter the measurements exactly as published \u2014 the theme never converts or derives a number. The first column is matched against the selected size to highlight a row." },
+        { "type": "text", "id": "measure_heading", "label": "How to measure heading", "default": "How to measure" },
+        { "type": "text", "id": "measure_step_1_title", "label": "Step 1 title" },
+        { "type": "textarea", "id": "measure_step_1", "label": "Step 1 text" },
+        { "type": "text", "id": "measure_step_2_title", "label": "Step 2 title" },
+        { "type": "textarea", "id": "measure_step_2", "label": "Step 2 text" },
+        { "type": "text", "id": "between_sizes_heading", "label": "Between sizes heading", "default": "Between sizes?" },
+        { "type": "textarea", "id": "between_sizes", "label": "Between sizes text" },
+        { "type": "textarea", "id": "size_note", "label": "Size note" },
+        { "type": "text", "id": "size_contact", "label": "Help line" }
       ]
     },
     {
