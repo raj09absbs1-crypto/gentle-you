@@ -177,12 +177,6 @@
             "inventory_threshold": 10
           }
         },
-        "short_description": {
-          "type": "short_description",
-          "settings": {
-            "words": 32
-          }
-        },
         "variant_picker": {
           "type": "variant_picker",
           "settings": {
