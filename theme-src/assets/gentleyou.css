@@ -522,6 +522,12 @@
   display: grid;
 }
 
+/* The incoming slide rises over the outgoing one rather than the two fading
+   past each other. A symmetric cross-fade leaves both frames part-transparent
+   at the midpoint, and the warm plate behind them shows through as a pale
+   wash — the blank the rotation used to flash between campaigns. Holding the
+   outgoing frame fully opaque underneath keeps the plate covered for every
+   frame of the swap. */
 .gy-hero__slide {
   grid-area: 1 / 1;
   align-self: center;
@@ -532,24 +538,25 @@
 }
 
 .gy-hero__slide.is-active {
+  z-index: 1;
   opacity: 1;
   transform: scale(1);
   filter: blur(0);
   pointer-events: auto;
   transition:
-    opacity 1s var(--gy-ease-out),
+    opacity 0.9s var(--gy-ease-out),
     transform 1.1s var(--gy-ease-out),
     filter 0.8s var(--gy-ease-out);
 }
 
+/* Stays opaque and unblurred for the whole transition; the class is dropped
+   once the incoming frame has fully covered it, so it is never seen leaving. */
 .gy-hero__slide.is-leaving {
-  opacity: 0;
-  transform: scale(0.985);
-  filter: blur(3px);
-  transition:
-    opacity 0.9s var(--gy-ease),
-    transform 1.1s var(--gy-ease-out),
-    filter 0.7s var(--gy-ease);
+  z-index: 0;
+  opacity: 1;
+  transform: scale(0.992);
+  filter: blur(0);
+  transition: transform 1.1s var(--gy-ease-out);
 }
 
 /* Hairline frame, drawn over the image so it never affects the photo itself. */
@@ -938,15 +945,18 @@
   pointer-events: none;
 }
 
+/* The incoming copy starts arriving while the outgoing copy is still on its
+   way out. The old 0.15s entry delay against a 0.45s exit left a window with
+   neither state on screen, which read as the text column emptying. */
 .gy-hero__state.is-active {
   opacity: 1;
   translate: 0 0;
   filter: blur(0);
   pointer-events: auto;
   transition:
-    opacity 0.75s var(--gy-ease-out) 0.15s,
-    translate 0.9s var(--gy-ease-out) 0.15s,
-    filter 0.6s var(--gy-ease-out) 0.15s;
+    opacity 0.6s var(--gy-ease-out),
+    translate 0.9s var(--gy-ease-out),
+    filter 0.6s var(--gy-ease-out);
 }
 
 .gy-hero__state.is-leaving {
@@ -954,7 +964,7 @@
   translate: 0 -8px;
   filter: blur(2px);
   transition:
-    opacity 0.45s var(--gy-ease),
+    opacity 0.55s var(--gy-ease),
     translate 0.6s var(--gy-ease),
     filter 0.45s var(--gy-ease);
 }
@@ -963,7 +973,7 @@
    rest of the state — a clean dissolve from one figure to the next, never a
    counting ticker. */
 .gy-hero__state.is-active .gy-hero__price-block {
-  animation: gy-price-in 0.9s var(--gy-ease-out) 0.1s both;
+  animation: gy-price-in 0.9s var(--gy-ease-out) both;
 }
 
 @keyframes gy-price-in {
@@ -983,7 +993,7 @@
 
 .gy-hero__captions .gy-hero__product-title.is-active {
   opacity: 1;
-  transition: opacity 0.8s var(--gy-ease-out) 0.2s;
+  transition: opacity 0.7s var(--gy-ease-out);
 }
 
 /* A light sweep crosses the plate as a new campaign settles in. The class is
@@ -994,7 +1004,7 @@
 
 @keyframes gy-sweep {
   0% { opacity: 0; }
-  40% { opacity: 0.5; }
+  40% { opacity: 0.22; }
   100% { opacity: 0; }
 }
 

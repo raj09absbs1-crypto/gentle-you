@@ -13,8 +13,10 @@
 (function () {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  // Matches the exit/enter timing in gentleyou.css.
-  const TRANSITION_MS = 1000;
+  // Matches the exit/enter timing in gentleyou.css. It must outlast the
+  // incoming slide's fade (0.9s) and the plate sweep (1.2s), because the
+  // outgoing slide is only safe to drop once the new one fully covers it.
+  const TRANSITION_MS = 1250;
   // How long after the visitor stops interacting before rotation resumes.
   const RESUME_DELAY_MS = 4000;
 
@@ -55,6 +57,7 @@
 
       if (this.slides.length > 1) {
         this.preload(1);
+        this.preloadRest();
         this.start();
       }
     }
@@ -163,6 +166,20 @@
       img.setAttribute('loading', 'eager');
       delete img.dataset.gySrc;
       delete img.dataset.gySrcset;
+    }
+
+    // Once the page is quiet, pull in every remaining slide. The rotation only
+    // ever promoted the next one, so a slow connection could land on a frame
+    // whose photograph had not arrived and show the bare plate instead.
+    preloadRest() {
+      const run = () => {
+        for (let i = 0; i < this.slides.length; i++) this.preload(i);
+      };
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(run, { timeout: 2500 });
+      } else {
+        window.setTimeout(run, 1200);
+      }
     }
 
     restartProgress() {

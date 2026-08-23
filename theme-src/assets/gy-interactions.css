@@ -1,0 +1,274 @@
+/**
+ * GentleYou — hover and focus micro-interactions.
+ *
+ * One layer, loaded once from the header section group, that gives the
+ * interactive parts of the store a consistent response to the pointer. It only
+ * ever adds motion and colour on :hover / :focus-visible: nothing here changes
+ * a resting layout, so no page can shift because this file loaded.
+ *
+ * House rules, so the store keeps reading as quiet luxury rather than as a
+ * demo reel:
+ *   - small distances (1-3px), long eases, never a bounce
+ *   - hairline underlines and thin rules instead of filled highlight bars
+ *   - elevation moves one step at most, never a coloured glow
+ *   - everything is inside `hover: hover` so a tap on a phone does not leave
+ *     an element stuck in its hovered state
+ *   - every rule has a reduced-motion escape at the foot of the file
+ *
+ * It contains no product data and no content of any kind.
+ */
+
+@media (hover: hover) and (pointer: fine) {
+  /* ---- Text links: a hairline that draws in from the leading edge ---- */
+
+  .gy-footer__links a,
+  .gy-footer__policies a,
+  .gy-searchpage__explore-list a,
+  .gy-collection__empty-actions a,
+  .gy-pdp__size-link {
+    position: relative;
+    transition: color var(--gy-duration-fast) var(--gy-ease);
+  }
+
+  .gy-footer__links a::after,
+  .gy-footer__policies a::after,
+  .gy-searchpage__explore-list a::after,
+  .gy-collection__empty-actions a::after,
+  .gy-pdp__size-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.2em;
+    height: 1px;
+    background-color: currentColor;
+    opacity: 0.45;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--gy-duration) var(--gy-ease-out);
+  }
+
+  .gy-footer__links a:hover::after,
+  .gy-footer__links a:focus-visible::after,
+  .gy-footer__policies a:hover::after,
+  .gy-footer__policies a:focus-visible::after,
+  .gy-searchpage__explore-list a:hover::after,
+  .gy-searchpage__explore-list a:focus-visible::after,
+  .gy-collection__empty-actions a:hover::after,
+  .gy-collection__empty-actions a:focus-visible::after,
+  .gy-pdp__size-link:hover::after,
+  .gy-pdp__size-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* The size link already carries a permanent underline of its own; the
+     drawn rule would double it, so that one only shifts in weight. */
+  .gy-pdp__size-link::after {
+    bottom: -0.35em;
+  }
+
+  /* ---- Social marks: lift, never spin ---- */
+
+  .gy-footer__social a {
+    display: inline-flex;
+    transition:
+      transform var(--gy-duration) var(--gy-ease-out),
+      opacity var(--gy-duration-fast) var(--gy-ease);
+    opacity: 0.75;
+  }
+
+  .gy-footer__social a:hover,
+  .gy-footer__social a:focus-visible {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+
+  /* ---- Product cards ---- */
+
+  /* The photograph already scales and cross-fades. The card answers with one
+     step of elevation and a hairline under the title, so the whole tile reads
+     as a single object responding rather than an image doing something on its
+     own. */
+  .gy-card__media {
+    transition:
+      box-shadow var(--gy-duration) var(--gy-ease-out),
+      transform var(--gy-duration) var(--gy-ease-out);
+  }
+
+  .gy-card__link:hover .gy-card__media,
+  .gy-card__link:focus-visible .gy-card__media {
+    box-shadow: var(--gy-elevation-2);
+    transform: translateY(-3px);
+  }
+
+  /* ---- Category tiles ---- */
+
+  /* ---- Editorial imagery ---- */
+
+  .gy-story__media img,
+  .gy-colhead__media img {
+    transition: transform 1.2s var(--gy-ease-out);
+  }
+
+  .gy-story__media:hover img,
+  .gy-colhead__media:hover img {
+    transform: scale(1.025);
+  }
+
+  /* ---- Trust and value rows: the mark lifts, the words hold still ---- */
+
+  /* .gy-props__figure carries data-gy-reveal, whose transition outranks
+     anything set here, so the artwork inside it moves rather than the figure. */
+  .gy-trust-row__icon,
+  .gy-hero__trust-icon,
+  .gy-props__figure > * {
+    transition: transform var(--gy-duration) var(--gy-ease-out);
+  }
+
+  .gy-trust-row__item:hover .gy-trust-row__icon,
+  .gy-hero__trust-item:hover .gy-hero__trust-icon,
+  .gy-props__item:hover .gy-props__figure > * {
+    transform: translateY(-2px);
+  }
+
+  /* ---- Newsletter ---- */
+
+  .gy-news__submit {
+    transition:
+      transform var(--gy-duration-fast) var(--gy-ease),
+      box-shadow var(--gy-duration-fast) var(--gy-ease);
+  }
+
+  .gy-news__submit:hover,
+  .gy-news__submit:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: var(--gy-elevation-2);
+  }
+
+  /* ---- Pagination ---- */
+
+  .gy-pagination a,
+  .gy-pagination__step {
+    transition:
+      background-color var(--gy-duration-fast) var(--gy-ease),
+      color var(--gy-duration-fast) var(--gy-ease);
+  }
+
+  .gy-pagination a:hover,
+  .gy-pagination a:focus-visible,
+  .gy-pagination__step:hover,
+  .gy-pagination__step:focus-visible {
+    background-color: rgb(var(--gy-lavender) / 0.55);
+  }
+
+  /* ---- Result and recommendation rows ---- */
+
+  .gy-psearch__link,
+  .gy-search__suggest-link,
+  .gy-cart-rec__item {
+    transition:
+      background-color var(--gy-duration-fast) var(--gy-ease),
+      transform var(--gy-duration) var(--gy-ease-out);
+  }
+
+  .gy-psearch__link:hover,
+  .gy-psearch__link:focus-visible,
+  .gy-search__suggest-link:hover,
+  .gy-search__suggest-link:focus-visible {
+    background-color: rgb(var(--gy-canvas-warm));
+    transform: translateX(2px);
+  }
+
+  .gy-psearch__image,
+  .gy-cart-rec__item img {
+    transition: transform var(--gy-duration-slow) var(--gy-ease-out);
+  }
+
+  .gy-psearch__link:hover .gy-psearch__image,
+  .gy-cart-rec__item:hover img {
+    transform: scale(1.04);
+  }
+
+  /* ---- Product page ---- */
+
+  .gy-pdp__thumb img {
+    transition: transform var(--gy-duration-slow) var(--gy-ease-out);
+  }
+
+  .gy-pdp__thumb:hover img {
+    transform: scale(1.06);
+  }
+
+  .gy-pdp__accordion summary {
+    transition: color var(--gy-duration-fast) var(--gy-ease);
+  }
+
+  .gy-pdp__accordion summary:hover .gy-pdp__accordion-icon {
+    transform: translateY(1px);
+  }
+
+  .gy-pdp__accordion-icon {
+    transition: transform var(--gy-duration) var(--gy-ease-out);
+  }
+
+  /* ---- Header ---- */
+
+  .gy-header__logo img,
+  .gy-header__wordmark {
+    transition: opacity var(--gy-duration-fast) var(--gy-ease);
+  }
+
+  .gy-header__logo:hover img,
+  .gy-header__logo:focus-visible img,
+  .gy-header__wordmark:hover {
+    opacity: 0.72;
+  }
+
+  .gy-header__drawer-link {
+    transition: transform var(--gy-duration) var(--gy-ease-out);
+  }
+
+  .gy-header__drawer-link:hover,
+  .gy-header__drawer-link:focus-visible {
+    transform: translateX(3px);
+  }
+
+  /* ---- Filter rows ---- */
+
+  .gy-filters__values label {
+    transition: color var(--gy-duration-fast) var(--gy-ease);
+  }
+
+  .gy-filters__values label:hover {
+    color: rgb(var(--gy-ink));
+  }
+}
+
+/* Nothing above may run when the visitor has asked for less motion. Colour
+   changes are kept — they carry no movement — but every transform is dropped. */
+@media (prefers-reduced-motion: reduce) {
+  .gy-footer__links a::after,
+  .gy-footer__policies a::after,
+  .gy-searchpage__explore-list a::after,
+  .gy-collection__empty-actions a::after,
+  .gy-pdp__size-link::after,
+  .gy-footer__social a,
+  .gy-card__media,
+  .gy-props__figure > *,
+  .gy-story__media img,
+  .gy-colhead__media img,
+  .gy-trust-row__icon,
+  .gy-hero__trust-icon,
+  .gy-news__submit,
+  .gy-psearch__link,
+  .gy-search__suggest-link,
+  .gy-cart-rec__item,
+  .gy-psearch__image,
+  .gy-cart-rec__item img,
+  .gy-pdp__thumb img,
+  .gy-pdp__accordion-icon,
+  .gy-header__drawer-link {
+    transition: none !important;
+    transform: none !important;
+  }
+}

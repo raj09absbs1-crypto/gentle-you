@@ -17,6 +17,13 @@
   rule inside is scoped to a container that only exists on those pages.
 {%- endcomment -%}
 {{ 'gy-static.css' | asset_url | stylesheet_tag }}
+{%- comment -%}
+  Hover and focus micro-interactions for the whole store, in one layer so
+  the response to a pointer is consistent from the header to the footer.
+  It only adds rules inside :hover / :focus-visible, so it cannot move
+  anything at rest.
+{%- endcomment -%}
+{{ 'gy-interactions.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'gy-search.js' | asset_url }}" defer="defer"></script>
 
