@@ -280,13 +280,25 @@
   {%- liquid
     assign band_option = null
     assign cup_option = null
+    comment
+      An option that names the cup can never be the band. "Cup size" contains
+      the band keyword ("size"), so on the products where Shopify lists the cup
+      option first it was being claimed as the band and both names ended up
+      pointing at the same option — which put cup letters in the band column of
+      the size guide. Deciding the cup first, and refusing it for the band,
+      resolves every option order in the catalogue.
+    endcomment
     for option in product.options_with_values
       assign lower_name = option.name | downcase
-      if band_option == null and lower_name contains section.settings.band_option_name
-        assign band_option = option
+      assign option_is_cup = false
+      if lower_name contains section.settings.cup_option_name
+        assign option_is_cup = true
       endif
-      if cup_option == null and lower_name contains section.settings.cup_option_name
+      if cup_option == null and option_is_cup
         assign cup_option = option
+      endif
+      if band_option == null and option_is_cup == false and lower_name contains section.settings.band_option_name
+        assign band_option = option
       endif
     endfor
 

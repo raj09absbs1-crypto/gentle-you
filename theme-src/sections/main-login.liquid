@@ -19,9 +19,16 @@
 {%- endif -%}
 
 <div class="customer login section-{{ section.id }}-padding">
-  <h1 id="recover" tabindex="-1">
+  {%- comment -%}
+    Both panes live in the DOM at once and customer.css swaps them with
+    #recover:target, so two h1s shipped on every login page. The login pane is
+    the default one, so it keeps the h1 and the recovery pane becomes an h2.
+    Every selector Dawn uses here is on the id, not the tag, so the toggle,
+    the focus target and the styling are unchanged.
+  {%- endcomment -%}
+  <h2 id="recover" tabindex="-1">
     {{ 'customer.recover_password.title' | t }}
-  </h1>
+  </h2>
   <div>
     <p>
       {{ 'customer.recover_password.subtext' | t }}
@@ -73,12 +80,17 @@
   </h1>
   <div>
     {%- if recover_success == true -%}
-      <h3 class="form__message" tabindex="-1" autofocus>
+      {%- comment -%}
+        An h2, matching the error message beside it: an h3 straight after the
+        page h1 skips a level, and customer.css only styles h2.form__message —
+        so as an h3 this success line was also rendering unstyled.
+      {%- endcomment -%}
+      <h2 class="form__message" tabindex="-1" autofocus>
         <span class="svg-wrapper">
           {{- 'icon-success.svg' | inline_asset_content -}}
         </span>
         {{ 'customer.recover_password.success' | t }}
-      </h3>
+      </h2>
     {%- endif -%}
     {%- form 'customer_login', novalidate: 'novalidate' -%}
       {%- if form.errors -%}
