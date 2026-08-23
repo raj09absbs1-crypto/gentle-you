@@ -1,89 +1,5 @@
 {
   "sections": {
-    "main": {
-      "type": "main-product",
-      "blocks": {
-        "judge_me_reviews_preview_badge_Lhrj8H": {
-          "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-          "settings": {}
-        },
-        "vendor": {
-          "type": "text",
-          "settings": {
-            "text": "Gentle You",
-            "text_style": "uppercase"
-          }
-        },
-        "title": {
-          "type": "title",
-          "settings": {}
-        },
-        "variant_picker": {
-          "type": "variant_picker",
-          "settings": {
-            "picker_type": "button",
-            "swatch_shape": "circle"
-          }
-        },
-        "price": {
-          "type": "price",
-          "settings": {}
-        },
-        "quantity_selector": {
-          "type": "quantity_selector",
-          "settings": {}
-        },
-        "buy_buttons": {
-          "type": "buy_buttons",
-          "settings": {
-            "show_dynamic_checkout": true,
-            "show_gift_card_recipient": true
-          }
-        },
-        "description": {
-          "type": "description",
-          "settings": {}
-        },
-        "share": {
-          "type": "share",
-          "settings": {
-            "share_label": "Share"
-          }
-        },
-        "judge_me_reviews_preview_badge_zmCTHB": {
-          "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-          "settings": {}
-        }
-      },
-      "block_order": [
-        "judge_me_reviews_preview_badge_Lhrj8H",
-        "vendor",
-        "title",
-        "variant_picker",
-        "price",
-        "quantity_selector",
-        "buy_buttons",
-        "description",
-        "share",
-        "judge_me_reviews_preview_badge_zmCTHB"
-      ],
-      "settings": {
-        "enable_sticky_info": true,
-        "color_scheme": "scheme-1",
-        "media_size": "large",
-        "constrain_to_viewport": false,
-        "media_fit": "contain",
-        "gallery_layout": "stacked",
-        "mobile_thumbnails": "show",
-        "media_position": "left",
-        "image_zoom": "lightbox",
-        "hide_variants": true,
-        "enable_video_looping": false,
-        "padding_top": 0,
-        "padding_bottom": 0
-      },
-      "disabled": true
-    },
     "disclosures": {
       "type": "disclosures",
       "settings": {
@@ -94,25 +10,6 @@
         "padding_top": 36,
         "padding_bottom": 0
       }
-    },
-    "related-products": {
-      "type": "related-products",
-      "settings": {
-        "heading": "You may also like",
-        "heading_size": "h2",
-        "products_to_show": 4,
-        "columns_desktop": 4,
-        "columns_mobile": "2",
-        "color_scheme": "scheme-1",
-        "image_ratio": "square",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "padding_top": 36,
-        "padding_bottom": 28
-      },
-      "disabled": true
     },
     "178308511965ad03cc": {
       "type": "apps",
@@ -157,10 +54,6 @@
     "gy_main": {
       "type": "gy-main-product",
       "blocks": {
-        "judge_badge_top": {
-          "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-          "settings": {}
-        },
         "vendor": {
           "type": "vendor",
           "settings": {}
@@ -240,10 +133,6 @@
             "open": false
           }
         },
-        "judge_badge_bottom": {
-          "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-          "settings": {}
-        },
         "highlights": {
           "type": "highlights",
           "settings": {
@@ -293,7 +182,6 @@
         }
       },
       "block_order": [
-        "judge_badge_top",
         "vendor",
         "title",
         "price",
@@ -307,8 +195,7 @@
         "details_description",
         "details_care",
         "details_shipping",
-        "details_exchange",
-        "judge_badge_bottom"
+        "details_exchange"
       ],
       "settings": {
         "enable_zoom": true,
@@ -371,8 +258,6 @@
     "gy_complementary",
     "gy_related",
     "178308511965ad03cc",
-    "17832791928bc348be",
-    "main",
-    "related-products"
+    "17832791928bc348be"
   ]
 }
