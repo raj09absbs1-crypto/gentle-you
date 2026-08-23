@@ -1,0 +1,79 @@
+{
+  "sections": {
+    "cart-items": {
+      "type": "main-cart-items",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "cart-footer": {
+      "type": "main-cart-footer",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "padding_top": 20,
+        "padding_bottom": 40
+      },
+      "blocks": {
+        "subtotal": {
+          "type": "subtotal",
+          "settings": {}
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "subtotal",
+        "buttons"
+      ]
+    },
+    "gy_cart_trust": {
+      "type": "gy-trust",
+      "blocks": {
+        "t1": {
+          "type": "point",
+          "settings": {
+            "icon": "package",
+            "text": "Cash on delivery",
+            "note": ""
+          }
+        },
+        "t2": {
+          "type": "point",
+          "settings": {
+            "icon": "truck",
+            "text": "Free prepaid shipping",
+            "note": ""
+          }
+        },
+        "t3": {
+          "type": "point",
+          "settings": {
+            "icon": "exchange",
+            "text": "3-day size exchange",
+            "note": ""
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3"
+      ],
+      "settings": {
+        "heading": "",
+        "tone": "lavender",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    }
+  },
+  "order": [
+    "cart-items",
+    "cart-footer",
+    "gy_cart_trust"
+  ]
+}

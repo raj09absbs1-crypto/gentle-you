@@ -1,0 +1,80 @@
+{%- comment -%}
+  GentleYou related products.
+
+  Uses Shopify's own product recommendations. The <product-recommendations>
+  element defined in global.js fetches this same section for the current
+  product, so every card is real Shopify data.
+{%- endcomment -%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{%- comment -%}
+  <product-recommendations> is defined in global.js, which the layout already
+  loads on every page. The theme has no related-products.js, so asking for one
+  only cost a 404 on every product page.
+{%- endcomment -%}
+<script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+
+<product-recommendations
+  class="gy-section gy-section--{{ section.settings.tone }} gy-related"
+  style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
+  data-section-id="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  {%- comment -%}
+    global.js appends product_id and section_id itself; passing them here too
+    just duplicated them in the request.
+  {%- endcomment -%}
+  data-url="{{ routes.product_recommendations_url }}?limit={{ section.settings.products_to_show }}&intent=related"
+  data-gy-reveal-scope
+  {{ section.shopify_attributes }}
+>
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    <div class="gy-container">
+      <header class="gy-section__head" data-gy-reveal>
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="gy-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="gy-section__heading">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+      </header>
+
+      <div class="gy-grid gy-grid--{{ section.settings.columns }}">
+        {%- for recommendation in recommendations.products -%}
+          <div class="gy-grid__item" data-gy-reveal style="--gy-reveal-delay: {{ forloop.index0 | times: 70 }}ms">
+            {%- render 'gy-card-product', card_product: recommendation, ratio: section.settings.image_ratio -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+</product-recommendations>
+
+{% schema %}
+{
+  "name": "GentleYou related",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "More from GentleYou" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "You may also like" },
+    { "type": "range", "id": "products_to_show", "min": 2, "max": 10, "step": 1, "label": "Products to show", "default": 4 },
+    {
+      "type": "select", "id": "columns", "label": "Desktop columns", "default": "4",
+      "options": [ { "value": "2", "label": "2" }, { "value": "3", "label": "3" }, { "value": "4", "label": "4" } ]
+    },
+    {
+      "type": "select", "id": "image_ratio", "label": "Image shape", "default": "portrait",
+      "options": [ { "value": "portrait", "label": "Portrait" }, { "value": "square", "label": "Square" } ]
+    },
+    {
+      "type": "select", "id": "tone", "label": "Background", "default": "lavender",
+      "options": [ { "value": "ivory", "label": "Warm ivory" }, { "value": "lavender", "label": "Soft lavender" }, { "value": "deep", "label": "Deep charcoal" } ]
+    },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 180, "step": 4, "unit": "px", "label": "Top padding", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 180, "step": 4, "unit": "px", "label": "Bottom padding", "default": 96 }
+  ],
+  "presets": [ { "name": "GentleYou related" } ],
+  "enabled_on": { "templates": ["product"] }
+}
+{% endschema %}

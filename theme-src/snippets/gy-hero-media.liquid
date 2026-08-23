@@ -1,0 +1,59 @@
+{%- comment -%}
+  One media layer of the GentleYou hero rotation.
+
+  All slides are rendered by Liquid and stacked in the same grid cell, so the
+  stage never changes height and switching products cannot shift the layout.
+  Only the first slide carries a real src: the rest keep their URLs in data
+  attributes until gentleyou-hero.js promotes them, so a six-product hero does
+  not download six full-size images up front.
+
+  Accepts:
+  - product: {Object} Shopify product
+  - index: {Number} zero-based slide index
+  - slide_id: {String} unique id fragment
+{%- endcomment -%}
+
+{%- liquid
+  assign is_first = false
+  if index == 0
+    assign is_first = true
+  endif
+-%}
+
+<div
+  class="gy-hero__slide{% if is_first %} is-active{% endif %}"
+  data-gy-slide="{{ index }}"
+  {% unless is_first %}aria-hidden="true"{% endunless %}
+>
+  {%- if product.featured_image -%}
+    {%- capture image_srcset -%}
+      {{ product.featured_image | image_url: width: 500 }} 500w,
+      {{ product.featured_image | image_url: width: 800 }} 800w,
+      {{ product.featured_image | image_url: width: 1100 }} 1100w,
+      {{ product.featured_image | image_url: width: 1400 }} 1400w
+    {%- endcapture -%}
+    <img
+      class="gy-hero__product-image"
+      {% if is_first %}
+        src="{{ product.featured_image | image_url: width: 1400 }}"
+        srcset="{{ image_srcset }}"
+        loading="eager"
+        fetchpriority="high"
+      {% else %}
+        data-gy-src="{{ product.featured_image | image_url: width: 1400 }}"
+        data-gy-srcset="{{ image_srcset }}"
+        loading="lazy"
+        fetchpriority="low"
+      {% endif %}
+      sizes="(min-width: 990px) 36rem, (min-width: 750px) 70vw, 92vw"
+      width="{{ product.featured_image.width }}"
+      height="{{ product.featured_image.height }}"
+      alt="{{ product.featured_image.alt | escape | default: product.title | escape }}"
+      decoding="async"
+    >
+  {%- else -%}
+    <div class="gy-hero__product-placeholder">
+      {{ 'product-apparel-2' | placeholder_svg_tag }}
+    </div>
+  {%- endif -%}
+</div>

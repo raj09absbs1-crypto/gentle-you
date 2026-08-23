@@ -1,0 +1,213 @@
+{% comment %}
+  Predictive search results.
+
+  Fetched by Dawn's `<predictive-search>` element from Shopify's predictive
+  search endpoint, so every product, collection, page and article below is a
+  real Shopify resource. Prices go through the theme's own snippets/price.liquid
+  so formatting, compare-at and sale states match the rest of the store — no
+  price, title, URL or availability is written here.
+
+  The ids, data attributes and `role="option"` list items are the contract
+  assets/predictive-search.js relies on for keyboard navigation and the live
+  region; the presentation around them is GentleYou's.
+{% endcomment %}
+{% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
+
+<div id="predictive-search-results" role="listbox">
+  {%- if predictive_search.performed -%}
+    {%- liquid
+      assign suggestion_count = predictive_search.resources.queries.size | plus: predictive_search.resources.collections.size
+      assign editorial_count = predictive_search.resources.pages.size | plus: predictive_search.resources.articles.size
+      assign first_column_results_size = suggestion_count | plus: editorial_count
+      assign total_results = predictive_search.resources.products.size | plus: first_column_results_size
+    -%}
+
+    {%- if total_results > 0 -%}
+      <div id="predictive-search-results-groups-wrapper" class="gy-psearch">
+        {%- if predictive_search.resources.products.size > 0 -%}
+          <section class="gy-psearch__group">
+            <h2 id="predictive-search-products" class="gy-psearch__heading">
+              {{- 'templates.search.products' | t -}}
+            </h2>
+            <ul
+              id="predictive-search-results-products-list"
+              class="gy-psearch__list gy-psearch__list--products"
+              role="group"
+              aria-labelledby="predictive-search-products"
+            >
+              {%- for product in predictive_search.resources.products -%}
+                {%- liquid
+                  assign variant = product.selected_or_first_available_variant
+                  assign on_sale = false
+                  if variant.compare_at_price > variant.price
+                    assign on_sale = true
+                  endif
+                -%}
+                <li
+                  id="predictive-search-option-product-{{ forloop.index }}"
+                  class="gy-psearch__item"
+                  role="option"
+                  aria-selected="false"
+                >
+                  <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'search' | escape }}">
+                    <a href="{{ product.url }}" class="gy-psearch__link" tabindex="-1">
+                      <span class="gy-psearch__media">
+                        {%- if product.featured_media != blank -%}
+                          <img
+                            class="gy-psearch__image"
+                            src="{{ product.featured_media | image_url: width: 200 }}"
+                            alt="{{ product.featured_media.alt | escape }}"
+                            width="72"
+                            height="{{ 72 | divided_by: product.featured_media.preview_image.aspect_ratio }}"
+                          >
+                        {%- endif -%}
+                        {%- unless product.available -%}
+                          <span class="gy-psearch__flag">{{ 'products.product.sold_out' | t }}</span>
+                        {%- endunless -%}
+                      </span>
+                      <span class="gy-psearch__body">
+                        <span class="gy-psearch__title">{{ product.title | escape }}</span>
+                        <span class="gy-psearch__price{% if on_sale %} gy-psearch__price--sale{% endif %}">
+                          {%- render 'price', product: product, use_variant: true, show_badges: false -%}
+                        </span>
+                      </span>
+                    </a>
+                  </product-component>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </section>
+        {%- endif -%}
+
+        {%- if suggestion_count > 0 -%}
+          <section class="gy-psearch__group gy-psearch__group--compact">
+            <h2 id="predictive-search-queries" class="gy-psearch__heading">
+              {{- 'templates.search.suggestions' | t -}}
+            </h2>
+            <ul
+              id="predictive-search-results-queries-list"
+              class="gy-psearch__list"
+              role="group"
+              aria-labelledby="predictive-search-queries"
+            >
+              {%- for collection in predictive_search.resources.collections -%}
+                <li
+                  id="predictive-search-option-collection-{{ forloop.index }}"
+                  class="gy-psearch__item gy-psearch__item--plain"
+                  role="option"
+                  aria-selected="false"
+                >
+                  <a href="{{ collection.url }}" class="gy-psearch__link gy-psearch__link--plain" tabindex="-1">
+                    {{ collection.title | escape }}
+                  </a>
+                </li>
+              {%- endfor -%}
+              {%- for query in predictive_search.resources.queries -%}
+                <li
+                  id="predictive-search-option-query-{{ forloop.index }}"
+                  class="gy-psearch__item gy-psearch__item--plain"
+                  role="option"
+                  aria-selected="false"
+                >
+                  <a
+                    href="{{ query.url }}"
+                    class="gy-psearch__link gy-psearch__link--plain"
+                    tabindex="-1"
+                    aria-label="{{ query.text }}"
+                  >
+                    {{ query.styled_text }}
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </section>
+        {%- endif -%}
+
+        {%- if editorial_count > 0 -%}
+          <section class="gy-psearch__group gy-psearch__group--compact">
+            <h2 id="predictive-search-pages" class="gy-psearch__heading">
+              {{- 'templates.search.pages' | t -}}
+            </h2>
+            <ul
+              id="predictive-search-results-pages-list"
+              class="gy-psearch__list"
+              role="group"
+              aria-labelledby="predictive-search-pages"
+            >
+              {%- for page in predictive_search.resources.pages -%}
+                <li
+                  id="predictive-search-option-page-{{ forloop.index }}"
+                  class="gy-psearch__item gy-psearch__item--plain"
+                  role="option"
+                  aria-selected="false"
+                >
+                  <a href="{{ page.url }}" class="gy-psearch__link gy-psearch__link--plain" tabindex="-1">
+                    {{ page.title | escape }}
+                  </a>
+                </li>
+              {%- endfor -%}
+              {%- for article in predictive_search.resources.articles -%}
+                <li
+                  id="predictive-search-option-article-{{ forloop.index }}"
+                  class="gy-psearch__item gy-psearch__item--plain"
+                  role="option"
+                  aria-selected="false"
+                >
+                  <a href="{{ article.url }}" class="gy-psearch__link gy-psearch__link--plain" tabindex="-1">
+                    {{ article.title | escape }}
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </section>
+        {%- endif -%}
+      </div>
+    {%- else -%}
+      <div id="predictive-search-results-groups-wrapper" class="gy-psearch gy-psearch--empty">
+        <p class="gy-psearch__empty-title">
+          {{ 'sections.gy.search_no_results_title' | t: terms: predictive_search.terms }}
+        </p>
+        <p class="gy-psearch__empty-text">{{ 'sections.gy.search_no_results_text' | t }}</p>
+      </div>
+    {%- endif -%}
+
+    {%- render 'loading-spinner', class: 'gy-search__spinner' -%}
+
+    <div id="predictive-search-option-search-keywords" class="gy-psearch__all">
+      <button
+        class="predictive-search__item gy-psearch__all-button"
+        tabindex="-1"
+        role="option"
+        aria-selected="false"
+      >
+        <span data-predictive-search-search-for-text>
+          {{- 'templates.search.search_for' | t: terms: predictive_search.terms -}}
+        </span>
+        <span aria-hidden="true">&rarr;</span>
+      </button>
+    </div>
+
+    <span
+      class="hidden"
+      data-predictive-search-live-region-count-value
+      data-total-results="{{ total_results }}"
+    >
+      {% liquid
+        if total_results == 0
+          echo 'templates.search.no_results' | t: terms: predictive_search.terms
+        else
+          echo 'templates.search.results_with_count' | t: count: total_results | append: ': '
+          if suggestion_count > 0
+            echo 'templates.search.results_suggestions_with_count' | t: count: suggestion_count | append: ', '
+          endif
+          if editorial_count > 0
+            echo 'templates.search.results_pages_with_count' | t: count: editorial_count | append: ', '
+          endif
+          if predictive_search.resources.products.size > 0
+            echo 'templates.search.results_products_with_count' | t: count: predictive_search.resources.products.size
+          endif
+        endif
+      %}
+    </span>
+  {%- endif -%}
+</div>

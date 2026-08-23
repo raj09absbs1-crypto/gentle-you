@@ -1,0 +1,85 @@
+{%- comment -%}
+  GentleYou editorial story — used for the comfort story and the brand story.
+  Image, heading, copy and call to action are all merchant-controlled.
+{%- endcomment -%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+
+<section
+  class="gy-section gy-section--{{ section.settings.tone }} gy-story gy-story--{{ section.settings.image_position }}"
+  style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
+  data-gy-reveal-scope
+  {{ section.shopify_attributes }}
+>
+  <div class="gy-container gy-story__inner">
+    <figure class="gy-story__media" data-gy-reveal>
+      {%- if section.settings.image != blank -%}
+        <img
+          class="gy-story__image"
+          {% if section.settings.enable_parallax %}data-gy-parallax-image{% endif %}
+          src="{{ section.settings.image | image_url: width: 1400 }}"
+          srcset="
+            {{ section.settings.image | image_url: width: 600 }} 600w,
+            {{ section.settings.image | image_url: width: 1000 }} 1000w,
+            {{ section.settings.image | image_url: width: 1400 }} 1400w
+          "
+          sizes="(min-width: 990px) 52vw, 100vw"
+          width="{{ section.settings.image.width }}"
+          height="{{ section.settings.image.height }}"
+          alt="{{ section.settings.image.alt | escape }}"
+          loading="lazy"
+          decoding="async"
+        >
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'gy-story__image' }}
+      {%- endif -%}
+    </figure>
+
+    <div class="gy-story__content">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="gy-eyebrow" data-gy-reveal>{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="gy-story__heading" data-gy-reveal>{{ section.settings.heading | escape | newline_to_br }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="gy-story__text rte" data-gy-reveal>{{ section.settings.text }}</div>
+      {%- endif -%}
+      {%- if section.settings.cta_text != blank and section.settings.cta_link != blank -%}
+        <a class="gy-button" href="{{ section.settings.cta_link }}" data-gy-reveal>
+          {{ section.settings.cta_text | escape }}
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "GentleYou story",
+  "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Comfort, without compromise." },
+    { "type": "richtext", "id": "text", "label": "Text" },
+    { "type": "text", "id": "cta_text", "label": "Button label" },
+    { "type": "url", "id": "cta_link", "label": "Button link" },
+    {
+      "type": "select", "id": "image_position", "label": "Image position", "default": "left",
+      "options": [ { "value": "left", "label": "Left" }, { "value": "right", "label": "Right" } ]
+    },
+    { "type": "checkbox", "id": "enable_parallax", "label": "Subtle image parallax", "default": true },
+    {
+      "type": "select", "id": "tone", "label": "Background", "default": "ivory",
+      "options": [ { "value": "ivory", "label": "Warm ivory" }, { "value": "lavender", "label": "Soft lavender" }, { "value": "deep", "label": "Deep charcoal" } ]
+    },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 180, "step": 4, "unit": "px", "label": "Top padding", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 180, "step": 4, "unit": "px", "label": "Bottom padding", "default": 96 }
+  ],
+  "presets": [ { "name": "GentleYou story" } ]
+}
+{% endschema %}

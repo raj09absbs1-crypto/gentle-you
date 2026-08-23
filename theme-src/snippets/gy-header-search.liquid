@@ -1,0 +1,119 @@
+{%- comment -%}
+  GentleYou header search.
+
+  A thin premium shell around Shopify's own search: the form posts to
+  routes.search_url with the native `q` parameter, and when predictive search
+  is enabled in Theme settings the markup is Dawn's `<predictive-search>`
+  custom element, so results come from Shopify's predictive search endpoint.
+  Nothing about products, prices or URLs is written here.
+
+  Accepts:
+  - input_id: {String} id for the search input (required)
+  - suggestions: {Object} a Shopify link list shown before the shopper types
+  - suggestions_heading: {String} heading above those links
+{%- endcomment -%}
+
+<div class="gy-search" id="GySearchOverlay" data-gy-search hidden>
+  <div class="gy-search__scrim" data-gy-search-close></div>
+
+  <div
+    class="gy-search__panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="GySearchTitle"
+    tabindex="-1"
+  >
+    <div class="gy-search__inner">
+      <div class="gy-search__head">
+        <p class="gy-search__title" id="GySearchTitle">{{ 'general.search.search' | t }}</p>
+        <button
+          class="gy-search__close"
+          type="button"
+          data-gy-search-close
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      {%- if settings.predictive_search_enabled -%}
+        <predictive-search class="gy-search__engine" data-loading-text="{{ 'accessibility.loading' | t }}">
+      {%- else -%}
+        <search-form class="gy-search__engine">
+      {%- endif -%}
+        <form action="{{ routes.search_url }}" method="get" role="search" class="gy-search__form">
+          <label class="visually-hidden" for="{{ input_id }}">{{ 'general.search.search' | t }}</label>
+
+          <div class="gy-search__field">
+            <span class="gy-search__field-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.2"/><path d="m15.6 15.6 4.1 4.1"/></svg>
+            </span>
+
+            <input
+              class="gy-search__input"
+              id="{{ input_id }}"
+              type="search"
+              name="q"
+              value="{{ search.terms | escape }}"
+              placeholder="{{ 'sections.gy.search_placeholder' | t }}"
+              data-gy-search-input
+              {%- if settings.predictive_search_enabled %}
+                role="combobox"
+                aria-expanded="false"
+                aria-owns="predictive-search-results"
+                aria-controls="predictive-search-results"
+                aria-haspopup="listbox"
+                aria-autocomplete="list"
+                autocorrect="off"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+              {%- endif %}
+            >
+
+            <button
+              class="gy-search__reset hidden"
+              type="reset"
+              aria-label="{{ 'general.search.reset' | t }}"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+            </button>
+          </div>
+
+          <input type="hidden" name="options[prefix]" value="last">
+
+          {%- if settings.predictive_search_enabled -%}
+            <div class="gy-search__results" tabindex="-1" data-predictive-search>
+              {%- render 'loading-spinner', class: 'gy-search__spinner' -%}
+            </div>
+
+            <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+          {%- endif -%}
+        </form>
+      {%- if settings.predictive_search_enabled -%}
+        </predictive-search>
+      {%- else -%}
+        </search-form>
+      {%- endif -%}
+
+      {%- comment -%}
+        Shown until the shopper starts typing. Every destination is a link the
+        merchant picked in the Theme Editor, so nothing here is invented.
+      {%- endcomment -%}
+      {%- if suggestions.links.size > 0 -%}
+        <div class="gy-search__suggest" data-gy-search-suggest>
+          <p class="gy-search__suggest-heading">
+            {{ suggestions_heading | default: 'Popular right now' | escape }}
+          </p>
+          <ul class="gy-search__suggest-list" role="list">
+            {%- for link in suggestions.links limit: 6 -%}
+              <li>
+                <a class="gy-search__suggest-link" href="{{ link.url }}">{{ link.title }}</a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>

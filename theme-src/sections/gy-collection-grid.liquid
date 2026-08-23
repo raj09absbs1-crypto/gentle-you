@@ -1,0 +1,271 @@
+{%- comment -%}
+  GentleYou collection grid.
+
+  Products, counts, sorting and filtering are all Shopify's own: the controls
+  post back to the collection URL with Shopify's native `sort_by` and filter
+  parameters, so results, URL state and pagination stay server-rendered and
+  work without JavaScript. Nothing about a product is hardcoded.
+{%- endcomment -%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+{{ 'gy-collection.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'gy-collection.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+  assign has_filters = false
+  for filter in collection.filters
+    assign has_filters = true
+    break
+  endfor
+-%}
+
+{%- paginate collection.products by section.settings.products_per_page -%}
+  <section
+    class="gy-section gy-section--{{ section.settings.tone }} gy-collection"
+    style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
+    data-gy-reveal-scope
+    {{ section.shopify_attributes }}
+  >
+    <div class="gy-container">
+      <div class="gy-collection__bar" data-gy-collection-bar>
+        <p class="gy-collection__count">
+          {{ 'sections.gy.products_count' | t: count: collection.products_count }}
+        </p>
+
+        <div class="gy-collection__tools">
+          {%- if has_filters and section.settings.enable_filtering -%}
+            <button class="gy-collection__tool" type="button" data-gy-filter-open aria-expanded="false" aria-controls="GyFilters-{{ section.id }}">
+              {{ 'sections.gy.filter' | t }}
+              {%- if collection.filters != blank -%}
+                {%- assign active_total = 0 -%}
+                {%- for filter in collection.filters -%}
+                  {%- assign active_total = active_total | plus: filter.active_values.size -%}
+                {%- endfor -%}
+                {%- if active_total > 0 -%}
+                  <span class="gy-collection__badge">{{ active_total }}</span>
+                {%- endif -%}
+              {%- endif -%}
+            </button>
+          {%- endif -%}
+
+          {%- if section.settings.enable_sorting -%}
+            <form class="gy-collection__sort" method="get" action="{{ collection.url }}" data-gy-sort-form>
+              <label class="visually-hidden" for="GySort-{{ section.id }}">{{ 'sections.gy.sort_by' | t }}</label>
+              <select id="GySort-{{ section.id }}" name="sort_by" data-gy-sort>
+                {%- for option in collection.sort_options -%}
+                  <option value="{{ option.value }}" {% if option.value == sort_by %}selected{% endif %}>
+                    {{ option.name }}
+                  </option>
+                {%- endfor -%}
+              </select>
+              {%- comment -%}Keep any active filters when the sort changes.{%- endcomment -%}
+              {%- for filter in collection.filters -%}
+                {%- for value in filter.active_values -%}
+                  <input type="hidden" name="{{ value.param_name }}" value="{{ value.value }}">
+                {%- endfor -%}
+              {%- endfor -%}
+              <noscript><button class="gy-collection__tool" type="submit">{{ 'sections.gy.apply' | t }}</button></noscript>
+            </form>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- if has_filters and section.settings.enable_filtering -%}
+        {%- assign chip_count = 0 -%}
+        {%- for filter in collection.filters -%}
+          {%- assign chip_count = chip_count | plus: filter.active_values.size -%}
+        {%- endfor -%}
+        {%- if chip_count > 0 -%}
+          <ul class="gy-collection__chips" role="list">
+            {%- for filter in collection.filters -%}
+              {%- for value in filter.active_values -%}
+                <li>
+                  <a class="gy-chip" href="{{ value.url_to_remove }}">
+                    {{ filter.label }}: {{ value.label }}
+                    <span aria-hidden="true">&times;</span>
+                  </a>
+                </li>
+              {%- endfor -%}
+            {%- endfor -%}
+            <li>
+              <a class="gy-chip gy-chip--clear" href="{{ collection.url }}?sort_by={{ sort_by }}">
+                {{ 'sections.gy.clear_all' | t }}
+              </a>
+            </li>
+          </ul>
+        {%- endif -%}
+
+        <div class="gy-filters" id="GyFilters-{{ section.id }}" data-gy-filters hidden>
+          <div class="gy-filters__scrim" data-gy-filter-close></div>
+          <form class="gy-filters__panel" method="get" action="{{ collection.url }}" data-gy-filter-form>
+            <header class="gy-filters__head">
+              <p class="gy-filters__title">{{ 'sections.gy.filter' | t }}</p>
+              <button class="gy-filters__close" type="button" data-gy-filter-close aria-label="{{ 'accessibility.close' | t }}">&times;</button>
+            </header>
+
+            <div class="gy-filters__body">
+              {%- for filter in collection.filters -%}
+                <details class="gy-filters__group" {% if filter.active_values.size > 0 %}open{% endif %}>
+                  <summary>
+                    <span>{{ filter.label }}</span>
+                    <span class="gy-filters__icon" aria-hidden="true"></span>
+                  </summary>
+
+                  {%- case filter.type -%}
+                    {%- when 'list', 'boolean' -%}
+                      <ul class="gy-filters__values" role="list">
+                        {%- for value in filter.values -%}
+                          <li>
+                            <label class="gy-filters__value{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
+                              <input
+                                type="checkbox"
+                                name="{{ value.param_name }}"
+                                value="{{ value.value }}"
+                                {% if value.active %}checked{% endif %}
+                                {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                              >
+                              <span class="gy-filters__box" aria-hidden="true"></span>
+                              <span class="gy-filters__name">{{ value.label }}</span>
+                              <span class="gy-filters__count">{{ value.count }}</span>
+                            </label>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+
+                    {%- when 'price_range' -%}
+                      <div class="gy-filters__price">
+                        <label>
+                          <span class="visually-hidden">{{ filter.min_value.label }}</span>
+                          <input
+                            class="gy-filters__price-input"
+                            type="number"
+                            name="{{ filter.min_value.param_name }}"
+                            value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+                            min="0"
+                            max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                            placeholder="0"
+                          >
+                        </label>
+                        <span aria-hidden="true">&ndash;</span>
+                        <label>
+                          <span class="visually-hidden">{{ filter.max_value.label }}</span>
+                          <input
+                            class="gy-filters__price-input"
+                            type="number"
+                            name="{{ filter.max_value.param_name }}"
+                            value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+                            min="0"
+                            max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                            placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                          >
+                        </label>
+                      </div>
+                  {%- endcase -%}
+                </details>
+              {%- endfor -%}
+            </div>
+
+            <footer class="gy-filters__foot">
+              <a class="gy-collection__tool" href="{{ collection.url }}?sort_by={{ sort_by }}">{{ 'sections.gy.clear_all' | t }}</a>
+              <input type="hidden" name="sort_by" value="{{ sort_by }}">
+              <button class="gy-button gy-filters__apply" type="submit">{{ 'sections.gy.apply' | t }}</button>
+            </footer>
+          </form>
+        </div>
+      {%- endif -%}
+
+      {%- if collection.products.size > 0 -%}
+        <div class="gy-grid gy-grid--{{ section.settings.columns }} gy-collection__grid">
+          {%- for product in collection.products -%}
+            {%- liquid
+              assign card_eager = false
+              if forloop.index <= 4
+                assign card_eager = true
+              endif
+            -%}
+            <div class="gy-grid__item" data-gy-reveal style="--gy-reveal-delay: {{ forloop.index0 | modulo: 4 | times: 60 }}ms">
+              {%- render 'gy-card-product',
+                card_product: product,
+                ratio: section.settings.image_ratio,
+                eager: card_eager,
+                show_secondary_image: section.settings.show_secondary_image,
+                quick_add: section.settings.enable_quick_add,
+                section_id: section.id,
+                heading_tag: 'h2'
+              -%}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          <nav class="gy-pagination" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
+            {%- if paginate.previous -%}
+              <a class="gy-pagination__step" href="{{ paginate.previous.url }}" aria-label="{{ 'general.pagination.previous' | t }}">&larr;</a>
+            {%- endif -%}
+            <ol role="list">
+              {%- for part in paginate.parts -%}
+                <li>
+                  {%- if part.is_link -%}
+                    <a href="{{ part.url }}">{{ part.title }}</a>
+                  {%- elsif part.title == paginate.current_page -%}
+                    <span aria-current="page">{{ part.title }}</span>
+                  {%- else -%}
+                    <span>{{ part.title }}</span>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ol>
+            {%- if paginate.next -%}
+              <a class="gy-pagination__step" href="{{ paginate.next.url }}" aria-label="{{ 'general.pagination.next' | t }}">&rarr;</a>
+            {%- endif -%}
+          </nav>
+        {%- endif -%}
+      {%- else -%}
+        <div class="gy-collection__empty">
+          <p class="gy-collection__empty-title">{{ 'sections.gy.empty_title' | t }}</p>
+          <p class="gy-collection__empty-text">{{ 'sections.gy.empty_text' | t }}</p>
+          <div class="gy-collection__empty-actions">
+            <a class="gy-button gy-button--outline" href="{{ collection.url }}">{{ 'sections.gy.clear_all' | t }}</a>
+            <a class="gy-button" href="{{ routes.all_products_collection_url }}">{{ 'sections.gy.continue_shopping' | t }}</a>
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "GentleYou collection grid",
+  "tag": "section",
+  "settings": [
+    { "type": "range", "id": "products_per_page", "min": 8, "max": 48, "step": 4, "label": "Products per page", "default": 24 },
+    {
+      "type": "select", "id": "columns", "label": "Desktop columns", "default": "4",
+      "options": [ { "value": "2", "label": "2" }, { "value": "3", "label": "3" }, { "value": "4", "label": "4" } ]
+    },
+    {
+      "type": "select", "id": "image_ratio", "label": "Image shape", "default": "portrait",
+      "options": [ { "value": "portrait", "label": "Portrait" }, { "value": "square", "label": "Square" } ]
+    },
+    { "type": "checkbox", "id": "show_secondary_image", "label": "Show the second image on hover", "default": true },
+    { "type": "checkbox", "id": "enable_quick_add", "label": "Enable quick add", "info": "Adds to cart only for products with a single purchasable variant; everything else links to the product page.", "default": true },
+    { "type": "header", "content": "Controls" },
+    { "type": "checkbox", "id": "enable_filtering", "label": "Enable filtering", "info": "Uses the filters set up in Shopify Search & Discovery.", "default": true },
+    { "type": "checkbox", "id": "enable_sorting", "label": "Enable sorting", "default": true },
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select", "id": "tone", "label": "Background", "default": "ivory",
+      "options": [ { "value": "ivory", "label": "Warm ivory" }, { "value": "lavender", "label": "Soft lavender" } ]
+    },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 96 }
+  ],
+  "enabled_on": { "templates": ["collection"] }
+}
+{% endschema %}

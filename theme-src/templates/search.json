@@ -1,0 +1,23 @@
+{
+  "sections": {
+    "gy_search": {
+      "type": "gy-main-search",
+      "settings": {
+        "heading": "Find your everyday favourite.",
+        "results_per_page": 24,
+        "columns": "4",
+        "image_ratio": "portrait",
+        "show_secondary_image": true,
+        "empty_title": "What are you looking for?",
+        "empty_text": "Search by style, size or fabric — or start with one of the edits below.",
+        "suggestions_heading": "Explore",
+        "suggestions": "main-menu",
+        "padding_top": 48,
+        "padding_bottom": 96
+      }
+    }
+  },
+  "order": [
+    "gy_search"
+  ]
+}

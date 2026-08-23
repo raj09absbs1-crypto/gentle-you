@@ -1,0 +1,729 @@
+/*
+  GentleYou cart layer.
+
+  Pure presentation over Dawn's own cart drawer, cart page and cart items —
+  every element styled here is markup Dawn renders and Dawn's cart.js updates.
+  No cart behaviour, endpoint, form or quantity rule is touched.
+*/
+
+/* ---- Cart drawer ---- */
+
+
+cart-drawer .drawer__inner {
+  background-color: rgb(var(--gy-canvas));
+  color: rgb(var(--gy-ink));
+  font-family: var(--gy-font-body);
+  padding: 0;
+}
+
+cart-drawer .cart-drawer__overlay {
+  background-color: rgb(var(--gy-ink) / 0.45);
+}
+
+cart-drawer .drawer__header {
+  align-items: baseline;
+  padding: var(--gy-space-lg) var(--gy-space-lg) var(--gy-space-md);
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.1);
+}
+
+cart-drawer .drawer__heading {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: 1.84rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: rgb(var(--gy-ink));
+}
+
+/* Dawn hangs the close button 10px past the panel edge, which puts part of
+   it off screen once the drawer is the full width of a phone. */
+cart-drawer .drawer__close {
+  inset-inline-end: 0.8rem;
+  width: 4rem;
+  height: 4rem;
+  border: 1px solid rgb(var(--gy-ink) / 0.12);
+  border-radius: 50%;
+  background-color: rgb(var(--gy-canvas-warm));
+  color: rgb(var(--gy-ink));
+  transition: background-color 200ms var(--gy-ease);
+}
+
+cart-drawer .drawer__close:hover {
+  background-color: rgb(var(--gy-lavender) / 0.4);
+}
+
+cart-drawer .drawer__contents {
+  padding-inline: var(--gy-space-lg);
+}
+
+/* The wrapper is inside .drawer__contents; padding both would indent every
+   line twice and leave a phone-width drawer with very little room. */
+cart-drawer .drawer__cart-items-wrapper {
+  padding-inline: 0;
+}
+
+cart-drawer .drawer__footer {
+  padding: var(--gy-space-md) var(--gy-space-lg);
+  padding-bottom: calc(var(--gy-space-md) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgb(var(--gy-ink) / 0.1);
+  background-color: rgb(var(--gy-canvas));
+}
+
+/* Empty state */
+cart-drawer .drawer__inner-empty {
+  padding: var(--gy-space-xl) var(--gy-space-lg);
+  background-color: rgb(var(--gy-canvas));
+}
+
+cart-drawer .cart__empty-text,
+.cart__empty-text {
+  font-family: var(--gy-font-heading);
+  font-size: clamp(2.16rem, 1.76rem + 1vw, 3.04rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: rgb(var(--gy-ink));
+}
+
+/* ---- Cart items (drawer and page share Dawn's markup) ---- */
+
+.cart-items,
+.cart-items td,
+.cart-items th {
+  border: 0;
+  font-family: var(--gy-font-body);
+}
+
+.cart-items thead th {
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.12);
+  font-size: 0.96rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.cart-item {
+  padding-block: var(--gy-space-md);
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
+}
+
+.cart-item:last-child {
+  border-bottom: 0;
+}
+
+.cart-item__image {
+  border-radius: var(--gy-radius-sm);
+  box-shadow: var(--gy-elevation-1);
+}
+
+.cart-item__name {
+  /* The title is the line item's link back to the product; its bare line box
+     measured 20px, under the 24px a pointer target needs. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.4rem;
+  font-family: var(--gy-font-body);
+  font-size: 1.408rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: rgb(var(--gy-ink));
+  text-decoration: none;
+}
+
+.cart-item__name:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Variant options — size, cup, colour — exactly as Shopify records them. */
+.product-option {
+  font-size: 1.248rem;
+  line-height: 1.5;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.cart-item__price-wrapper .price,
+.cart-item__totals .price {
+  font-size: 1.52rem;
+  color: rgb(var(--gy-ink));
+}
+
+.cart-item__old-price {
+  font-size: 1.28rem;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.cart-item__discounted-prices .cart-item__final-price {
+  font-weight: 500;
+}
+
+/* Quantity stepper matched to the product page control. */
+.cart-item .quantity {
+  width: 13.2rem;
+  border: 1px solid rgb(var(--gy-ink) / 0.16);
+  border-radius: var(--gy-radius-sm);
+  background-color: rgb(var(--gy-canvas-warm));
+  overflow: hidden;
+}
+
+.cart-item .quantity::before,
+.cart-item .quantity::after {
+  display: none;
+}
+
+.cart-item .quantity__button {
+  /* Comfortable touch targets; the harness measured Dawn's defaults at 27px. */
+  min-width: 4.4rem;
+  min-height: 4.4rem;
+  transition: background-color 180ms var(--gy-ease), transform 180ms var(--gy-ease);
+}
+
+.cart-item .quantity__input {
+  min-height: 4.4rem;
+}
+
+.cart-item .quantity__button:hover {
+  background-color: rgb(var(--gy-lavender) / 0.4);
+}
+
+.cart-item .quantity__button:active {
+  transform: scale(0.92);
+}
+
+.cart-item .quantity__button[disabled],
+.cart-item .quantity__button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+cart-remove-button .button,
+.cart-remove-button .button {
+  min-width: 4rem;
+  min-height: 4rem;
+  border-radius: var(--gy-radius-sm);
+  color: rgb(var(--gy-ink-muted));
+  transition: color 180ms var(--gy-ease), background-color 180ms var(--gy-ease);
+}
+
+cart-remove-button .button:hover {
+  color: rgb(var(--gy-ink));
+  background-color: rgb(var(--gy-lavender) / 0.35);
+}
+
+/* Dawn adds .loading while a cart request is in flight. */
+.cart-item.cart-item--disabled,
+.cart-item .loading__spinner:not(.hidden) ~ * {
+  opacity: 0.6;
+}
+
+/* ---- Totals and checkout ---- */
+
+.totals {
+  align-items: baseline;
+  justify-content: space-between;
+  padding-block: var(--gy-space-sm);
+}
+
+.totals__total {
+  margin: 0;
+  font-family: var(--gy-font-body);
+  font-size: 1.088rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.totals__total-value {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: clamp(2.16rem, 1.76rem + 0.9vw, 2.88rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: rgb(var(--gy-ink));
+}
+
+.tax-note {
+  margin-block: var(--gy-space-2xs) var(--gy-space-md);
+  font-size: 1.216rem;
+  line-height: 1.55;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.cart__checkout-button,
+.cart__dynamic-checkout-buttons button {
+  min-height: 5.6rem;
+  border-radius: var(--gy-radius-md);
+  font-size: 1.216rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.cart__checkout-button {
+  position: relative;
+  overflow: hidden;
+  background-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+  box-shadow: var(--gy-elevation-1);
+  transition: transform 200ms var(--gy-ease), box-shadow 200ms var(--gy-ease);
+}
+
+.cart__checkout-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  translate: -110% 0;
+  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 0.2) 50%, transparent 80%);
+  transition: translate 900ms var(--gy-ease-out);
+  pointer-events: none;
+}
+
+.cart__checkout-button:not([disabled]):hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gy-elevation-2);
+}
+
+.cart__checkout-button:not([disabled]):hover::after {
+  translate: 110% 0;
+}
+
+/* ---- Cart page ---- */
+
+.cart-page-gy {
+  background-color: rgb(var(--gy-canvas));
+}
+
+.cart__warnings {
+  padding-block: clamp(4.8rem, 8vw, 9.6rem);
+}
+
+.cart__login-title,
+.cart__login-paragraph {
+  color: rgb(var(--gy-ink-soft));
+}
+
+.cart__items {
+  padding-top: var(--gy-space-md);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.1);
+}
+
+.cart__footer {
+  padding-top: var(--gy-space-lg);
+}
+
+.cart__blocks {
+  border: 1px solid rgb(var(--gy-ink) / 0.1);
+  border-radius: var(--gy-radius-md);
+  background-color: rgb(var(--gy-canvas-warm));
+  padding: var(--gy-space-lg);
+}
+
+@media screen and (min-width: 990px) {
+  /* Items on the left, summary sticky on the right. */
+  .cart__footer-wrapper .cart__footer {
+    position: sticky;
+    top: 10.4rem;
+  }
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  cart-drawer .drawer__close,
+  .cart-item .quantity__button,
+  cart-remove-button .button,
+  .cart__checkout-button,
+  .cart__checkout-button::after {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* Dawn's count bubble inside the GentleYou header icon: keep it inside the
+   icon rather than Dawn's own offset, which sat outside the viewport edge. */
+.gy-header__cart .cart-count-bubble {
+  position: absolute;
+  top: 0.48rem;
+  right: 0.4rem;
+  left: auto;
+  bottom: auto;
+  min-width: 1.68rem;
+  height: 1.68rem;
+  padding: 0 0.32rem;
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+  font-size: 0.96rem;
+  line-height: 1.68rem;
+  text-align: center;
+}
+
+/* A little more room than Dawn's default so long product titles and the
+   variant options breathe. */
+@media screen and (min-width: 750px) {
+  cart-drawer .drawer__inner {
+    max-width: 44rem;
+  }
+}
+
+/* ---- Drawer line items -------------------------------------------------
+   Dawn's three-column table gets cramped in a narrow drawer, so inside the
+   drawer only, each line becomes image + content, with the quantity stepper
+   and the line total sharing the row underneath. Markup and behaviour are
+   untouched. The long selectors are deliberate: Dawn's drawer stylesheet
+   claims `.cart-drawer .cart-items .cart-item__quantity` and friends, which
+   outrank a shorter selector whatever order the stylesheets load in. */
+
+cart-drawer .cart-drawer .cart-items,
+cart-drawer .cart-drawer .cart-items tbody,
+cart-drawer .cart-drawer .cart-items tr,
+cart-drawer .cart-drawer .cart-items td,
+cart-drawer .cart-drawer .cart-items th {
+  display: block;
+  width: auto;
+}
+
+cart-drawer .cart-drawer .cart-items thead {
+  display: none;
+}
+
+cart-drawer .cart-drawer .cart-items tr.cart-item {
+  display: grid;
+  /* Image, content, then the line total in a track of its own so it never
+     shares a cell with the quantity stepper. */
+  grid-template-columns: 8.8rem minmax(0, 1fr) max-content;
+  column-gap: 1.2rem;
+  row-gap: 0.8rem;
+  align-items: start;
+  padding-block: 2rem;
+}
+
+cart-drawer .cart-drawer .cart-items .cart-item__media {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 8.8rem;
+}
+
+cart-drawer .cart-drawer .cart-items .cart-item__details {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+cart-drawer .cart-drawer .cart-items .cart-item__quantity {
+  grid-column: 2 / 4;
+  grid-row: 2;
+  padding: 0;
+}
+
+cart-drawer .cart-drawer .cart-items tr.cart-item {
+  grid-template-rows: auto auto;
+}
+
+/* Line total sits beside the title, where a shopper looks for it, leaving
+   the whole row underneath to the quantity stepper and remove control. */
+cart-drawer .cart-drawer .cart-items .cart-item__totals {
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  align-self: start;
+  padding: 0;
+  text-align: right;
+}
+
+cart-drawer .cart-drawer .cart-items .cart-item__totals .price,
+cart-drawer .cart-drawer .cart-items .cart-item__price-wrapper > * {
+  white-space: nowrap;
+}
+
+cart-drawer .cart-drawer .cart-items .cart-item__quantity-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+cart-drawer .cart-drawer .cart-items .cart-item__name {
+  font-size: 1.4rem;
+}
+
+cart-drawer .cart-drawer .cart-items .product-option {
+  font-size: 1.25rem;
+}
+
+/* ---- Cart on small screens ---------------------------------------------
+   The drawer is nearly the width of the phone, so the generous desktop
+   gutters cost the line items room they need for the title and the stepper.
+   Layout, markup and behaviour are unchanged; only the spacing tightens. */
+@media screen and (max-width: 749px) {
+  cart-drawer .drawer__contents {
+    padding-inline: var(--gy-space-sm);
+  }
+
+  cart-drawer .drawer__footer {
+    padding-inline: var(--gy-space-sm);
+  }
+
+  /* On the cart page Dawn gives the line total a quarter-width column, so a
+     price wraps onto two lines. Sizing that column to its content keeps the
+     total on one line and hands the rest of the row to the product. */
+  cart-items .cart-items tr.cart-item {
+    grid-template-columns: 8.8rem minmax(0, 1fr) max-content;
+    column-gap: var(--gy-space-sm);
+    row-gap: var(--gy-space-xs);
+    margin-bottom: 0;
+  }
+
+  cart-items .cart-items .cart-item__media {
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+
+  cart-items .cart-items .cart-item__details {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  cart-items .cart-items .cart-item__totals {
+    grid-column: 3;
+    grid-row: 1;
+    align-items: flex-start;
+  }
+
+  cart-items .cart-items .cart-item__quantity {
+    grid-column: 2 / 4;
+    grid-row: 2;
+  }
+
+  cart-items .cart-items .cart-item__totals .price {
+    white-space: nowrap;
+  }
+
+  /* Dawn's 4rem gap under the column headings and 3.5rem between lines leave
+     a lot of empty space on a phone. */
+  cart-items .cart-items thead tr {
+    margin-bottom: var(--gy-space-sm);
+  }
+
+  /* Room under the checkout button so it never sits against the next
+     section, including on handsets with a home indicator. */
+  .cart__footer {
+    padding-bottom: calc(var(--gy-space-lg) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ---- Reassurance in the drawer ----------------------------------------
+   A quiet line above the checkout button, in the store's own policy wording.
+   Additive only: nothing above this point changes. */
+.gy-cart__reassure {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem var(--gy-space-md);
+  margin: 0 0 var(--gy-space-sm);
+  padding: 0;
+  list-style: none;
+}
+
+.gy-cart__reassure li {
+  position: relative;
+  padding-left: 1.6rem;
+  font-size: 1.056rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-cart__reassure li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 0.56rem;
+  height: 0.56rem;
+  border-radius: 50%;
+  background-color: rgb(var(--gy-lavender-deep) / 0.85);
+}
+
+/* Remove control: Dawn sizes it from its icon, which leaves a target well
+   under the 4.4rem minimum — hard to hit on a phone, and easy to hit by
+   accident next to the stepper. Additive only. */
+cart-remove-button,
+.cart-remove-button {
+  display: inline-flex;
+}
+
+cart-remove-button .button,
+.cart-remove-button .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  min-width: 4.4rem;
+  height: 4.4rem;
+  min-height: 4.4rem;
+  padding: 0;
+}
+
+cart-remove-button .button .svg-wrapper,
+cart-remove-button .button svg,
+.cart-remove-button .button svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+/* ---- One suggestion before checkout -----------------------------------
+   Two compact cards above the reassurance line. Deliberately quiet: the
+   checkout button stays the only thing that looks like an action. */
+/* The element must keep a box: it fetches when it scrolls into view, and a
+   display:none placeholder would never intersect, so it would never fill.
+   Empty, it is a zero-height block that adds nothing. */
+.gy-cart-rec-slot {
+  display: block;
+}
+
+.gy-cart-rec {
+  margin-bottom: var(--gy-space-md);
+  padding-top: var(--gy-space-sm);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.08);
+}
+
+.gy-cart-rec__heading {
+  margin: 0 0 var(--gy-space-xs);
+  font-size: 1.056rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-cart-rec__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gy-space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gy-cart-rec__item {
+  min-width: 0;
+}
+
+/* The card is the theme's own; only its scale changes in here. */
+.gy-cart-rec .gy-card__title {
+  font-size: 1.216rem;
+  line-height: 1.35;
+}
+
+.gy-cart-rec .gy-card__price .price {
+  font-size: 1.344rem;
+}
+
+.gy-cart-rec .gy-card__price .price__sale .price-item--regular {
+  font-size: 1.088rem;
+}
+
+/* The saving is already visible in the struck compare-at price beside it; a
+   badge as well would be two claims about one number, in a very small card.
+   Sold-out products are filtered out of the section, so the flag has no other
+   job in here. */
+.gy-cart-rec .gy-card__flag {
+  display: none;
+}
+
+/* Shorter crop than a collection card: the drawer has a checkout button to
+   keep above the fold. */
+.gy-cart-rec .gy-card__media {
+  aspect-ratio: 1 / 1;
+}
+
+.gy-cart-rec .gy-card__price .price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.64rem;
+}
+
+/* The card's action styles live in the collection stylesheet, which the cart
+   has no reason to load; these are the few rules the two mini cards need. */
+.gy-cart-rec .gy-card__action {
+  margin-top: var(--gy-space-2xs);
+}
+
+.gy-cart-rec .gy-card__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.48rem;
+  width: 100%;
+  min-height: 4.4rem;
+  padding: 0 1.2rem;
+  border: 1px solid rgb(var(--gy-ink) / 0.2);
+  border-radius: var(--gy-radius-sm);
+  background-color: transparent;
+  color: rgb(var(--gy-ink));
+  font-family: inherit;
+  font-size: 1.024rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 200ms var(--gy-ease), border-color 200ms var(--gy-ease), color 200ms var(--gy-ease);
+}
+
+.gy-cart-rec .gy-card__button:hover {
+  border-color: rgb(var(--gy-ink));
+  background-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+}
+
+.gy-cart-rec .gy-card__button:focus-visible {
+  outline: 2px solid rgb(var(--gy-lavender-deep));
+  outline-offset: 2px;
+}
+
+/* Two narrow cards rather than one wide one: a single card at full drawer
+   width reads as a product page, and pushes checkout below the fold. */
+@media screen and (max-width: 359px) {
+  .gy-cart-rec__list {
+    gap: var(--gy-space-2xs);
+  }
+
+  .gy-cart-rec .gy-card__title {
+    font-size: 1.12rem;
+  }
+
+  .gy-cart-rec .gy-card__price .price {
+    font-size: 1.216rem;
+  }
+
+  .gy-cart-rec .gy-card__button {
+    padding-inline: 0.4rem;
+    font-size: 0.928rem;
+    letter-spacing: 0.06em;
+  }
+}
+
+/* Dawn's "Continue shopping" link on the cart page is an 11px-tall target on
+   a phone. Additive only. */
+.cart__warnings .underlined-link,
+.title-wrapper-with-link .underlined-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 4.4rem;
+}
+
+/* base.css aligns this row to flex-end below 990px, which was fine when the
+   link was plain text. Now that it is a 44px touch target its label floats
+   above the heading's baseline, so centre the row — exactly what Dawn already
+   does from 990px up. The touch target itself is unchanged. */
+.title-wrapper-with-link {
+  align-items: center;
+}

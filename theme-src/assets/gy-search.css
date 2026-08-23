@@ -1,0 +1,834 @@
+/*
+  GentleYou search
+  ----------------
+  Styles the header search overlay, Shopify's predictive search results and
+  the search results page. Presentation only — the markup it dresses is
+  Shopify's own search form and predictive search output.
+*/
+
+/* ---- Overlay shell ---------------------------------------------------- */
+
+.gy-search {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.gy-search[hidden] {
+  display: none;
+}
+
+.gy-search__scrim {
+  position: absolute;
+  inset: 0;
+  background-color: rgb(var(--gy-ink) / 0.32);
+  opacity: 0;
+  transition: opacity 320ms var(--gy-ease);
+}
+
+.gy-search.is-open .gy-search__scrim {
+  opacity: 1;
+}
+
+.gy-search__panel {
+  position: relative;
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: rgb(var(--gy-canvas));
+  box-shadow: var(--gy-elevation-3);
+  opacity: 0;
+  translate: 0 -1.6rem;
+  transition: opacity 320ms var(--gy-ease), translate 380ms var(--gy-ease-out);
+}
+
+.gy-search.is-open .gy-search__panel {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.gy-search__panel:focus-visible {
+  outline: none;
+}
+
+.gy-search__inner {
+  width: min(78rem, 100%);
+  margin-inline: auto;
+  padding: var(--gy-space-md) var(--gy-space-md) var(--gy-space-lg);
+}
+
+.gy-search__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gy-space-sm);
+  margin-bottom: var(--gy-space-md);
+}
+
+.gy-search__title {
+  margin: 0;
+  font-family: var(--gy-font-body);
+  font-size: 1.088rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-search__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  padding: 0;
+  border: 1px solid rgb(var(--gy-ink) / 0.12);
+  border-radius: 50%;
+  background-color: rgb(var(--gy-canvas-warm));
+  color: rgb(var(--gy-ink));
+  cursor: pointer;
+  transition: background-color 200ms var(--gy-ease);
+}
+
+.gy-search__close svg {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.gy-search__close:hover {
+  background-color: rgb(var(--gy-lavender) / 0.5);
+}
+
+.gy-search__close:focus-visible {
+  outline: 2px solid rgb(var(--gy-lavender-deep));
+  outline-offset: 2px;
+}
+
+/* ---- The field -------------------------------------------------------- */
+
+.gy-search__engine,
+.gy-search__form {
+  display: block;
+}
+
+.gy-search__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--gy-space-xs);
+  /* No padding on the right: the reset button is 4.4rem wide, so its glyph
+     then sits the same distance from the edge as the close button's. */
+  padding-inline: var(--gy-space-md) 0;
+  border: 1px solid rgb(var(--gy-ink) / 0.14);
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-canvas-warm));
+  transition: border-color 200ms var(--gy-ease), background-color 200ms var(--gy-ease);
+}
+
+.gy-search__field:focus-within {
+  border-color: rgb(var(--gy-lavender-deep) / 0.7);
+  background-color: rgb(var(--gy-canvas));
+}
+
+.gy-search__field-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-search__field-icon svg {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.gy-search__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 6rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--gy-font-heading);
+  font-size: clamp(1.76rem, 1.6rem + 0.5vw, 2.24rem);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-search__input::placeholder {
+  color: rgb(var(--gy-ink-muted) / 0.85);
+}
+
+.gy-search__input:focus {
+  outline: none;
+}
+
+.gy-search__input::-webkit-search-decoration,
+.gy-search__input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.gy-search__reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 4.4rem;
+  height: 4.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: rgb(var(--gy-ink-muted));
+  cursor: pointer;
+}
+
+.gy-search__reset svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.gy-search__reset:hover {
+  color: rgb(var(--gy-ink));
+}
+
+.gy-search__reset.hidden {
+  display: none;
+}
+
+/* ---- Suggestions before typing ---------------------------------------- */
+
+.gy-search__suggest {
+  margin-top: var(--gy-space-lg);
+}
+
+.gy-search--typing .gy-search__suggest {
+  display: none;
+}
+
+.gy-search__suggest-heading {
+  margin: 0 0 var(--gy-space-sm);
+  font-size: 1.088rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-blush-deep));
+}
+
+.gy-search__suggest-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gy-space-xs) var(--gy-space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gy-search__suggest-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 4.4rem;
+  padding: 0 var(--gy-space-sm);
+  border: 1px solid rgb(var(--gy-ink) / 0.12);
+  border-radius: var(--gy-radius-pill);
+  font-size: 1.408rem;
+  color: rgb(var(--gy-ink-soft));
+  text-decoration: none;
+  transition: background-color 200ms var(--gy-ease), color 200ms var(--gy-ease), border-color 200ms var(--gy-ease);
+}
+
+.gy-search__suggest-link:hover {
+  border-color: transparent;
+  background-color: rgb(var(--gy-lavender) / 0.55);
+  color: rgb(var(--gy-ink));
+}
+
+/* ---- Predictive results ----------------------------------------------- */
+
+.gy-search__results {
+  margin-top: var(--gy-space-lg);
+}
+
+.gy-search__results:empty {
+  margin-top: 0;
+}
+
+.gy-search__spinner {
+  display: none;
+}
+
+predictive-search[loading] .gy-search__spinner {
+  display: block;
+  width: 2.4rem;
+  margin: var(--gy-space-sm) auto 0;
+  color: rgb(var(--gy-lavender-deep));
+}
+
+predictive-search:not([open]) #predictive-search-results-groups-wrapper,
+predictive-search:not([open]) .gy-psearch__all {
+  display: none;
+}
+
+.gy-psearch {
+  display: grid;
+  gap: var(--gy-space-md);
+}
+
+.gy-psearch__heading {
+  margin: 0 0 var(--gy-space-xs);
+  font-family: var(--gy-font-body);
+  font-size: 1.088rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-blush-deep));
+}
+
+.gy-psearch__group + .gy-psearch__group {
+  padding-top: var(--gy-space-md);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.07);
+}
+
+.gy-psearch__group--compact .gy-psearch__list {
+  gap: 0;
+}
+
+.gy-psearch__list {
+  display: grid;
+  gap: var(--gy-space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The row bleeds a little past the content column so the highlight reads as
+   a row, while the image still lines up with the field above it. */
+.gy-psearch__item {
+  margin-inline: calc(var(--gy-space-2xs) * -1);
+  border-radius: var(--gy-radius-sm);
+  transition: background-color 200ms var(--gy-ease);
+}
+
+.gy-psearch__item[aria-selected='true'],
+.gy-psearch__item:hover {
+  background-color: rgb(var(--gy-lavender) / 0.35);
+}
+
+.gy-psearch__link {
+  display: grid;
+  grid-template-columns: 7.2rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--gy-space-sm);
+  min-height: 4.4rem;
+  padding: var(--gy-space-2xs);
+  color: inherit;
+  text-decoration: none;
+}
+
+.gy-psearch__media {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--gy-radius-sm);
+  background-color: rgb(var(--gy-canvas-warm));
+  aspect-ratio: 3 / 4;
+}
+
+.gy-psearch__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: scale 600ms var(--gy-ease-out);
+}
+
+.gy-psearch__item:hover .gy-psearch__image {
+  scale: 1.04;
+}
+
+.gy-psearch__flag {
+  position: absolute;
+  left: 0.4rem;
+  bottom: 0.4rem;
+  padding: 0.24rem 0.56rem;
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-canvas) / 0.92);
+  color: rgb(var(--gy-ink-soft));
+  font-size: 0.768rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.gy-psearch__body {
+  display: grid;
+  gap: 0.48rem;
+}
+
+.gy-psearch__title {
+  font-size: 1.44rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgb(var(--gy-ink));
+}
+
+/* Prices come from snippets/price.liquid; only the type is set here, and it
+   matches the product cards used everywhere else. */
+.gy-psearch__price .price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.64rem;
+  font-size: 1.472rem;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-psearch__price .price__sale .price-item--regular,
+.gy-psearch__price s {
+  font-size: 1.184rem;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-psearch__price--sale .price-item--sale {
+  font-weight: 500;
+}
+
+.gy-psearch__item--plain .gy-psearch__link--plain {
+  display: flex;
+  align-items: center;
+  min-height: 4.4rem;
+  padding: 0 var(--gy-space-2xs);
+  font-weight: 400;
+  font-size: 1.472rem;
+  color: rgb(var(--gy-ink-soft));
+  text-decoration: none;
+}
+
+.gy-psearch--empty {
+  padding: var(--gy-space-md) 0 var(--gy-space-2xs);
+}
+
+.gy-psearch__empty-title {
+  margin: 0 0 var(--gy-space-3xs);
+  font-family: var(--gy-font-heading);
+  font-size: 2.08rem;
+  font-weight: 300;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-psearch__empty-text {
+  margin: 0;
+  font-size: 1.472rem;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-psearch__all {
+  margin-top: var(--gy-space-md);
+  padding-top: var(--gy-space-sm);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.08);
+}
+
+.gy-psearch__all-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gy-space-2xs);
+  min-height: 4.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--gy-font-body);
+  font-size: 1.28rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink));
+  cursor: pointer;
+}
+
+.gy-psearch__all-button span:last-child {
+  transition: translate 240ms var(--gy-ease-out);
+}
+
+.gy-psearch__all-button:hover span:last-child,
+.gy-psearch__all-button[aria-selected='true'] span:last-child {
+  translate: 0.4rem 0;
+}
+
+/* ---- Mobile: a full-height sheet -------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  /* The sheet hugs its content and only grows to the full screen once there
+     are results to scroll, so an empty search is a compact panel rather than
+     a full page of nothing. It still keeps a floor, so the sheet ends with
+     room under the links instead of stopping hard against whatever control
+     happens to sit behind it on the page. */
+  .gy-search__panel {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 42vh;
+    max-height: 100%;
+    /* The sheet ends on a soft edge and casts a deep shadow, so it reads as a
+       layer resting over the page. Whatever the page happens to have just
+       below — a button, a heading — is then clearly behind the sheet rather
+       than a second control cut off by it. */
+    border-radius: 0 0 var(--gy-radius-lg) var(--gy-radius-lg);
+    box-shadow: 0 2.4rem 4.8rem -0.8rem rgb(var(--gy-ink) / 0.45);
+  }
+
+  .gy-search--typing .gy-search__panel {
+    height: 100%;
+  }
+
+  /* The page behind is context, not something to read: dimmed further on a
+     phone, where the sheet covers only part of the screen. */
+  .gy-search__scrim {
+    background-color: rgb(var(--gy-ink) / 0.62);
+  }
+
+  .gy-search__inner {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    /* Room under the links, so the sheet's edge is spacing rather than a cut. */
+    padding: var(--gy-space-sm) var(--gy-space-sm) var(--gy-space-xl);
+  }
+
+  .gy-search__head {
+    margin-bottom: var(--gy-space-sm);
+  }
+
+  /* The sheet fills the screen, but the field and the suggestions underneath
+     it sit together at the top: only a list with results in it is allowed to
+     take the space that is left, so an empty search never stretches into a
+     column of dead air. */
+  .gy-search__engine,
+  .gy-search__form {
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
+    min-height: 0;
+  }
+
+  predictive-search[open].gy-search__engine,
+  predictive-search[open] .gy-search__form {
+    flex: 1 1 auto;
+  }
+
+  /* Only the results scroll, so the field and the close button stay put. */
+  .gy-search__results {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  predictive-search:not([open]) .gy-search__results {
+    flex: 0 0 auto;
+  }
+
+  .gy-search__field {
+    padding-inline: var(--gy-space-sm) 0;
+  }
+
+  .gy-search__input {
+    height: 5.2rem;
+  }
+
+  .gy-search__suggest {
+    margin-top: var(--gy-space-md);
+  }
+
+  .gy-search__suggest-link {
+    min-height: 4.4rem;
+    padding-inline: var(--gy-space-sm);
+    font-size: 1.344rem;
+  }
+
+  .gy-psearch__link {
+    grid-template-columns: 6.4rem minmax(0, 1fr);
+    gap: var(--gy-space-xs);
+  }
+
+  .gy-psearch__title {
+    font-size: 1.376rem;
+  }
+}
+
+/* Very small handsets: the field and the pills stay comfortable rather than
+   crowding the edges. */
+@media screen and (max-width: 359px) {
+  .gy-search__inner {
+    padding-inline: var(--gy-space-xs);
+  }
+
+  .gy-search__suggest-link {
+    padding-inline: var(--gy-space-xs);
+  }
+}
+
+/* ---- Search page ------------------------------------------------------ */
+
+.gy-searchpage {
+  padding-block: var(--gy-section-top, 4.8rem) var(--gy-section-bottom, 9.6rem);
+  background-color: rgb(var(--gy-canvas));
+}
+
+.gy-searchpage__head {
+  max-width: 68rem;
+  margin-bottom: var(--gy-space-xl);
+}
+
+/* Nothing to show: the page keeps its rhythm instead of a screen of air. */
+.gy-searchpage--lean {
+  padding-bottom: var(--gy-space-xl);
+}
+
+.gy-searchpage--lean .gy-searchpage__head {
+  margin-bottom: var(--gy-space-md);
+}
+
+.gy-searchpage__eyebrow {
+  margin: 0 0 var(--gy-space-2xs);
+  font-size: var(--gy-text-eyebrow);
+  font-weight: 600;
+  letter-spacing: var(--gy-tracking-eyebrow);
+  text-transform: uppercase;
+  color: rgb(var(--gy-blush-deep));
+}
+
+.gy-searchpage__title {
+  margin: 0 0 var(--gy-space-md);
+  max-width: 20ch;
+  font-family: var(--gy-font-heading);
+  font-size: clamp(3.2rem, 2.4rem + 2.4vw, 5.12rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: var(--gy-tracking-tight);
+  color: rgb(var(--gy-ink));
+}
+
+.gy-searchpage__title em {
+  font-style: italic;
+  color: rgb(var(--gy-lavender-deep));
+}
+
+.gy-searchpage__form {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--gy-space-xs);
+  padding: 0 var(--gy-space-2xs) 0 var(--gy-space-sm);
+  border: 1px solid rgb(var(--gy-ink) / 0.14);
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-canvas-warm));
+}
+
+.gy-searchpage__form:focus-within {
+  border-color: rgb(var(--gy-lavender-deep) / 0.7);
+  background-color: rgb(var(--gy-canvas));
+}
+
+.gy-searchpage__form-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-searchpage__form-icon svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.gy-searchpage__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 5.6rem;
+  border: 0;
+  background: none;
+  font-family: var(--gy-font-body);
+  font-size: 1.6rem;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-searchpage__input:focus {
+  outline: none;
+}
+
+.gy-searchpage__input::-webkit-search-decoration,
+.gy-searchpage__input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.gy-searchpage__submit {
+  flex: 0 0 auto;
+  min-height: 4.4rem;
+  padding-inline: var(--gy-space-md);
+}
+
+.gy-searchpage__count {
+  margin: var(--gy-space-md) 0 0;
+  font-size: 1.408rem;
+  letter-spacing: 0.02em;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-searchpage__grid {
+  margin-bottom: var(--gy-space-xl);
+}
+
+.gy-searchpage__editorial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gy-space-3xs);
+  height: 100%;
+  padding: var(--gy-space-md);
+  border: 1px solid rgb(var(--gy-ink) / 0.1);
+  border-radius: var(--gy-radius-md);
+  background-color: rgb(var(--gy-canvas-warm));
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 200ms var(--gy-ease), background-color 200ms var(--gy-ease);
+}
+
+.gy-searchpage__editorial:hover {
+  border-color: rgb(var(--gy-lavender-deep) / 0.5);
+  background-color: rgb(var(--gy-lavender) / 0.35);
+}
+
+.gy-searchpage__editorial-kind {
+  font-size: 1.024rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-searchpage__editorial-title {
+  font-family: var(--gy-font-heading);
+  font-size: 1.92rem;
+  font-weight: 300;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-searchpage__empty {
+  max-width: 56rem;
+  padding-block: var(--gy-space-md) 0;
+}
+
+.gy-searchpage__empty-title {
+  margin: 0 0 var(--gy-space-2xs);
+  font-family: var(--gy-font-heading);
+  font-size: clamp(2.08rem, 1.84rem + 0.8vw, 2.56rem);
+  font-weight: 300;
+  line-height: 1.25;
+  letter-spacing: var(--gy-tracking-tight);
+  color: rgb(var(--gy-ink));
+}
+
+.gy-searchpage__empty-text {
+  max-width: 44ch;
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1.6;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-searchpage__explore {
+  margin-top: var(--gy-space-md);
+}
+
+.gy-searchpage__explore-heading {
+  margin: 0 0 var(--gy-space-xs);
+  font-size: 1.088rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-blush-deep));
+}
+
+.gy-searchpage__explore-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gy-space-xs) var(--gy-space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media screen and (max-width: 749px) {
+  /* The field keeps its own pill and the button sits under it, rather than a
+     button floating inside a box. */
+  .gy-searchpage__form {
+    position: relative;
+    flex-wrap: wrap;
+    gap: var(--gy-space-xs);
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .gy-searchpage__form-icon {
+    position: absolute;
+    top: 1.8rem;
+    left: var(--gy-space-sm);
+  }
+
+  .gy-searchpage__input {
+    flex: 1 1 100%;
+    height: 5.6rem;
+    padding-inline: 4.6rem var(--gy-space-sm);
+    border: 1px solid rgb(var(--gy-ink) / 0.14);
+    border-radius: var(--gy-radius-pill);
+    background-color: rgb(var(--gy-canvas-warm));
+  }
+
+  .gy-searchpage__input:focus {
+    border-color: rgb(var(--gy-lavender-deep) / 0.7);
+    background-color: rgb(var(--gy-canvas));
+  }
+
+  .gy-searchpage__submit {
+    width: 100%;
+  }
+}
+
+/* ---- Reduced motion --------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .gy-search__scrim,
+  .gy-search__panel,
+  .gy-search__close,
+  .gy-search__field,
+  .gy-search__suggest-link,
+  .gy-psearch__item,
+  .gy-psearch__image,
+  .gy-psearch__all-button span:last-child,
+  .gy-searchpage__editorial {
+    transition: none !important;
+  }
+
+  .gy-search__panel {
+    translate: none !important;
+  }
+
+  .gy-psearch__item:hover .gy-psearch__image {
+    scale: 1 !important;
+  }
+
+  .gy-psearch__all-button:hover span:last-child {
+    translate: none !important;
+  }
+}
+
+/* The overlay locks the page behind it. Shared with the size-guide drawer,
+   repeated here because gy-product.css is only loaded on product pages. */
+body.gy-no-scroll {
+  overflow: hidden;
+}

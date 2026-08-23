@@ -1,0 +1,950 @@
+{%- comment -%}
+  GentleYou product detail page.
+
+  Presentation only. Every value — media, title, price, compare-at price,
+  availability, variants, quantity rules and the description — is read from the
+  Shopify product and variant objects. Price rendering goes through the theme's
+  existing snippets/price.liquid, the variant picker through
+  snippets/product-variant-picker.liquid and the purchase form through
+  snippets/buy-buttons.liquid, so Dawn's product-info.js / product-form.js /
+  cart.js contract and the Shiprocket Fastrr inputs are untouched.
+{%- endcomment -%}
+
+{%- liquid
+  assign product_form_id = 'product-form-' | append: section.id
+  assign variant = product.selected_or_first_available_variant
+  assign compare_at = variant.compare_at_price
+  assign current_price = variant.price
+
+  assign discount_percent = 0
+  if compare_at > current_price and compare_at > 0
+    assign discount_diff = compare_at | minus: current_price | times: 100.0
+    assign discount_percent = discount_diff | divided_by: compare_at | round
+  endif
+-%}
+
+{{ 'gentleyou.css' | asset_url | stylesheet_tag }}
+{{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
+{{ 'gy-product.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
+{{ 'component-swatch.css' | asset_url | stylesheet_tag }}
+{{ 'component-swatch-input.css' | asset_url | stylesheet_tag }}
+{{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'gy-product.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  Size guide.
+
+  Band and cup values are the product's real Shopify option values — the
+  theme never invents a size. Measurements come only from what the merchant
+  supplies: a `size_measurements` line per size, or a product metafield when
+  one is set. Where nothing is supplied the column simply stays empty rather
+  than showing a fabricated number.
+{%- endcomment -%}
+{%- liquid
+  assign band_option = null
+  assign cup_option = null
+  assign panty_option = null
+  comment
+    An option that names the cup can never be the band. "Cup size" contains
+    the band keyword ("size"), so on the products where Shopify lists the cup
+    option first it was being claimed as the band and both names ended up
+    pointing at the same option — which put cup letters in the band column of
+    the size guide. Deciding the cup first, and refusing it for the band,
+    resolves every option order in the catalogue.
+  endcomment
+  comment
+    A combo lists three size options — band, cup and the bottom half — and
+    every one of them contains the band keyword ("size"). Cup and bottom are
+    therefore decided first and refused for the band, exactly as the cup
+    already was, so the band cannot swallow "Panty Size" on the sets where
+    Shopify lists it before the bra size.
+  endcomment
+  assign panty_keyword = section.settings.panty_option_name | default: 'panty'
+  for option in product.options_with_values
+    assign lower_name = option.name | downcase
+    assign option_is_cup = false
+    assign option_is_panty = false
+    if lower_name contains section.settings.cup_option_name
+      assign option_is_cup = true
+    endif
+    if lower_name contains panty_keyword
+      assign option_is_panty = true
+    endif
+    if cup_option == null and option_is_cup
+      assign cup_option = option
+    endif
+    if panty_option == null and option_is_panty
+      assign panty_option = option
+    endif
+    if band_option == null and option_is_cup == false and option_is_panty == false and lower_name contains section.settings.band_option_name
+      assign band_option = option
+    endif
+  endfor
+
+  assign measurement_lines = section.settings.size_measurements | newline_to_br | split: '<br />'
+  assign metafield_chart = product.metafields.custom.size_chart
+-%}
+
+{%- comment -%}
+  Which size chart belongs to this product.
+
+  Detection uses the product's own Shopify classification only — product
+  type, standard category, tags and the optional custom.size_chart_type
+  metafield. The product title is deliberately not matched, so a combo or
+  bundle never inherits a chart from a word in its name. Each `size_chart`
+  block carries its own keywords, so the merchant decides in the Theme
+  Editor which products get which chart; blocks are tested in editor order
+  and the first match wins. A block with no keywords is the fallback for
+  products nothing else matches, and when no block matches at all the
+  section-level chart settings are used, so existing setups keep working.
+{%- endcomment -%}
+{%- liquid
+  assign chart_haystack = product.type
+  if product.category != blank
+    assign chart_haystack = chart_haystack | append: ' | ' | append: product.category.name
+  endif
+  if product.metafields.custom.size_chart_type != blank
+    assign chart_haystack = chart_haystack | append: ' | ' | append: product.metafields.custom.size_chart_type
+  endif
+  for tag in product.tags
+    assign chart_haystack = chart_haystack | append: ' | ' | append: tag
+  endfor
+  assign chart_haystack = chart_haystack | downcase
+
+  comment
+    Two haystacks, because the two keyword lists answer different questions.
+
+    The size option names are Shopify data as much as the type and the tags
+    are, and on a catalogue where type, category and tags have not been
+    filled in they are the only classification a product carries: an option
+    called "Cup Size" is evidence of a bra, "Panty Size" of a brief. So the
+    match keywords are tested against the option names too.
+
+    The exclude keywords are not. They exist to keep a brief from being
+    handed bra measurements, and a set legitimately offers both kinds of
+    size — testing "panty" against a combo's own option names would refuse
+    it the bra chart it needs. Exclusion stays a judgement about what the
+    product is, which is what type, category and tags describe.
+  endcomment
+  assign chart_option_haystack = chart_haystack
+  for option in product.options_with_values
+    assign chart_option_haystack = chart_option_haystack | append: ' | ' | append: option.name
+  endfor
+  assign chart_option_haystack = chart_option_haystack | downcase
+
+  assign chart_block = null
+  assign chart_fallback = null
+  assign panty_chart_block = null
+  assign panty_chart_matched = false
+  for block in section.blocks
+    if block.type != 'size_chart'
+      continue
+    endif
+    comment
+      Every block is run through the same keyword test; only where the answer
+      is filed differs. A chart marked as bottom sizing is held aside so a set
+      can show it alongside its top chart, and so a brief classified by type
+      or tag alone still finds it even when its size option is called plain
+      Size and nothing else.
+    endcomment
+    assign chart_excluded = false
+    assign exclude_words = block.settings.exclude | downcase | split: ','
+    for word in exclude_words
+      assign word = word | strip
+      if word != blank and chart_haystack contains word
+        assign chart_excluded = true
+      endif
+    endfor
+
+    assign chart_matched = false
+    if chart_excluded == false and block.settings.match != blank
+      assign match_words = block.settings.match | downcase | split: ','
+      for word in match_words
+        assign word = word | strip
+        if word != blank and chart_option_haystack contains word
+          assign chart_matched = true
+        endif
+      endfor
+    endif
+
+    comment
+      Shopify validates a JSON template against the section schema it already
+      holds, so on the upload that introduces chart_scope the setting can be
+      dropped from the template before the new schema lands. Falling back to
+      the block's own keywords means a chart written for the bottom half is
+      still recognised as one, and the guide cannot quietly lose it.
+    endcomment
+    assign block_is_bottom = false
+    if block.settings.chart_scope == 'bottom'
+      assign block_is_bottom = true
+    elsif block.settings.chart_scope == blank and block.settings.match contains panty_keyword
+      assign block_is_bottom = true
+    endif
+
+    if block_is_bottom
+      if panty_chart_block == null
+        assign panty_chart_block = block
+        assign panty_chart_matched = chart_matched
+      endif
+      continue
+    endif
+    if block.settings.match == blank
+      if chart_fallback == null
+        assign chart_fallback = block
+      endif
+      continue
+    endif
+    if chart_block == null and chart_matched
+      assign chart_block = block
+    endif
+  endfor
+  if chart_block == null
+    assign chart_block = chart_fallback
+  endif
+
+  assign chart_rows_raw = section.settings.size_chart_rows
+  assign chart_columns_raw = section.settings.size_chart_columns
+  assign chart_heading = section.settings.size_chart_heading | default: 'Size chart'
+  assign chart_category = section.settings.size_chart_category
+  assign measure_heading = section.settings.measure_heading | default: 'How to measure'
+  assign measure_step_1_title = section.settings.measure_step_1_title
+  assign measure_step_1 = section.settings.measure_step_1
+  assign measure_step_2_title = section.settings.measure_step_2_title
+  assign measure_step_2 = section.settings.measure_step_2
+  assign between_sizes_heading = section.settings.between_sizes_heading | default: 'Between sizes?'
+  assign between_sizes = section.settings.between_sizes
+  assign size_note = section.settings.size_note
+  assign size_contact = section.settings.size_contact
+
+  comment
+    The chart's own words — how to measure, what to do between sizes, the
+    footnote — come from whichever block is actually describing this product.
+    On a brief that is the bottom chart, which is never the top chart, so
+    without this the measuring instructions the merchant wrote for it would
+    be dropped along with it.
+  endcomment
+  assign guide_block = chart_block
+  if guide_block == null and panty_chart_matched
+    assign guide_block = panty_chart_block
+  endif
+
+  if chart_block != null and chart_block.settings.rows != blank
+    assign chart_rows_raw = chart_block.settings.rows
+    assign chart_columns_raw = chart_block.settings.columns | default: chart_columns_raw
+    assign chart_heading = chart_block.settings.heading | default: chart_heading
+    assign chart_category = chart_block.settings.category | default: chart_category
+  endif
+
+  if guide_block != null and guide_block.settings.rows != blank
+    assign measure_heading = guide_block.settings.measure_heading | default: measure_heading
+    if guide_block.settings.measure_step_1 != blank or guide_block.settings.measure_step_2 != blank
+      assign measure_step_1_title = guide_block.settings.measure_step_1_title
+      assign measure_step_1 = guide_block.settings.measure_step_1
+      assign measure_step_2_title = guide_block.settings.measure_step_2_title
+      assign measure_step_2 = guide_block.settings.measure_step_2
+    endif
+    assign between_sizes_heading = guide_block.settings.between_sizes_heading | default: between_sizes_heading
+    assign between_sizes = guide_block.settings.between_sizes | default: between_sizes
+    assign size_note = guide_block.settings.size_note | default: size_note
+    assign size_contact = guide_block.settings.size_contact | default: size_contact
+  endif
+
+  assign selected_band = ''
+  assign selected_cup = ''
+  if band_option
+    assign selected_band = band_option.selected_value.name | default: ''
+  endif
+  if cup_option
+    assign selected_cup = cup_option.selected_value.name | default: ''
+  endif
+  assign current_code = selected_band | append: selected_cup | upcase | strip
+
+  assign panty_rows = ''
+  assign panty_columns = ''
+  assign panty_heading = chart_heading
+  assign panty_category = ''
+  assign selected_panty = ''
+  if panty_option
+    assign selected_panty = panty_option.selected_value.name | default: ''
+  endif
+  if panty_chart_block
+    assign panty_rows = panty_chart_block.settings.rows
+    assign panty_columns = panty_chart_block.settings.columns
+    assign panty_heading = panty_chart_block.settings.heading | default: chart_heading
+    assign panty_category = panty_chart_block.settings.category
+  endif
+
+  comment
+    Which halves of the body this product actually sizes.
+
+    A Cup Size option is evidence of a top and a Panty Size option of a
+    bottom, and a chart whose own keywords match the product is evidence
+    either way — that is how a brief classified by type or tag is recognised
+    when its size option is called plain "Size". A set has both and shows
+    both. A product with neither shows whatever the old resolution produced,
+    so a shop that classifies its products by type and tags is unaffected.
+  endcomment
+  assign has_top = false
+  assign has_bottom = false
+  if cup_option or chart_block
+    assign has_top = true
+  endif
+  if panty_option or panty_chart_matched
+    assign has_bottom = true
+  endif
+
+  assign show_top_chart = true
+  if has_bottom and has_top == false
+    assign show_top_chart = false
+  endif
+
+  assign show_bottom_chart = false
+  if has_bottom and panty_rows != blank and panty_chart_block != chart_block
+    assign show_bottom_chart = true
+  endif
+
+  comment
+    Which size the bottom chart should mark as the shopper's own. On a set
+    that is the bottom option; on a brief whose only option is called Size it
+    is that one.
+  endcomment
+  if selected_panty == blank and has_bottom and panty_option == null and band_option
+    assign selected_panty = band_option.selected_value.name | default: ''
+  endif
+
+  comment
+    Whether the guide has any sizing in it at all. "Between sizes?" and
+    the contact footnote are general advice, not sizing, so a product
+    the charts do not cover was offering a Size guide link that opened
+    a drawer telling the shopper nothing about their size. The link is
+    only worth showing when there is something behind it.
+  endcomment
+  comment
+    On a set both charts are on screen at once. Two blocks headed Size chart
+    over a merchant category naming a different product, such as High-Waist
+    Briefs on a lingerie set, does not tell the shopper which one to read.
+    Labelling each chart with the option it sizes uses the exact words printed
+    above the picker they just used, which are the product's own Shopify
+    option names and nothing invented.
+  endcomment
+  assign shows_both_charts = false
+  if show_top_chart and chart_rows_raw != blank and show_bottom_chart and panty_option
+    assign shows_both_charts = true
+  endif
+  if shows_both_charts
+    if band_option
+      assign chart_category = band_option.name
+    endif
+    assign panty_category = panty_option.name
+  endif
+
+  assign guide_has_sizing = false
+  if band_option and section.settings.size_measurements != blank
+    assign guide_has_sizing = true
+  endif
+  if cup_option and chart_rows_raw == blank
+    assign guide_has_sizing = true
+  endif
+  if metafield_chart != blank
+    assign guide_has_sizing = true
+  endif
+  if show_top_chart and chart_rows_raw != blank
+    assign guide_has_sizing = true
+  endif
+  if show_bottom_chart
+    assign guide_has_sizing = true
+  endif
+-%}
+
+<product-info
+  id="MainProduct-{{ section.id }}"
+  class="gy-pdp gy-section gy-section--ivory"
+  style="--gy-pad-top: {{ section.settings.padding_top }}px; --gy-pad-bottom: {{ section.settings.padding_bottom }}px;"
+  data-section="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-update-url="true"
+  data-url="{{ product.url }}"
+  {{ section.shopify_attributes }}
+>
+  <div class="gy-container gy-pdp__inner">
+    <div class="gy-pdp__media">
+      {%- render 'gy-product-gallery',
+        product: product,
+        section_id: section.id,
+        zoom: section.settings.enable_zoom
+      -%}
+    </div>
+
+    <div class="gy-pdp__info" id="ProductInfo-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            <div class="gy-pdp__app" {{ block.shopify_attributes }}>{% render block %}</div>
+
+          {%- when 'vendor' -%}
+            {%- if product.vendor != blank -%}
+              <p class="gy-pdp__vendor" {{ block.shopify_attributes }}>{{ product.vendor }}</p>
+            {%- endif -%}
+
+          {%- when 'title' -%}
+            <h1 class="gy-pdp__title" {{ block.shopify_attributes }}>{{ product.title }}</h1>
+
+          {%- when 'price' -%}
+            <div class="gy-pdp__price-block" {{ block.shopify_attributes }}>
+              <div id="price-{{ section.id }}" class="gy-pdp__price" role="status">
+                {%- render 'price', product: product, use_variant: true, show_badges: false, price_class: 'price--large' -%}
+              </div>
+
+              <div class="gy-pdp__price-meta" id="PriceMeta-{{ section.id }}">
+                {%- if compare_at > current_price -%}
+                  <span class="gy-pdp__compare">
+                    <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                    {%- if settings.currency_code_enabled -%}
+                      {{ compare_at | money_with_currency }}
+                    {%- else -%}
+                      {{ compare_at | money }}
+                    {%- endif -%}
+                  </span>
+                  {%- if block.settings.show_saving and discount_percent > 0 -%}
+                    <span class="gy-pdp__saving">
+                      {{ 'sections.hero_product.discount_html' | t: percent: discount_percent }}
+                    </span>
+                  {%- endif -%}
+                {%- endif -%}
+
+                {%- if block.settings.show_tax_note -%}
+                  <span class="gy-pdp__tax">{{ 'products.product.taxes_included' | t }}</span>
+                {%- endif -%}
+              </div>
+
+              <div
+                id="Inventory-{{ section.id }}"
+                class="gy-pdp__stock{% unless product.selected_or_first_available_variant.inventory_management == 'shopify' %} gy-pdp__stock--hidden{% endunless %}"
+                role="status"
+              >
+                {%- if variant.available -%}
+                  {%- if variant.inventory_management == 'shopify'
+                    and variant.inventory_quantity > 0
+                    and variant.inventory_quantity <= block.settings.inventory_threshold
+                  -%}
+                    {{ 'products.product.inventory_low_stock' | t }}
+                  {%- else -%}
+                    {{ 'products.product.inventory_in_stock' | t }}
+                  {%- endif -%}
+                {%- else -%}
+                  {{ 'products.product.inventory_out_of_stock' | t }}
+                {%- endif -%}
+              </div>
+            </div>
+
+          {%- when 'variant_picker' -%}
+            <div class="gy-pdp__variants">
+              <div class="gy-pdp__variants-head">
+                <div>
+                  {%- if block.settings.heading != blank -%}
+                    <p class="gy-pdp__variants-title">{{ block.settings.heading | escape }}</p>
+                  {%- endif -%}
+                  {%- if block.settings.subheading != blank -%}
+                    <p class="gy-pdp__variants-sub">{{ block.settings.subheading | escape }}</p>
+                  {%- endif -%}
+                </div>
+
+                {%- if block.settings.show_size_guide and guide_has_sizing -%}
+                  <button class="gy-pdp__size-link" type="button" data-gy-size-guide-open aria-haspopup="dialog">
+                    {{ section.settings.size_guide_label | default: 'Size guide' | escape }}
+                    <span aria-hidden="true">&rarr;</span>
+                  </button>
+                {%- endif -%}
+              </div>
+
+              {%- render 'product-variant-picker',
+                product: product,
+                block: block,
+                product_form_id: product_form_id
+              -%}
+            </div>
+
+          {%- when 'quantity_selector' -%}
+            {%- liquid
+              assign cart_qty = cart | item_count_for_variant: variant.id
+            -%}
+            <div class="gy-pdp__quantity product-form__input product-form__quantity" id="Quantity-Form-{{ section.id }}" {{ block.shopify_attributes }}>
+              <label class="quantity__label form__label" for="Quantity-{{ section.id }}">
+                {{ 'products.product.quantity.label' | t }}
+                <span class="quantity__rules-cart{% if cart_qty == 0 %} hidden{% endif %}">
+                  {%- render 'loading-spinner' -%}
+                  <span>({{ 'products.product.quantity.in_cart_html' | t: quantity: cart_qty }})</span>
+                </span>
+              </label>
+              <quantity-input class="quantity" data-url="{{ product.url }}" data-section="{{ section.id }}">
+                <button class="quantity__button" name="minus" type="button">
+                  <span class="visually-hidden">{{ 'products.product.quantity.decrease' | t: product: product.title | escape }}</span>
+                  <span class="svg-wrapper">{{- 'icon-minus.svg' | inline_asset_content -}}</span>
+                </button>
+                <input
+                  class="quantity__input"
+                  type="number"
+                  name="quantity"
+                  id="Quantity-{{ section.id }}"
+                  data-cart-quantity="{{ cart_qty }}"
+                  data-min="{{ variant.quantity_rule.min }}"
+                  min="{{ variant.quantity_rule.min }}"
+                  {% if variant.quantity_rule.max != null %}
+                    data-max="{{ variant.quantity_rule.max }}"
+                    max="{{ variant.quantity_rule.max }}"
+                  {% endif %}
+                  step="{{ variant.quantity_rule.increment }}"
+                  value="{{ variant.quantity_rule.min }}"
+                  form="{{ product_form_id }}"
+                >
+                <button class="quantity__button" name="plus" type="button">
+                  <span class="visually-hidden">{{ 'products.product.quantity.increase' | t: product: product.title | escape }}</span>
+                  <span class="svg-wrapper">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
+                </button>
+              </quantity-input>
+              <div class="quantity__rules caption" id="Quantity-Rules-{{ section.id }}"></div>
+            </div>
+
+          {%- when 'buy_buttons' -%}
+            <div class="gy-pdp__buy" {{ block.shopify_attributes }}>
+              {%- render 'buy-buttons',
+                block: block,
+                product: product,
+                product_form_id: product_form_id,
+                section_id: section.id,
+                show_pickup_availability: true
+              -%}
+            </div>
+
+          {%- when 'highlights' -%}
+            {%- comment -%}
+              Editorial presentation of the product's own Shopify description.
+              The lines below are the merchant's own text split on the bullet
+              glyphs already used in Admin — nothing is added or rewritten.
+            {%- endcomment -%}
+            {%- liquid
+              assign source = product.description | replace: '<br>', '✔' | replace: '<br/>', '✔' | replace: '<br />', '✔'
+              assign source = source | replace: '</p>', '✔' | replace: '</li>', '✔'
+              assign source = source | strip_html | replace: '&nbsp;', ' ' | replace: '&amp;', '&'
+              assign source = source | replace: 'Product Description:', '' | replace: 'Product description:', ''
+              assign source = source | replace: '✓', '✔' | replace: '•', '✔'
+              assign lines = source | split: '✔'
+            -%}
+            {%- assign printed = 0 -%}
+            <div class="gy-pdp__highlights" {{ block.shopify_attributes }}>
+              {%- if block.settings.heading != blank -%}
+                <p class="gy-pdp__highlights-heading">{{ block.settings.heading | escape }}</p>
+              {%- endif -%}
+              <ul role="list">
+                {%- for line in lines -%}
+                  {%- assign clean = line | strip -%}
+                  {%- if clean != blank and clean.size > 2 and printed < block.settings.max_lines -%}
+                    <li>{{ clean }}</li>
+                    {%- assign printed = printed | plus: 1 -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            </div>
+
+          {%- when 'short_description' -%}
+            {%- liquid
+              assign words = block.settings.words | default: 32
+              assign short = product.description | strip_html | replace: '&nbsp;', ' ' | replace: '&amp;', '&'
+              assign short = short | replace: 'Product Description:', '' | replace: 'Product description:', ''
+              assign short = short | replace: '✔', '' | replace: '✓', '' | replace: '•', ''
+              assign short = short | strip | truncatewords: words
+            -%}
+            {%- if short != blank -%}
+              <p class="gy-pdp__short" {{ block.shopify_attributes }}>{{ short }}</p>
+            {%- endif -%}
+
+          {%- when 'trust' -%}
+            <ul class="gy-pdp__trust" role="list" {{ block.shopify_attributes }}>
+              {%- assign points = block.settings.points | split: '|' -%}
+              {%- for point in points -%}
+                <li>{{ point | strip }}</li>
+              {%- endfor -%}
+            </ul>
+
+          {%- when 'details' -%}
+            {%- liquid
+              assign body = block.settings.content
+              if block.settings.source == 'description' and product.description != blank
+                assign body = product.description
+              endif
+            -%}
+            {%- if body != blank -%}
+              <details class="gy-pdp__accordion" {% if block.settings.open %}open{% endif %} {{ block.shopify_attributes }}>
+                <summary>
+                  <span>{{ block.settings.heading | escape }}</span>
+                  <span class="gy-pdp__accordion-icon" aria-hidden="true"></span>
+                </summary>
+                <div class="gy-pdp__accordion-body rte">{{ body }}</div>
+              </details>
+            {%- endif -%}
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- if guide_has_sizing -%}
+  <div class="gy-pdp__drawer" data-gy-size-guide-drawer hidden>
+    <div class="gy-pdp__drawer-scrim" data-gy-size-guide-close></div>
+    <aside
+      class="gy-pdp__drawer-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="SizeGuideTitle-{{ section.id }}"
+      tabindex="-1"
+    >
+      <header class="gy-pdp__drawer-head">
+        <div>
+          <p class="gy-pdp__drawer-title" id="SizeGuideTitle-{{ section.id }}">
+            {{ section.settings.size_guide_heading | default: 'Find your best fit.' | escape }}
+          </p>
+          {%- if section.settings.size_guide_intro != blank -%}
+            <p class="gy-pdp__drawer-intro">{{ section.settings.size_guide_intro | escape }}</p>
+          {%- endif -%}
+        </div>
+        <button
+          class="gy-pdp__drawer-close"
+          type="button"
+          data-gy-size-guide-close
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          &times;
+        </button>
+      </header>
+
+      <div class="gy-pdp__drawer-body">
+        {%- if band_option and section.settings.size_measurements != blank -%}
+          <section class="gy-guide__block">
+            <h3 class="gy-guide__label">{{ band_option.name }}</h3>
+            <table class="gy-guide__table">
+              <thead>
+                <tr>
+                  <th scope="col">{{ band_option.name }}</th>
+                  <th scope="col">{{ section.settings.measurement_label | default: 'Underbust' | escape }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%- for value in band_option.values -%}
+                  {%- liquid
+                    assign measurement = ''
+                    for line in measurement_lines
+                      assign parts = line | strip | split: ':'
+                      assign key = parts[0] | strip
+                      if key == value.name and parts.size > 1
+                        assign measurement = parts[1] | strip
+                      endif
+                    endfor
+                  -%}
+                  <tr {% if value.selected %}class="is-current"{% endif %}>
+                    <th scope="row">{{ value.name }}</th>
+                    <td>
+                      {%- if measurement != blank -%}
+                        {{ measurement }}
+                      {%- else -%}
+                        <span class="gy-guide__blank" aria-hidden="true">&mdash;</span>
+                        <span class="visually-hidden">{{ 'sections.gy.measurement_not_set' | t }}</span>
+                      {%- endif -%}
+                    </td>
+                  </tr>
+                {%- endfor -%}
+              </tbody>
+            </table>
+          </section>
+        {%- endif -%}
+
+        {%- if cup_option and chart_rows_raw == blank -%}
+          <section class="gy-guide__block">
+            <h3 class="gy-guide__label">{{ cup_option.name }}</h3>
+            <ul class="gy-guide__cups" role="list">
+              {%- for value in cup_option.values -%}
+                <li class="{% if value.selected %}is-current{% endif %}">{{ value.name }}</li>
+              {%- endfor -%}
+            </ul>
+          </section>
+        {%- endif -%}
+
+        {%- if metafield_chart != blank -%}
+          <section class="gy-guide__block gy-guide__metafield rte">
+            {{ metafield_chart | metafield_tag }}
+          </section>
+        {%- endif -%}
+
+        {%- comment -%}
+          Size charts. A bra shows the top chart, a brief shows the bottom
+          chart, and a set shows both — decided by the size options the product
+          actually offers, so a combo is never left with only half its sizing.
+        {%- endcomment -%}
+
+        {%- if show_top_chart -%}
+          {%- render 'gy-size-chart',
+            heading: chart_heading,
+            category: chart_category,
+            columns: chart_columns_raw,
+            rows: chart_rows_raw,
+            current_code: current_code
+          -%}
+        {%- endif -%}
+
+        {%- comment -%}
+          The bottom half of a set. It is rendered whenever the product offers
+          a bottom size option and the merchant has published a bottom chart,
+          which is what was missing on every combo: the guide resolved a single
+          chart, so the panty sizes in the picker had nothing to read against.
+        {%- endcomment -%}
+        {%- if show_bottom_chart -%}
+          {%- render 'gy-size-chart',
+            heading: panty_heading,
+            category: panty_category,
+            columns: panty_columns,
+            rows: panty_rows,
+            current_code: selected_panty
+          -%}
+        {%- endif -%}
+
+        {%- if measure_step_1 != blank or measure_step_2 != blank -%}
+          <section class="gy-guide__block">
+            <h3 class="gy-guide__label">{{ measure_heading | escape }}</h3>
+            <ol class="gy-guide__steps" role="list">
+              {%- if measure_step_1 != blank -%}
+                <li>
+                  <span class="gy-guide__step-number">01</span>
+                  <div>
+                    <p class="gy-guide__step-title">{{ measure_step_1_title | escape }}</p>
+                    <p class="gy-guide__step-text">{{ measure_step_1 | escape }}</p>
+                  </div>
+                </li>
+              {%- endif -%}
+              {%- if measure_step_2 != blank -%}
+                <li>
+                  <span class="gy-guide__step-number">02</span>
+                  <div>
+                    <p class="gy-guide__step-title">{{ measure_step_2_title | escape }}</p>
+                    <p class="gy-guide__step-text">{{ measure_step_2 | escape }}</p>
+                  </div>
+                </li>
+              {%- endif -%}
+            </ol>
+          </section>
+        {%- endif -%}
+
+        {%- if between_sizes != blank -%}
+          <section class="gy-guide__block gy-guide__note">
+            <h3 class="gy-guide__label">{{ between_sizes_heading | escape }}</h3>
+            <p>{{ between_sizes | escape }}</p>
+          </section>
+        {%- endif -%}
+
+        {%- if size_note != blank or size_contact != blank -%}
+          <div class="gy-guide__footnote">
+            {%- if size_note != blank -%}
+              <p>{{ size_note | escape }}</p>
+            {%- endif -%}
+            {%- if size_contact != blank -%}
+              <p>{{ size_contact | escape }}</p>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.size_guide_text != blank -%}
+          <div class="gy-guide__block rte">{{ section.settings.size_guide_text }}</div>
+        {%- endif -%}
+      </div>
+    </aside>
+  </div>
+  {%- endif -%}
+
+  {%- if section.settings.enable_sticky_bar -%}
+    <div class="gy-pdp__sticky" data-gy-sticky-bar hidden>
+      <div class="gy-pdp__sticky-inner">
+        {%- comment -%}
+          The selected variant's own image where Shopify has one, so the bar
+          shows the piece in the colour being bought rather than the product's
+          default photograph.
+        {%- endcomment -%}
+        {%- liquid
+          assign sticky_image = variant.featured_media.preview_image | default: product.featured_image
+        -%}
+        <div class="gy-pdp__sticky-media">
+          {%- if sticky_image -%}
+            <img
+              src="{{ sticky_image | image_url: width: 120 }}"
+              width="{{ sticky_image.width }}"
+              height="{{ sticky_image.height }}"
+              alt=""
+              loading="lazy"
+            >
+          {%- endif -%}
+        </div>
+        <div class="gy-pdp__sticky-text">
+          <p class="gy-pdp__sticky-title">{{ product.title }}</p>
+          {%- comment -%}
+            A div, not a p: snippets/price.liquid renders a div, and a div
+            inside a paragraph makes the browser close the paragraph early —
+            which left this wrapper empty, put the price outside it, and so
+            stopped both of its style rules from ever matching. That is why
+            the struck compare-at price was showing in the bar.
+          {%- endcomment -%}
+          <div class="gy-pdp__sticky-price" id="StickyPrice-{{ section.id }}">
+            {%- render 'price', product: product, use_variant: true -%}
+          </div>
+        </div>
+        <button class="gy-button gy-pdp__sticky-button" type="button" data-gy-sticky-add>
+          {{ 'products.product.add_to_cart' | t }}
+        </button>
+      </div>
+    </div>
+  {%- endif -%}
+</product-info>
+
+{% schema %}
+{
+  "name": "GentleYou product",
+  "tag": "section",
+  "class": "gy-pdp-section",
+  "settings": [
+    { "type": "header", "content": "Gallery" },
+    { "type": "checkbox", "id": "enable_zoom", "label": "Open the active image full size on click", "default": true },
+    { "type": "header", "content": "Size guide" },
+    { "type": "text", "id": "size_guide_label", "label": "Trigger label", "default": "Size guide" },
+    { "type": "text", "id": "size_guide_heading", "label": "Heading", "default": "Find your best fit." },
+    { "type": "text", "id": "size_guide_intro", "label": "Supporting line", "default": "Simple measurements to help you choose comfortably." },
+    { "type": "text", "id": "band_option_name", "label": "Band option name contains", "info": "Which product option holds the band size. Lower case.", "default": "size" },
+    { "type": "text", "id": "cup_option_name", "label": "Cup option name contains", "info": "Which product option holds the cup size. Lower case.", "default": "cup" },
+    { "type": "text", "id": "panty_option_name", "label": "Bottom option name contains", "info": "Which product option holds the panty or brief size. Lower case.", "default": "panty" },
+    { "type": "text", "id": "measurement_label", "label": "Measurement column heading", "default": "Underbust" },
+    { "type": "textarea", "id": "size_measurements", "label": "Measurements", "info": "One per line as \"size: measurement\", for example \"32: 68-72 cm\". Sizes with nothing here show an empty cell — the theme never invents a measurement. A product metafield custom.size_chart is also rendered when set." },
+    { "type": "text", "id": "size_chart_heading", "label": "Size chart heading", "default": "Size chart" },
+    { "type": "text", "id": "size_chart_category", "label": "Size chart category", "default": "Bras" },
+    { "type": "text", "id": "size_chart_columns", "label": "Size chart column headings", "info": "Separated by |.", "default": "Size|Underbust (inch)|Bust (inch)|UK size|EU size" },
+    { "type": "textarea", "id": "size_chart_rows", "label": "Size chart rows", "info": "One row per line, columns separated by |. The first column is matched against the selected band and cup to highlight a row." },
+    { "type": "text", "id": "measure_heading", "label": "How to measure heading", "default": "How to measure" },
+    { "type": "text", "id": "measure_step_1_title", "label": "Step 1 title", "default": "Measure your band" },
+    { "type": "textarea", "id": "measure_step_1", "label": "Step 1 text", "default": "Wrap the measuring tape firmly around your ribcage, directly underneath your bust." },
+    { "type": "text", "id": "measure_step_2_title", "label": "Step 2 title", "default": "Measure your bust" },
+    { "type": "textarea", "id": "measure_step_2", "label": "Step 2 text", "default": "Measure around the fullest part of your bust without pulling the tape too tightly." },
+    { "type": "text", "id": "between_sizes_heading", "label": "Between sizes heading", "default": "Between sizes?" },
+    { "type": "textarea", "id": "between_sizes", "label": "Between sizes text", "default": "If you're between sizes, we recommend choosing the larger size for a more comfortable everyday fit." },
+    { "type": "textarea", "id": "size_note", "label": "Size note", "default": "Fit can vary slightly by style and fabric. Please check the available options on the product page before ordering." },
+    { "type": "text", "id": "size_contact", "label": "Help line", "info": "Optional. Shown under the size note." },
+    { "type": "richtext", "id": "size_guide_text", "label": "Extra content", "info": "Optional. Appears at the end of the panel." },
+    { "type": "header", "content": "Mobile" },
+    { "type": "checkbox", "id": "enable_sticky_bar", "label": "Sticky purchase bar on mobile", "default": true },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Top padding", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Bottom padding", "default": 72 }
+  ],
+  "blocks": [
+    { "type": "@app" },
+    { "type": "vendor", "name": "Vendor", "limit": 1 },
+    { "type": "title", "name": "Title", "limit": 1 },
+    {
+      "type": "price", "name": "Price", "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "show_saving", "label": "Show saving percentage", "default": true },
+        { "type": "checkbox", "id": "show_tax_note", "label": "Show tax note", "default": false },
+        { "type": "range", "id": "inventory_threshold", "min": 0, "max": 100, "step": 1, "label": "Low stock threshold", "default": 10 }
+      ]
+    },
+    {
+      "type": "highlights", "name": "Highlights", "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "Lists the product's own Shopify description, split on the bullets already used in Admin. Nothing is written by the theme." },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Why you'll love it" },
+        { "type": "range", "id": "max_lines", "min": 2, "max": 10, "step": 1, "label": "Maximum lines", "default": 6 }
+      ]
+    },
+    {
+      "type": "short_description", "name": "Short description", "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "Uses the product's own Shopify description, shortened." },
+        { "type": "range", "id": "words", "min": 12, "max": 60, "step": 2, "label": "Words", "default": 32 }
+      ]
+    },
+    {
+      "type": "variant_picker", "name": "Variant picker", "limit": 1,
+      "settings": [
+        {
+          "type": "select", "id": "picker_type", "label": "Style", "default": "button",
+          "options": [ { "value": "dropdown", "label": "Dropdown" }, { "value": "button", "label": "Pills" } ]
+        },
+        {
+          "type": "select", "id": "swatch_shape", "label": "Swatch shape", "default": "circle",
+          "options": [ { "value": "circle", "label": "Circle" }, { "value": "square", "label": "Square" }, { "value": "none", "label": "None" } ]
+        },
+        { "type": "checkbox", "id": "show_size_guide", "label": "Show size guide link", "default": true },
+        { "type": "text", "id": "heading", "label": "Heading above options", "default": "Find your fit." },
+        { "type": "text", "id": "subheading", "label": "Small line under the heading", "default": "Choose your size, cup & colour." }
+      ]
+    },
+    { "type": "quantity_selector", "name": "Quantity selector", "limit": 1 },
+    {
+      "type": "buy_buttons", "name": "Buy buttons", "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show dynamic checkout buttons", "default": true },
+        { "type": "checkbox", "id": "show_gift_card_recipient", "label": "Show gift card recipient form", "default": true }
+      ]
+    },
+    {
+      "type": "trust", "name": "Reassurance line", "limit": 1,
+      "settings": [
+        { "type": "text", "id": "points", "label": "Points", "info": "Separate with |. Use the store's own published policy wording.", "default": "Cash on delivery | Free prepaid shipping | 3-day size exchange" }
+      ]
+    },
+    {
+      "type": "size_chart", "name": "Size chart",
+      "settings": [
+        { "type": "paragraph", "content": "Shown inside the size guide only when this product matches the keywords below. Keywords are checked against the product's Shopify type, category, tags, size option names and the custom.size_chart_type metafield \u2014 never its title \u2014 so combos and bundles do not pick up a chart by accident. Blocks are checked in the order they appear here and the first match wins. Leave the keywords empty to make this the chart for products nothing else matches." },
+        { "type": "select", "id": "chart_scope", "label": "This chart sizes", "info": "A set that offers both a bra size and a panty size shows its top chart and its bottom chart together.", "default": "top", "options": [ { "value": "top", "label": "The top \u2014 bra, bralette, nightwear" }, { "value": "bottom", "label": "The bottom \u2014 panty, brief" } ] },
+        { "type": "text", "id": "match", "label": "Show when type, category or tags contain", "info": "Separated by commas, for example: panty, panties, brief, briefs." },
+        { "type": "text", "id": "exclude", "label": "But never when they contain", "info": "Optional. Separated by commas, for example: combo, set." },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Size chart" },
+        { "type": "text", "id": "category", "label": "Product type label", "info": "Shown under the heading, for example \"High-Waist Briefs\"." },
+        { "type": "text", "id": "columns", "label": "Column headings", "info": "Separated by |.", "default": "Size|Waist (inch)|Hip (inch)|UK size|EU size" },
+        { "type": "textarea", "id": "rows", "label": "Rows", "info": "One row per line, columns separated by |. Enter the measurements exactly as published \u2014 the theme never converts or derives a number. The first column is matched against the selected size to highlight a row." },
+        { "type": "text", "id": "measure_heading", "label": "How to measure heading", "default": "How to measure" },
+        { "type": "text", "id": "measure_step_1_title", "label": "Step 1 title" },
+        { "type": "textarea", "id": "measure_step_1", "label": "Step 1 text" },
+        { "type": "text", "id": "measure_step_2_title", "label": "Step 2 title" },
+        { "type": "textarea", "id": "measure_step_2", "label": "Step 2 text" },
+        { "type": "text", "id": "between_sizes_heading", "label": "Between sizes heading", "default": "Between sizes?" },
+        { "type": "textarea", "id": "between_sizes", "label": "Between sizes text" },
+        { "type": "textarea", "id": "size_note", "label": "Size note" },
+        { "type": "text", "id": "size_contact", "label": "Help line" }
+      ]
+    },
+    {
+      "type": "details", "name": "Details section",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Description" },
+        {
+          "type": "select", "id": "source", "label": "Content", "default": "custom",
+          "options": [ { "value": "description", "label": "Product description from Shopify" }, { "value": "custom", "label": "Text below" } ]
+        },
+        { "type": "richtext", "id": "content", "label": "Text" },
+        { "type": "checkbox", "id": "open", "label": "Open by default", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "GentleYou product",
+      "blocks": [
+        { "type": "vendor" }, { "type": "title" }, { "type": "price" },
+        { "type": "short_description" }, { "type": "variant_picker" },
+        { "type": "quantity_selector" }, { "type": "buy_buttons" }, { "type": "trust" }
+      ]
+    }
+  ],
+  "enabled_on": { "templates": ["product"] }
+}
+{% endschema %}

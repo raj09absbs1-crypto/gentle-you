@@ -1,0 +1,82 @@
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "a1": {
+          "type": "announcement",
+          "settings": {
+            "text": "Cash on delivery",
+            "link": ""
+          }
+        },
+        "a2": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free prepaid shipping",
+            "link": ""
+          }
+        },
+        "a3": {
+          "type": "announcement",
+          "settings": {
+            "text": "3-day size exchange",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "a1",
+        "a2",
+        "a3"
+      ],
+      "settings": {
+        "auto_rotate": true,
+        "change_slides_speed": 4,
+        "color_scheme": "scheme-lavender-white",
+        "show_line_separator": false,
+        "show_social": false,
+        "enable_country_selector": false,
+        "enable_language_selector": false
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_position": "middle-left",
+        "mobile_logo_position": "center",
+        "menu": "main-menu",
+        "menu_type_desktop": "dropdown",
+        "sticky_header_type": "on-scroll-up",
+        "show_line_separator": true,
+        "color_scheme": "scheme-1",
+        "menu_color_scheme": "scheme-1",
+        "enable_country_selector": true,
+        "enable_language_selector": true,
+        "enable_customer_avatar": true,
+        "margin_bottom": 0,
+        "padding_top": 20,
+        "padding_bottom": 20
+      },
+      "disabled": true
+    },
+    "gy_header": {
+      "type": "gy-header",
+      "settings": {
+        "logo": "shopify://shop_images/a6badd3d-cc27-4bd9-b080-ae6822bbdf1b.png",
+        "logo_width": 140,
+        "menu": "main-menu",
+        "sticky": true,
+        "search_suggestions_heading": "Popular right now",
+        "search_suggestions": "main-menu"
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "gy_header",
+    "header"
+  ]
+}

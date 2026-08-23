@@ -1,0 +1,1489 @@
+/*
+  GentleYou product detail page.
+
+  Scoped entirely to .gy-pdp — it layers on gentleyou.css (tokens) and
+  gentleyou-home.css (section frame, buttons, cards) and never restyles Dawn's
+  own components outside this page.
+*/
+
+.gy-pdp {
+  display: block;
+}
+
+.gy-pdp__inner {
+  display: grid;
+  gap: clamp(3.2rem, 4vw, 6.4rem);
+  align-items: start;
+}
+
+/* Grid items default to a min-width of their content; the photographs are
+   large, so the columns must be allowed to shrink below intrinsic width. */
+.gy-pdp__inner > *,
+.gy-pdp__frames,
+.gy-pdp__frame {
+  min-width: 0;
+}
+
+/* ---- Gallery ---- */
+
+.gy-pdp__gallery {
+  display: block;
+}
+
+.gy-pdp__stage {
+  position: relative;
+  display: grid;
+  border-radius: var(--gy-radius-lg);
+  background-color: rgb(var(--gy-canvas-warm));
+  box-shadow: var(--gy-elevation-2);
+  overflow: hidden;
+}
+
+.gy-pdp__frames {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Every frame shares one grid cell, so the stage is as tall as the tallest
+   photograph and switching images cannot shift the page. */
+.gy-pdp__frame {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: scale(0.98);
+  pointer-events: none;
+}
+
+.gy-pdp__frame.is-active {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+  transition: opacity 420ms var(--gy-ease-out), transform 480ms var(--gy-ease-out);
+}
+
+.gy-pdp__image,
+.gy-pdp__frame img,
+.gy-pdp__frame svg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  /* No filters or crops: the photograph is shown exactly as uploaded. */
+}
+
+.gy-pdp__gallery[data-zoom='true'] .gy-pdp__frame.is-active .gy-pdp__image {
+  cursor: zoom-in;
+}
+
+.gy-pdp__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  translate: 0 -50%;
+  border: 1px solid rgb(var(--gy-ink) / 0.08);
+  border-radius: 50%;
+  background-color: rgb(var(--gy-frame) / 0.85);
+  color: rgb(var(--gy-ink));
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--gy-duration) var(--gy-ease);
+}
+
+.gy-pdp__nav svg { width: 1.76rem; height: 1.76rem; }
+.gy-pdp__nav--prev { left: 1.2rem; }
+.gy-pdp__nav--next { right: 1.2rem; }
+
+.gy-pdp__stage:hover .gy-pdp__nav,
+.gy-pdp__nav:focus-visible {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .gy-pdp__nav { opacity: 0.85; }
+}
+
+.gy-pdp__counter {
+  position: absolute;
+  right: 1.44rem;
+  bottom: 1.44rem;
+  z-index: 2;
+  margin: 0;
+  padding: 0.35em 0.75em;
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-frame) / 0.85);
+  font-size: 1.056rem;
+  letter-spacing: 0.12em;
+  color: rgb(var(--gy-ink-soft));
+  font-variant-numeric: tabular-nums;
+}
+
+.gy-pdp__counter-sep { opacity: 0.45; margin-inline: 0.15em; }
+
+.gy-pdp__thumbs {
+  display: flex;
+  gap: 0.96rem;
+  margin: 1.2rem 0 0;
+  padding: 0.4rem 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.gy-pdp__thumbs::-webkit-scrollbar { display: none; }
+
+.gy-pdp__thumb {
+  display: block;
+  width: 7.2rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--gy-radius-sm);
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+  opacity: 0.6;
+  transition: opacity var(--gy-duration-fast) var(--gy-ease), border-color var(--gy-duration-fast) var(--gy-ease);
+}
+
+.gy-pdp__thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.gy-pdp__thumb.is-active,
+.gy-pdp__thumb:hover,
+.gy-pdp__thumb:focus-visible {
+  opacity: 1;
+  border-color: rgb(var(--gy-ink) / 0.35);
+}
+
+/* Full-size view */
+.gy-pdp__lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.6rem, 4vw, 4.8rem);
+  border: 0;
+  background-color: rgb(var(--gy-ink) / 0.88);
+}
+
+.gy-pdp__lightbox img {
+  max-width: 100%;
+  max-height: 88vh;
+  width: auto;
+  border-radius: var(--gy-radius-md);
+}
+
+.gy-pdp__lightbox-close {
+  position: absolute;
+  top: 1.6rem;
+  right: 1.6rem;
+  width: 4.4rem;
+  height: 4.4rem;
+  border: 0;
+  border-radius: 50%;
+  background-color: rgb(var(--gy-canvas));
+  color: rgb(var(--gy-ink));
+  font-size: 1.76rem;
+  cursor: pointer;
+}
+
+/* ---- Info column ---- */
+
+.gy-pdp__info {
+  max-width: 54.4rem;
+}
+
+.gy-pdp__vendor {
+  margin: 0 0 var(--gy-space-sm);
+  font-size: var(--gy-text-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--gy-tracking-eyebrow);
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-pdp__title {
+  margin: 0 0 var(--gy-space-md);
+  font-family: var(--gy-font-heading);
+  font-size: clamp(2.4rem, 1.76rem + 1.3vw, 3.6rem);
+  font-weight: 300;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.gy-pdp__price-block {
+  margin: 0 0 var(--gy-space-lg);
+  padding-bottom: var(--gy-space-md);
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.1);
+}
+
+.gy-pdp__price .price {
+  font-family: var(--gy-font-heading);
+  font-size: clamp(3.2rem, 2.24rem + 2vw, 4.8rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-pdp__price .price-item { margin: 0; font-size: inherit; }
+
+.gy-pdp__price .price__sale s.price-item--regular,
+.gy-pdp__price .price__badge-sale,
+.gy-pdp__price .price__badge-sold-out {
+  display: none;
+}
+
+/* Quiet fade when the selected variant changes the figures. */
+.gy-pdp__price-block.is-updating .gy-pdp__price,
+.gy-pdp__price-block.is-updating .gy-pdp__price-meta {
+  animation: gy-price-swap 480ms var(--gy-ease-out);
+}
+
+@keyframes gy-price-swap {
+  0% { opacity: 0.25; translate: 0 6px; }
+  100% { opacity: 1; translate: 0 0; }
+}
+
+.gy-pdp__price-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--gy-space-sm) var(--gy-space-md);
+  margin-top: var(--gy-space-sm);
+}
+
+.gy-pdp__compare {
+  font-size: 1.68rem;
+  color: rgb(var(--gy-ink-muted));
+  text-decoration: line-through;
+}
+
+.gy-pdp__saving {
+  padding: 0.4em 0.85em;
+  border: 1px solid rgb(var(--gy-lavender-deep) / 0.45);
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-lavender) / 0.5);
+  font-size: 0.992rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.gy-pdp__tax,
+.gy-pdp__stock {
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-pdp__stock {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: var(--gy-space-sm);
+}
+
+.gy-pdp__stock::before {
+  content: '';
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background-color: rgb(var(--gy-lavender-deep));
+}
+
+.gy-pdp__stock--hidden { visibility: hidden; }
+
+.gy-pdp__short {
+  margin: 0 0 var(--gy-space-lg);
+  max-width: 46ch;
+  font-size: var(--gy-text-body);
+  line-height: 1.7;
+  color: rgb(var(--gy-ink-soft));
+}
+
+/* ---- Variant selectors -------------------------------------------------
+   Dawn's markup, GentleYou surface. Every option, value and availability
+   state comes from Shopify — these rules only change how they look. */
+
+.gy-pdp__variants {
+  position: relative;
+  margin-bottom: var(--gy-space-lg);
+}
+
+.gy-pdp__variants-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--gy-space-md);
+  margin-bottom: var(--gy-space-md);
+  padding-bottom: var(--gy-space-sm);
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
+}
+
+.gy-pdp__variants-title {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: 1.68rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.gy-pdp__variants-sub {
+  margin: 0.24rem 0 0;
+  font-size: 1.248rem;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-pdp__size-link {
+  flex: 0 0 auto;
+  /* A 12px-tall target on the control that answers "will this fit me". The
+     negative margin keeps it optically aligned where it already sat. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 4.4rem;
+  margin-block: -1.6rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.056rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-soft));
+  transition: color var(--gy-duration-fast) var(--gy-ease);
+}
+
+.gy-pdp__size-link span {
+  display: inline-block;
+  transition: transform var(--gy-duration-fast) var(--gy-ease);
+}
+
+.gy-pdp__size-link:hover { color: rgb(var(--gy-ink)); }
+.gy-pdp__size-link:hover span { transform: translateX(3px); }
+
+/* Size and cup: compact rounded rectangles, not pills. */
+.gy-pdp .product-form__input--pill input[type='radio'] + label,
+.gy-pdp .product-form__input--swatch input[type='radio'] + label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.96rem;
+  min-height: 4.4rem;
+  padding: 0.88rem 1.52rem;
+  margin: 0 0.72rem 0.72rem 0;
+  border: 1px solid rgb(var(--gy-ink) / 0.16);
+  border-radius: var(--gy-radius-sm);
+  background-color: rgb(var(--gy-canvas-warm));
+  color: rgb(var(--gy-ink));
+  font-size: 1.312rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition:
+    border-color 200ms var(--gy-ease),
+    background-color 200ms var(--gy-ease),
+    color 200ms var(--gy-ease),
+    transform 200ms var(--gy-ease);
+}
+
+.gy-pdp .product-form__input--pill input[type='radio'] + label:hover,
+.gy-pdp .product-form__input--swatch input[type='radio'] + label:hover {
+  border-color: rgb(var(--gy-lavender-deep) / 0.65);
+  background-color: rgb(var(--gy-lavender) / 0.35);
+}
+
+.gy-pdp .product-form__input--pill input[type='radio'] + label:active {
+  transform: scale(0.97);
+}
+
+.gy-pdp .product-form__input--pill input[type='radio']:checked + label,
+.gy-pdp .product-form__input--swatch input[type='radio']:checked + label {
+  background-color: rgb(var(--gy-ink));
+  border-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+}
+
+.gy-pdp .product-form__input input[type='radio']:focus-visible + label {
+  outline: 2px solid rgb(var(--gy-lavender-deep));
+  outline-offset: 2px;
+}
+
+/* Unavailable combinations: clearly not selectable. Availability itself is
+   Shopify's, computed by Dawn's variant picker. */
+.gy-pdp .product-form__input input[type='radio']:disabled + label,
+.gy-pdp .product-form__input input[type='radio'].disabled + label {
+  position: relative;
+  opacity: 0.38;
+  cursor: not-allowed;
+  color: rgb(var(--gy-ink-muted));
+  background-color: transparent;
+}
+
+.gy-pdp .product-form__input input[type='radio']:disabled + label::after,
+.gy-pdp .product-form__input input[type='radio'].disabled + label::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  height: 1px;
+  background-color: currentColor;
+  rotate: -14deg;
+  opacity: 0.6;
+}
+
+.gy-pdp .product-form__input input[type='radio']:disabled + label:hover,
+.gy-pdp .product-form__input input[type='radio'].disabled + label:hover {
+  border-color: rgb(var(--gy-ink) / 0.16);
+  background-color: transparent;
+}
+
+/* Colour: swatch dot plus the real option name, when Shopify supplies swatch
+   data for the option values. Without swatches the same label styling applies,
+   showing the colour name alone — the theme never invents a colour. */
+.gy-pdp .product-form__input--swatch input[type='radio'] + label {
+  gap: 0.96rem;
+  min-width: 0;
+  padding-inline: 1.36rem 1.76rem;
+  justify-content: flex-start;
+}
+
+.gy-pdp .product-form__input--swatch .swatch {
+  width: 1.84rem;
+  height: 1.84rem;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--gy-ink) / 0.15);
+  box-shadow: 0 0 0 3px rgb(var(--gy-canvas));
+}
+
+.gy-pdp .product-form__input--swatch input[type='radio']:checked + label .swatch {
+  box-shadow:
+    0 0 0 2px rgb(var(--gy-canvas)),
+    0 0 0 4px rgb(var(--gy-lavender-deep));
+}
+
+.gy-pdp .product-form__input--swatch input[type='radio']:checked + label {
+  background-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+}
+
+/* Selected value shown beside the option name, as Dawn renders it. */
+.gy-pdp .form__label .gy-selected,
+.gy-pdp .product-form__input legend span {
+  color: rgb(var(--gy-ink-muted));
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* ---- Size guide drawer ---- */
+
+.gy-pdp__drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+}
+
+.gy-pdp__drawer-scrim {
+  position: absolute;
+  inset: 0;
+  background-color: rgb(var(--gy-ink) / 0.45);
+  opacity: 0;
+  transition: opacity 320ms var(--gy-ease);
+}
+
+.gy-pdp__drawer.is-open .gy-pdp__drawer-scrim { opacity: 1; }
+
+.gy-pdp__drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  /* Wide enough for the full five-column size chart on desktop. */
+  width: min(57.6rem, 94vw);
+  display: flex;
+  flex-direction: column;
+  padding: clamp(2rem, 3vw, 3.2rem);
+  background-color: rgb(var(--gy-canvas));
+  box-shadow: var(--gy-elevation-3);
+  translate: 100% 0;
+  transition: translate 380ms var(--gy-ease-out);
+  overflow-y: auto;
+}
+
+.gy-pdp__drawer.is-open .gy-pdp__drawer-panel { translate: 0 0; }
+
+.gy-pdp__drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gy-space-sm);
+  padding-bottom: var(--gy-space-md);
+  margin-bottom: var(--gy-space-md);
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.1);
+}
+
+.gy-pdp__drawer-title {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: 1.84rem;
+  font-weight: 400;
+}
+
+.gy-pdp__drawer-close {
+  width: 4rem;
+  height: 4rem;
+  border: 1px solid rgb(var(--gy-ink) / 0.12);
+  border-radius: 50%;
+  background-color: rgb(var(--gy-canvas-warm));
+  color: rgb(var(--gy-ink));
+  font-size: 1.92rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gy-pdp__drawer-body {
+  font-size: 1.472rem;
+  line-height: 1.75;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-pdp__drawer-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--gy-space-sm);
+}
+
+.gy-pdp__drawer-body th,
+.gy-pdp__drawer-body td {
+  padding: 0.96rem 0.64rem;
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
+  text-align: left;
+  font-size: 1.36rem;
+}
+
+body.gy-no-scroll { overflow: hidden; }
+
+/* ---- Highlights ---- */
+
+.gy-pdp__highlights {
+  margin: 0 0 var(--gy-space-lg);
+  padding: var(--gy-space-md) 0 0;
+  border-top: 1px solid rgb(var(--gy-ink) / 0.08);
+}
+
+.gy-pdp__highlights-heading {
+  margin: 0 0 var(--gy-space-sm);
+  font-size: 1.056rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-pdp__highlights ul {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gy-pdp__highlights li {
+  position: relative;
+  padding-left: 2.16rem;
+  font-size: 1.52rem;
+  line-height: 1.6;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-pdp__highlights li::before {
+  content: '';
+  position: absolute;
+  left: 0.4rem;
+  top: 0.62em;
+  width: 0.64rem;
+  height: 0.64rem;
+  border-radius: 50%;
+  background-color: rgb(var(--gy-lavender-deep) / 0.75);
+}
+
+.gy-pdp .form__label {
+  font-size: 1.088rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink));
+}
+
+/* Quantity + purchase */
+.gy-pdp__quantity {
+  margin-bottom: var(--gy-space-md);
+}
+
+.gy-pdp .quantity {
+  border-radius: var(--gy-radius-sm);
+  border: 1px solid rgb(var(--gy-ink) / 0.16);
+  background-color: rgb(var(--gy-canvas-warm));
+  overflow: hidden;
+  width: 15.2rem;
+  /* Dawn's stepper is 3rem tall, below a comfortable target on a phone. */
+  height: 4.8rem;
+}
+
+.gy-pdp .quantity__button {
+  width: 4.8rem;
+  height: 4.8rem;
+}
+
+.gy-pdp .quantity__input {
+  width: 4.4rem;
+  height: 4.8rem;
+  font-size: 1.472rem;
+}
+
+.gy-pdp .quantity__button {
+  transition: background-color 180ms var(--gy-ease), transform 180ms var(--gy-ease);
+}
+
+.gy-pdp .quantity__button:hover {
+  background-color: rgb(var(--gy-lavender) / 0.4);
+}
+
+.gy-pdp .quantity__button:active {
+  transform: scale(0.92);
+}
+
+.gy-pdp .quantity::before,
+.gy-pdp .quantity::after { display: none; }
+
+/* Add to cart, Shopify's dynamic checkout and Shiprocket's Buy it Now are
+   three buttons from three different sources stacked in one column. They take
+   the same height and the same corner here so the column reads as one control,
+   not as three. This rule used to say pill and the submit then overrode itself
+   to 12px, which is how the dynamic checkout button ended up the only rounded
+   one in the stack. */
+.gy-pdp__buy .product-form__submit,
+.gy-pdp__buy .shopify-payment-button__button {
+  min-height: 5.8rem;
+  border-radius: var(--gy-radius-md);
+  font-size: 1.376rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.gy-pdp__buy .product-form__submit {
+  position: relative;
+  overflow: hidden;
+  background-color: rgb(var(--gy-ink));
+  color: rgb(var(--gy-canvas));
+  box-shadow: var(--gy-elevation-1);
+  transition:
+    transform 200ms var(--gy-ease),
+    box-shadow 200ms var(--gy-ease),
+    background-color 200ms var(--gy-ease);
+}
+
+/* One slow light sweep on hover — no looping shimmer. */
+.gy-pdp__buy .product-form__submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  translate: -110% 0;
+  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 0.2) 50%, transparent 80%);
+  transition: translate 900ms var(--gy-ease-out);
+  pointer-events: none;
+}
+
+.gy-pdp__buy .product-form__submit:not([disabled]):hover::after {
+  translate: 110% 0;
+}
+
+.gy-pdp__buy .product-form__submit:not([disabled]):active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Dawn adds .loading while the add-to-cart request is in flight. */
+.gy-pdp__buy .product-form__submit.loading {
+  opacity: 0.8;
+  cursor: progress;
+}
+
+.gy-pdp__buy .product-form__submit:not([disabled]):hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gy-elevation-2);
+}
+
+/* A ring the keyboard can see, on the two controls that complete a purchase. */
+.gy-pdp__buy .product-form__submit:focus-visible,
+.gy-pdp__sticky-button:focus-visible,
+.gy-pdp .quantity__button:focus-visible,
+.gy-pdp__size-link:focus-visible {
+  outline: 2px solid rgb(var(--gy-lavender-deep));
+  outline-offset: 3px;
+}
+
+.gy-pdp__buy .product-form__submit[disabled] {
+  opacity: 0.45;
+  background-color: rgb(var(--gy-ink) / 0.55);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ---- Shiprocket's Buy it Now, brought in line with Add to cart ----
+
+   The button and its badge are injected at runtime by the Shiprocket app and
+   styled by the app's own stylesheet plus the <style> block inside
+   snippets/sr-checkout.liquid. Neither of those may be edited here, so the
+   theme states the geometry it needs from its own stylesheet instead. Nothing
+   below changes what the button does — it is size, colour and position only.
+
+   Measured against Add to cart before this rule: 45px tall against 58, square
+   corners against 12px, rgb(11 11 11) against the theme ink, 1.08px letter
+   spacing against 2.2, and no gap at all between the two. The !important flags
+   are here because the app's rules load after the theme's and cannot be
+   reordered from inside the theme. */
+.gy-pdp__buy .product-form__buttons {
+  display: grid;
+  gap: var(--gy-space-sm);
+}
+
+.gy-pdp__buy .shiprocket-headless {
+  /* The badge is absolutely positioned against the button's bottom edge; the
+     room for it is reserved here so it can sit clear of the corner instead of
+     across it. */
+  padding-bottom: 1.4rem;
+}
+
+.gy-pdp__buy .sr-headless-checkout {
+  min-height: 5.8rem !important;
+  height: auto !important;
+  margin: 0 !important;
+  border-radius: var(--gy-radius-md) !important;
+  background-color: rgb(var(--gy-ink)) !important;
+  color: rgb(var(--gy-canvas)) !important;
+  font-family: var(--gy-font-body) !important;
+  font-size: 1.376rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.16em !important;
+  overflow: visible;
+  box-shadow: var(--gy-elevation-1);
+  transition:
+    transform 200ms var(--gy-ease),
+    box-shadow 200ms var(--gy-ease),
+    opacity 200ms var(--gy-ease);
+}
+
+.gy-pdp__buy .sr-headless-checkout:not([disabled]):hover {
+  box-shadow: var(--gy-elevation-2);
+  transform: translateY(-1px);
+}
+
+.gy-pdp__buy .sr-headless-checkout:not([disabled]):active {
+  transform: translateY(0) scale(0.99);
+}
+
+.gy-pdp__buy .sr-headless-checkout:focus-visible {
+  outline: 2px solid rgb(var(--gy-ink));
+  outline-offset: 3px;
+}
+
+/* Out of the corner and under the button, where it reads as a credit rather
+   than as something spilling over the edge. */
+.gy-pdp__buy .sr-headless-checkout .sr-powered-by {
+  right: 50% !important;
+  bottom: -1.5rem !important;
+  transform: translateX(50%);
+  opacity: 0.55;
+}
+
+/* The label carries the same wide letter spacing as Add to cart, which with
+   the payment marks beside it is enough to wrap on a narrow phone. It is two
+   words on one line or it is not a button label. */
+.gy-pdp__buy .sr-headless-checkout .sr-checkout-visible2 {
+  white-space: nowrap;
+}
+
+/* The payment marks and the arrow the app places beside the label. */
+.gy-pdp__buy .sr-headless-checkout img {
+  max-height: 1.8rem;
+  width: auto;
+  flex: 0 0 auto;
+}
+
+/* The app spaces these with a flat 15px padding-left, which on a 320px screen
+   pushes the marks into the button's edge. */
+@media screen and (max-width: 429px) {
+  .gy-pdp__buy .sr-headless-checkout .sr-pl-15 {
+    padding-left: 0.8rem;
+  }
+  .gy-pdp__buy .sr-headless-checkout {
+    letter-spacing: 0.1em !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gy-pdp__buy .sr-headless-checkout {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* Sits directly under the buy button: one short claim per line. The info
+   column is never wide enough to set these side by side without breaking a
+   phrase over two rows, so they stay stacked at every width. */
+.gy-pdp__trust {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: start;
+  gap: var(--gy-space-xs) var(--gy-space-lg);
+  margin: var(--gy-space-md) 0 0;
+  padding: var(--gy-space-md) 0 0;
+  border-top: 1px solid rgb(var(--gy-ink) / 0.08);
+  list-style: none;
+}
+
+.gy-pdp__trust li {
+  position: relative;
+  padding-left: 1.76rem;
+  font-size: 1.088rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-pdp__trust li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 0.64rem;
+  height: 0.64rem;
+  border-radius: 50%;
+  background-color: rgb(var(--gy-lavender-deep) / 0.8);
+}
+
+/* Accordions */
+.gy-pdp__accordion {
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.1);
+}
+
+.gy-pdp__accordion:first-of-type {
+  border-top: 1px solid rgb(var(--gy-ink) / 0.1);
+  margin-top: var(--gy-space-lg);
+}
+
+.gy-pdp__accordion > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gy-space-sm);
+  padding: 1.76rem 0;
+  list-style: none;
+  cursor: pointer;
+  font-size: 1.152rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.gy-pdp__accordion > summary::-webkit-details-marker { display: none; }
+
+.gy-pdp__accordion-icon {
+  position: relative;
+  width: 1.36rem;
+  height: 1.36rem;
+  flex: 0 0 auto;
+}
+
+.gy-pdp__accordion-icon::before,
+.gy-pdp__accordion-icon::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 1px;
+  background-color: currentColor;
+  transition: transform var(--gy-duration) var(--gy-ease);
+}
+
+.gy-pdp__accordion-icon::after {
+  transform: rotate(90deg);
+}
+
+.gy-pdp__accordion[open] .gy-pdp__accordion-icon::after {
+  transform: rotate(0deg);
+}
+
+.gy-pdp__accordion-body {
+  padding-bottom: 2rem;
+  font-size: 1.472rem;
+  line-height: 1.75;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-pdp__accordion-body ul { padding-left: 1.76rem; }
+
+.gy-pdp__app {
+  margin-bottom: var(--gy-space-sm);
+}
+
+/* ---- Sticky purchase bar (mobile) ---- */
+
+.gy-pdp__sticky {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 1.12rem clamp(1.2rem, 3vw, 2.4rem);
+  padding-bottom: calc(1.12rem + env(safe-area-inset-bottom, 0px));
+  background-color: rgb(var(--gy-canvas) / 0.96);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.08);
+  translate: 0 110%;
+  transition: translate var(--gy-duration) var(--gy-ease-out);
+}
+
+.gy-pdp__sticky.is-visible {
+  translate: 0 0;
+}
+
+.gy-pdp__sticky-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.gy-pdp__sticky-media img {
+  width: 4.4rem;
+  height: 5.44rem;
+  object-fit: cover;
+  border-radius: var(--gy-radius-sm);
+}
+
+.gy-pdp__sticky-text {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.gy-pdp__sticky-title {
+  margin: 0;
+  font-size: 1.152rem;
+  line-height: 1.3;
+  color: rgb(var(--gy-ink-soft));
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.gy-pdp__sticky-price {
+  margin: 0.24rem 0 0;
+}
+
+.gy-pdp__sticky-price .price {
+  font-size: 1.52rem;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-pdp__sticky-price .price__sale s.price-item--regular { display: none; }
+
+.gy-pdp__sticky-button {
+  flex: 0 0 auto;
+  min-height: 4.8rem;
+  padding-inline: 2.4rem;
+  border-radius: var(--gy-radius-md);
+  font-size: 1.088rem;
+  transition: transform 180ms var(--gy-ease);
+}
+
+.gy-pdp__sticky-button:active { transform: scale(0.97); }
+
+.gy-pdp__sticky-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media screen and (min-width: 750px) {
+  .gy-pdp__sticky { display: none; }
+}
+
+/* ---- Layout ---- */
+
+@media screen and (min-width: 990px) {
+  .gy-pdp__inner {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: clamp(4rem, 5vw, 8rem);
+  }
+
+  .gy-pdp__info {
+    position: sticky;
+    top: 9.6rem;
+  }
+
+  .gy-pdp__thumbs { margin-top: 1.6rem; }
+  .gy-pdp__thumb { width: 8.8rem; }
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .gy-pdp__frame,
+  .gy-pdp__frame.is-active,
+  .gy-pdp__nav,
+  .gy-pdp__thumb,
+  .gy-pdp__sticky,
+  .gy-pdp__accordion-icon::before,
+  .gy-pdp__accordion-icon::after,
+  .gy-pdp__buy .product-form__submit,
+  .gy-pdp__buy .product-form__submit::after,
+  .gy-pdp .product-form__input label,
+  .gy-pdp .quantity__button,
+  .gy-pdp__drawer-panel,
+  .gy-pdp__drawer-scrim {
+    transition: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .gy-pdp__price-block.is-updating .gy-pdp__price,
+  .gy-pdp__price-block.is-updating .gy-pdp__price-meta {
+    animation: none !important;
+  }
+}
+
+/* ---- Size guide content -------------------------------------------------- */
+
+.gy-pdp__drawer-head {
+  align-items: flex-start;
+}
+
+.gy-pdp__drawer-intro {
+  margin: 0.56rem 0 0;
+  max-width: 32ch;
+  font-size: 1.36rem;
+  line-height: 1.6;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-guide__block {
+  margin-bottom: var(--gy-space-xl);
+}
+
+.gy-guide__label {
+  margin: 0 0 var(--gy-space-sm);
+  font-family: var(--gy-font-body);
+  font-size: 1.056rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-guide__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gy-guide__table th,
+.gy-guide__table td {
+  padding: 1.12rem 0.4rem;
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
+  text-align: left;
+  font-size: 1.44rem;
+  font-weight: 400;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-guide__table thead th {
+  padding-bottom: 0.72rem;
+  border-bottom-color: rgb(var(--gy-ink) / 0.16);
+  font-size: 0.992rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-guide__table tbody th {
+  font-weight: 500;
+  color: rgb(var(--gy-ink));
+}
+
+/* The size selected on the product page is highlighted, nothing more. */
+.gy-guide__table tr.is-current th,
+.gy-guide__table tr.is-current td {
+  background-color: rgb(var(--gy-lavender) / 0.35);
+}
+
+.gy-guide__blank {
+  color: rgb(var(--gy-ink-muted));
+  opacity: 0.6;
+}
+
+.gy-guide__cups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gy-guide__cups li {
+  min-width: 4.4rem;
+  padding: 0.88rem 1.36rem;
+  border: 1px solid rgb(var(--gy-ink) / 0.14);
+  border-radius: var(--gy-radius-sm);
+  background-color: rgb(var(--gy-canvas-warm));
+  text-align: center;
+  font-size: 1.36rem;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-guide__cups li.is-current {
+  border-color: rgb(var(--gy-lavender-deep) / 0.6);
+  background-color: rgb(var(--gy-lavender) / 0.4);
+  color: rgb(var(--gy-ink));
+}
+
+.gy-guide__steps {
+  display: grid;
+  gap: var(--gy-space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: gy-step;
+}
+
+.gy-guide__steps li {
+  display: flex;
+  gap: var(--gy-space-md);
+}
+
+.gy-guide__step-number {
+  flex: 0 0 auto;
+  font-family: var(--gy-font-heading);
+  font-size: 1.52rem;
+  color: rgb(var(--gy-lavender-deep));
+  letter-spacing: 0.02em;
+}
+
+.gy-guide__step-title {
+  margin: 0 0 0.32rem;
+  font-size: 1.472rem;
+  font-weight: 500;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-guide__step-text {
+  margin: 0;
+  font-size: 1.408rem;
+  line-height: 1.65;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-guide__note {
+  padding: var(--gy-space-md);
+  border-radius: var(--gy-radius-md);
+  background-color: rgb(var(--gy-lavender) / 0.28);
+}
+
+.gy-guide__note p {
+  margin: 0;
+  font-size: 1.44rem;
+  line-height: 1.65;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-guide__footnote {
+  margin: 0;
+  padding-top: var(--gy-space-md);
+  border-top: 1px solid rgb(var(--gy-ink) / 0.08);
+  font-size: 1.248rem;
+  line-height: 1.6;
+  color: rgb(var(--gy-ink-muted));
+}
+
+/* Mobile: a near-full-width sheet rather than a narrow drawer. */
+@media screen and (max-width: 749px) {
+  .gy-pdp__drawer-panel {
+    top: auto;
+    left: 0;
+    width: 100%;
+    max-height: 88vh;
+    border-radius: var(--gy-radius-lg) var(--gy-radius-lg) 0 0;
+    padding-bottom: calc(var(--gy-space-lg) + env(safe-area-inset-bottom, 0px));
+    translate: 0 100%;
+  }
+
+  .gy-pdp__drawer.is-open .gy-pdp__drawer-panel {
+    translate: 0 0;
+  }
+}
+
+/* ---- Size chart ---------------------------------------------------------
+   Real, selectable, responsive table content — never an image. */
+
+.gy-chart__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gy-space-sm);
+  margin-bottom: var(--gy-space-sm);
+}
+
+.gy-chart__title {
+  margin: 0;
+  font-family: var(--gy-font-body);
+  font-size: 1.088rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-blush-deep));
+}
+
+.gy-chart__category {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: 1.52rem;
+  font-weight: 400;
+  color: rgb(var(--gy-ink));
+}
+
+/* The table scrolls inside its own container; the page never does. */
+.gy-chart__scroll {
+  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid rgb(var(--gy-ink) / 0.1);
+  border-radius: var(--gy-radius-sm);
+  background-color: rgb(var(--gy-canvas));
+  /* Only this container ever scrolls sideways; the page never does. */
+  overscroll-behavior-x: contain;
+}
+
+/* A soft right edge while there is more table to reach. */
+.gy-chart__wrap {
+  position: relative;
+}
+
+/* Soft edges that say "there is more table this way". Each one is present only
+   while there is actually content past it, and neither ever covers a value the
+   shopper has scrolled to. */
+.gy-chart__wrap::before,
+.gy-chart__wrap::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  width: 3.6rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms var(--gy-ease);
+}
+
+.gy-chart__wrap::after {
+  right: 1px;
+  border-radius: 0 var(--gy-radius-sm) var(--gy-radius-sm) 0;
+  background: linear-gradient(90deg, rgb(var(--gy-canvas) / 0), rgb(var(--gy-canvas)) 82%);
+}
+
+.gy-chart__wrap::before {
+  left: 1px;
+  z-index: 2;
+  border-radius: var(--gy-radius-sm) 0 0 var(--gy-radius-sm);
+  background: linear-gradient(270deg, rgb(var(--gy-canvas) / 0), rgb(var(--gy-canvas)) 82%);
+}
+
+/* Right edge: shown while more table remains to the right. */
+.gy-chart__wrap.is-scrollable:not(.is-scrolled-end)::after {
+  opacity: 1;
+}
+
+/* Left edge: shown only once the shopper has scrolled away from the start. */
+.gy-chart__wrap.is-scrollable.is-scrolled-away::before {
+  opacity: 1;
+}
+
+.gy-chart__hint {
+  display: none;
+  margin: 0.8rem 0 0;
+  font-size: 1.056rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-chart__wrap.is-scrollable .gy-chart__hint {
+  display: block;
+}
+
+.gy-chart__wrap.is-scrolled-end .gy-chart__hint {
+  visibility: hidden;
+}
+
+.gy-chart__scroll:focus-visible {
+  outline: 2px solid rgb(var(--gy-lavender-deep));
+  outline-offset: 2px;
+}
+
+.gy-chart__table {
+  width: 100%;
+  /* Columns never wrap, so the table takes the width its content needs and the
+     container scrolls if that exceeds the panel. */
+  min-width: max-content;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.gy-chart__table th,
+.gy-chart__table td {
+  padding: 0.992rem 1.12rem;
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.07);
+  text-align: left;
+  font-size: 1.28rem;
+  font-weight: 400;
+  white-space: nowrap;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-chart__table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-block: 1.12rem;
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.16);
+  background-color: rgb(var(--gy-canvas-warm));
+  font-size: 0.928rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.gy-chart__table tbody th {
+  font-weight: 600;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-chart__table tbody tr:last-child th,
+.gy-chart__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.gy-chart__table tbody tr:hover th,
+.gy-chart__table tbody tr:hover td {
+  background-color: rgb(var(--gy-canvas-warm) / 0.7);
+}
+
+/* The row matching the shopper's selected band and cup. */
+.gy-chart__table tbody tr.is-current th,
+.gy-chart__table tbody tr.is-current td {
+  background-color: rgb(var(--gy-lavender) / 0.45);
+  color: rgb(var(--gy-ink));
+}
+
+.gy-chart__table tbody tr.is-current th {
+  box-shadow: inset 2px 0 0 rgb(var(--gy-lavender-deep));
+}
+
+.gy-guide__footnote p {
+  margin: 0 0 0.64rem;
+}
+
+.gy-guide__footnote p:last-child {
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 749px) {
+  .gy-chart__table th,
+  .gy-chart__table td {
+    padding: 0.928rem 0.8rem;
+    font-size: 1.184rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gy-chart__table tbody tr:hover th,
+  .gy-chart__table tbody tr:hover td,
+  .gy-chart__wrap::before,
+  .gy-chart__wrap::after {
+    transition: none !important;
+  }
+}
+
+/* ---- Size chart: the edge fades never sit on a value -------------------
+   The fade is an affordance, not a mask. At its full desktop width it reaches
+   about a third of the way into a narrow-screen column, so a size or a
+   measurement at the edge of the scroll looks chopped rather than faded. On
+   small screens it is trimmed to the width of a cell's own padding: it still
+   softens the edge and still says there is more table this way, but every
+   value the shopper scrolls to stays legible. Scrolling itself is unchanged. */
+@media screen and (max-width: 749px) {
+  .gy-chart__wrap::before,
+  .gy-chart__wrap::after {
+    width: 1.6rem;
+  }
+}
+
+/* ---- Small screens: what the shopper sees first ------------------------
+   Measured on the built page: the stage (467px), the thumbnail rail (103px)
+   and the column gap (32px) filled 602px of an 844px first screen, so the
+   product title landed at the fold and the price below it — a shopper had to
+   scroll a full screen to learn what the piece is called and what it costs.
+
+   The photograph is not cropped or shrunk to fix that. The thumbnail rail
+   stands down on phones instead, where the stage already swipes, carries
+   prev/next buttons and shows a "1 / 5" counter, and where the colour
+   selector below changes the image anyway. The rail returns from 750px up. */
+@media screen and (max-width: 749px) {
+  .gy-pdp__thumbs {
+    display: none;
+  }
+
+  .gy-pdp__inner {
+    gap: var(--gy-space-xs);
+  }
+
+  /* Desktop leading between the vendor line, the title and the price costs
+     another 24px of the first screen for no gain at this size. */
+  .gy-pdp__vendor {
+    margin-bottom: var(--gy-space-2xs);
+  }
+
+  .gy-pdp__title {
+    margin-bottom: var(--gy-space-sm);
+  }
+}
+
+/* Between the phone layout and the two-column desktop one the page is still a
+   single column, so a full-width photograph on a portrait tablet is a whole
+   screen on its own and pushes the title 1.3 screens down. Holding the gallery
+   to a sensible measure — the same thing the text column does — brings the
+   title and the price back up without cropping anything. */
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  .gy-pdp__gallery {
+    max-width: 42rem;
+    margin-inline: auto;
+  }
+}
