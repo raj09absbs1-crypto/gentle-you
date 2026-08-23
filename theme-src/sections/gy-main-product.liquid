@@ -173,7 +173,21 @@
       endfor
     endif
 
+    comment
+      Shopify validates a JSON template against the section schema it already
+      holds, so on the upload that introduces chart_scope the setting can be
+      dropped from the template before the new schema lands. Falling back to
+      the block's own keywords means a chart written for the bottom half is
+      still recognised as one, and the guide cannot quietly lose it.
+    endcomment
+    assign block_is_bottom = false
     if block.settings.chart_scope == 'bottom'
+      assign block_is_bottom = true
+    elsif block.settings.chart_scope == blank and block.settings.match contains panty_keyword
+      assign block_is_bottom = true
+    endif
+
+    if block_is_bottom
       if panty_chart_block == null
         assign panty_chart_block = block
         assign panty_chart_matched = chart_matched
