@@ -1,0 +1,430 @@
+/*
+  GentleYou — static / content pages
+  ----------------------------------
+  Phase 10. Dawn's own sections still render these pages: 404, page,
+  page.contact, list-collections, blog, article and the customer account
+  templates. Nothing here rebuilds those templates or moves their markup —
+  this file only dresses the sections Dawn already outputs in the same
+  typography, spacing, links, buttons and surfaces the rest of the store uses,
+  so a shopper who lands on a 404 or opens Contact mid-session stays inside
+  the same brand.
+
+  Every rule is scoped to a container that only exists on those pages:
+
+    .template-404            main-404
+    .gy-static--page         main-page      (page, page.contact)
+    .gy-static--collections  main-list-collections
+    .contact                 contact-form
+    .main-blog               main-blog
+    .article-template        main-article
+    .customer                main-account and the other customers/* sections
+
+  None of those containers appear in the GentleYou header, footer, PDP,
+  collection, search or cart, so no shared Dawn class is overridden globally.
+  Tokens come from gentleyou.css, which gy-header already loads everywhere.
+*/
+
+.template-404,
+.gy-static--page,
+.gy-static--collections,
+.contact,
+.main-blog,
+.article-template,
+.customer {
+  --gy-static-measure: 68ch;
+
+  /* No background is painted here on purpose: these containers are inner,
+     page-width elements, so a fill would show up as a band narrower than the
+     page. The body already carries the store's canvas colour. */
+  color: rgb(var(--gy-ink-soft));
+  font-family: var(--gy-font-body);
+}
+
+/* ---- Typography ---------------------------------------------------------
+   One heading voice across all of these pages: the light, tightly tracked
+   display face the homepage and PDP already use. Sizes are fluid so the same
+   rule holds from 320 to 1440 without a breakpoint per page. */
+
+.template-404 h1,
+.template-404 .title,
+.gy-static--page .main-page-title,
+.gy-static--collections .title--primary,
+.contact .title,
+.main-blog .title--primary,
+.article-template__title,
+.customer h1 {
+  margin: 0 0 var(--gy-space-md);
+  font-family: var(--gy-font-heading);
+  font-size: clamp(2.72rem, 1.68rem + 2.6vw, 4.48rem);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: rgb(var(--gy-ink));
+  text-wrap: balance;
+}
+
+.gy-static--page h2,
+.contact h2:not(.visually-hidden):not(.form-status),
+.main-blog h2,
+.article-template h2,
+.customer h2 {
+  margin: var(--gy-space-lg) 0 var(--gy-space-sm);
+  font-family: var(--gy-font-heading);
+  font-size: clamp(2rem, 1.52rem + 1.2vw, 2.72rem);
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-static--page h3,
+.article-template h3,
+.customer h3 {
+  margin: var(--gy-space-md) 0 var(--gy-space-2xs);
+  font-family: var(--gy-font-heading);
+  font-size: clamp(1.6rem, 1.44rem + 0.5vw, 1.92rem);
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-static--page .rte,
+.article-template__content,
+.template-404 p,
+.customer p {
+  max-width: var(--gy-static-measure);
+  font-size: var(--gy-text-body);
+  line-height: 1.75;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.gy-static--page .rte > * + *,
+.article-template__content > * + * {
+  margin-top: var(--gy-space-sm);
+}
+
+.gy-static--page .rte ul,
+.gy-static--page .rte ol,
+.article-template__content ul,
+.article-template__content ol {
+  padding-left: 2.4rem;
+}
+
+.gy-static--page .rte li + li,
+.article-template__content li + li {
+  margin-top: var(--gy-space-3xs);
+}
+
+/* ---- Links --------------------------------------------------------------
+   Body links get the quiet lavender underline used elsewhere, not Dawn's
+   heavy full-weight underline. */
+
+.gy-static--page .rte a,
+.article-template__content a,
+.customer a:not(.button) {
+  color: rgb(var(--gy-ink));
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--gy-lavender-deep) / 0.55);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color var(--gy-duration-fast) var(--gy-ease);
+}
+
+.gy-static--page .rte a:hover,
+.article-template__content a:hover,
+.customer a:not(.button):hover {
+  text-decoration-color: rgb(var(--gy-lavender-deep));
+}
+
+.article-template__link,
+.template-404 .underlined-link {
+  font-size: 1.184rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+/* Both of those are inline text links; give them a real touch target
+   without changing where the text sits. */
+.article-template__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 4.4rem;
+}
+
+/* ---- Buttons ------------------------------------------------------------
+   The same near-black pill the hero and PDP use. Scoped to these pages only —
+   Dawn's .button elsewhere in the theme is untouched. */
+
+.template-404 .button,
+.gy-static--page .button,
+.contact .button,
+.main-blog .button,
+.article-template .button,
+.customer .button,
+.customer button,
+.customer input[type='submit'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 5.6rem;
+  padding: 1.6rem 4rem;
+  border: 1px solid rgb(var(--gy-ink));
+  border-radius: var(--gy-radius-pill);
+  background-color: rgb(var(--gy-ink));
+  background-image: none;
+  color: rgb(var(--gy-canvas));
+  font-family: var(--gy-font-body);
+  font-size: 1.248rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: var(--gy-elevation-1);
+  transition:
+    transform var(--gy-duration-fast) var(--gy-ease),
+    box-shadow var(--gy-duration-fast) var(--gy-ease);
+}
+
+.template-404 .button:hover,
+.gy-static--page .button:hover,
+.contact .button:hover,
+.main-blog .button:hover,
+.article-template .button:hover,
+.customer .button:hover,
+.customer button:hover,
+.customer input[type='submit']:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--gy-elevation-2);
+}
+
+.template-404 .button::after,
+.template-404 .button::before,
+.gy-static--page .button::after,
+.gy-static--page .button::before,
+.contact .button::after,
+.contact .button::before,
+.main-blog .button::after,
+.main-blog .button::before,
+.article-template .button::after,
+.article-template .button::before,
+.customer .button::after,
+.customer .button::before,
+.customer button::after,
+.customer button::before {
+  display: none;
+}
+
+/* ---- Forms (contact, comments, account) ---------------------------------
+   Dawn's floating-label field, restyled: a hairline underline instead of a
+   boxed border, matching the search and filter inputs. The markup, ids,
+   labels and error hooks are Dawn's own and are not touched. */
+
+.contact .field,
+.article-template .field,
+.customer .field {
+  margin-bottom: var(--gy-space-sm);
+}
+
+.contact .field__input,
+.contact .select__select,
+.contact textarea,
+.article-template .field__input,
+.article-template textarea,
+.customer .field__input,
+.customer .field input,
+.customer .select__select {
+  min-height: 5.2rem;
+  padding: 2.2rem 1.6rem 0.8rem;
+  border: 0;
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.18);
+  border-radius: 0;
+  background-color: rgb(var(--gy-canvas-warm) / 0.5);
+  box-shadow: none;
+  color: rgb(var(--gy-ink));
+  font-family: var(--gy-font-body);
+  font-size: 1.52rem;
+  transition: border-color var(--gy-duration-fast) var(--gy-ease);
+}
+
+.contact .field__input:focus,
+.contact textarea:focus,
+.article-template .field__input:focus,
+.customer .field__input:focus,
+.customer .field input:focus {
+  border-bottom-color: rgb(var(--gy-lavender-deep));
+  outline: 2px solid rgb(var(--gy-lavender-deep) / 0.45);
+  outline-offset: 2px;
+}
+
+.contact .field__label,
+.article-template .field__label,
+.customer .field__label,
+.customer .field label {
+  left: 1.6rem;
+  color: rgb(var(--gy-ink-muted));
+  font-size: 1.36rem;
+  letter-spacing: 0.02em;
+}
+
+.contact .field.field:after,
+.contact .field.field:before,
+.contact .field:hover.field:after,
+.article-template .field.field:after,
+.article-template .field.field:before,
+.article-template .field:hover.field:after,
+.customer .field.field:after,
+.customer .field.field:before,
+.customer .field:hover.field:after {
+  display: none;
+}
+
+.contact .contact__button {
+  margin-top: var(--gy-space-md);
+}
+
+/* ---- Page shells --------------------------------------------------------
+   Breathing room consistent with the rest of the store. Padding only; no
+   layout is moved. */
+
+.template-404 {
+  padding-block: var(--gy-space-2xl);
+}
+
+.template-404 p {
+  margin-inline: auto;
+  font-size: var(--gy-text-eyebrow);
+  letter-spacing: var(--gy-tracking-eyebrow);
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.template-404 .title {
+  margin-top: var(--gy-space-sm);
+}
+
+.template-404 .button {
+  margin-top: var(--gy-space-lg);
+}
+
+.gy-static--page,
+.gy-static--collections,
+.main-blog,
+.customer {
+  padding-block: var(--gy-space-xl);
+}
+
+.article-template__content,
+.article-template__social-sharing {
+  padding-top: var(--gy-space-md);
+}
+
+.article-template__back {
+  padding-block: var(--gy-space-lg) var(--gy-space-2xl);
+}
+
+/* ---- Cards / content surfaces -------------------------------------------
+   Blog and collection-list cards pick up the calm card treatment used by the
+   GentleYou product grid: soft surface, hairline edge, quiet lift on hover.
+   Dawn's own .card classes elsewhere are untouched because these rules are
+   scoped to the two page containers. */
+
+.gy-static--collections .card,
+.main-blog .card {
+  border: 0;
+  border-radius: var(--gy-radius-md);
+  background-color: rgb(var(--gy-canvas-warm) / 0.45);
+  box-shadow: none;
+  overflow: hidden;
+  transition: box-shadow var(--gy-duration) var(--gy-ease);
+}
+
+.gy-static--collections .card:hover,
+.main-blog .card:hover {
+  box-shadow: var(--gy-elevation-1);
+}
+
+.gy-static--collections .card__heading,
+.main-blog .card__heading {
+  margin: 0;
+  font-family: var(--gy-font-heading);
+  font-size: clamp(1.6rem, 1.44rem + 0.6vw, 2.08rem);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: rgb(var(--gy-ink));
+}
+
+.gy-static--collections .card__heading a,
+.main-blog .card__heading a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.gy-static--collections .card__information,
+.main-blog .card__information {
+  padding: var(--gy-space-sm) var(--gy-space-sm) var(--gy-space-md);
+}
+
+.main-blog .article-card__excerpt {
+  margin-top: var(--gy-space-2xs);
+  font-size: 1.44rem;
+  line-height: 1.65;
+  color: rgb(var(--gy-ink-soft));
+}
+
+.main-blog .circle-divider,
+.main-blog .article-card__info {
+  font-size: 1.184rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+/* ---- Account tables -----------------------------------------------------
+   Order history keeps Dawn's table markup; only its type and rules change. */
+
+.customer table {
+  font-size: 1.44rem;
+}
+
+.customer th {
+  font-family: var(--gy-font-body);
+  font-size: 1.152rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--gy-ink-muted));
+}
+
+.customer td,
+.customer th {
+  border-bottom: 1px solid rgb(var(--gy-ink) / 0.08);
+}
+
+/* ---- Motion -------------------------------------------------------------
+   Honour the same reduced-motion contract as the rest of the theme. */
+
+@media (prefers-reduced-motion: reduce) {
+  .template-404 .button,
+  .gy-static--page .button,
+  .contact .button,
+  .main-blog .button,
+  .article-template .button,
+  .customer .button,
+  .customer button,
+  .gy-static--collections .card,
+  .main-blog .card {
+    transition: none;
+  }
+
+  .template-404 .button:hover,
+  .gy-static--page .button:hover,
+  .contact .button:hover,
+  .main-blog .button:hover,
+  .article-template .button:hover,
+  .customer .button:hover,
+  .customer button:hover {
+    transform: none;
+  }
+}

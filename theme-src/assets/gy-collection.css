@@ -178,6 +178,15 @@
   font-size: 1.056rem;
 }
 
+/* Touch sizing. On a touch viewport the chip grows to a 44px target; the
+   padding, border, radius, colour and type stay exactly as above, so only the
+   vertical hit area changes. Pointer widths keep the tighter 3.6rem chip. */
+@media screen and (max-width: 749px) {
+  .gy-chip {
+    min-height: 4.4rem;
+  }
+}
+
 /* ---- Filter panel ---- */
 
 .gy-filters {

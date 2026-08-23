@@ -13,6 +13,9 @@
   - show_secondary_image: {Boolean} cross-fade to the second media on hover
   - quick_add: {Boolean} offer add-to-cart / choose-options
   - section_id: {String} used to build a unique product form id
+  - heading_tag: {String} heading level for the card title, 'h3' by default.
+    Pass 'h2' where the cards are the first content under the page's own h1,
+    so the heading order does not skip a level.
 {%- endcomment -%}
 
 {%- liquid
@@ -92,7 +95,8 @@
       {%- endif -%}
     </div>
 
-    <h3 class="gy-card__title">{{ card_product.title }}</h3>
+    {%- assign card_heading_tag = heading_tag | default: 'h3' -%}
+    <{{ card_heading_tag }} class="gy-card__title">{{ card_product.title }}</{{ card_heading_tag }}>
 
     <div class="gy-card__price">
       {%- render 'price', product: card_product, use_variant: true, show_compare_at_price: true -%}

@@ -719,6 +719,10 @@
   display: inline-flex;
   align-items: center;
   justify-self: center;
+  /* The mark measured 43px tall — one pixel under a 44px touch target. The
+     min-height closes that without moving anything: the flex box is already
+     centring its contents, so the logo stays optically where it was. */
+  min-height: 4.4rem;
   text-decoration: none;
   color: inherit;
 }

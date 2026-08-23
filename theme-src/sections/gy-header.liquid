@@ -10,6 +10,13 @@
 {{ 'gentleyou-home.css' | asset_url | stylesheet_tag }}
 {{ 'gy-cart.css' | asset_url | stylesheet_tag }}
 {{ 'gy-search.css' | asset_url | stylesheet_tag }}
+{%- comment -%}
+  Loaded once here, from the section group that is present on every page, so
+  Dawn's own content pages (404, page, contact, list-collections, blog,
+  article, customer accounts) inherit the GentleYou visual language. Every
+  rule inside is scoped to a container that only exists on those pages.
+{%- endcomment -%}
+{{ 'gy-static.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'gy-search.js' | asset_url }}" defer="defer"></script>
 

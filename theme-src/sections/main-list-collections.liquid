@@ -39,7 +39,8 @@
           {% render 'card-collection',
             card_collection: collection,
             media_aspect_ratio: section.settings.image_ratio,
-            columns: 3
+            columns: 3,
+            heading_tag: 'h2'
           %}
         </li>
       {%- endfor -%}
@@ -50,7 +51,7 @@
 {% schema %}
 {
   "name": "t:sections.main-list-collections.name",
-  "class": "section",
+  "class": "section gy-static gy-static--collections",
   "settings": [
     {
       "type": "inline_richtext",

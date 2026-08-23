@@ -190,7 +190,20 @@
       </div>
 
       <div class="gy-hero__content">
-        <h2 class="gy-hero__heading">{{ heading | escape | newline_to_br }}</h2>
+        {%- comment -%}
+          The hero carries the page's primary headline. On the index template
+          that headline is the document's top-level heading, so it renders as
+          h1 there; anywhere else the section is used it stays an h2 so it does
+          not compete with that page's own h1. The class is unchanged, so the
+          styling is identical either way.
+        {%- endcomment -%}
+        {%- liquid
+          assign hero_heading_tag = 'h2'
+          if template.name == 'index'
+            assign hero_heading_tag = 'h1'
+          endif
+        -%}
+        <{{ hero_heading_tag }} class="gy-hero__heading">{{ heading | escape | newline_to_br }}</{{ hero_heading_tag }}>
 
         <div class="gy-hero__states" data-gy-states>
           {%- if slide_count > 0 -%}

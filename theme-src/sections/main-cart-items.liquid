@@ -38,7 +38,14 @@
     </div>
 
     <div class="cart__warnings">
-      <h1 class="cart__empty-text">{{ 'sections.cart.empty' | t }}</h1>
+      {%- comment -%}
+        Both the cart title and this empty-state line are always in the DOM;
+        `.is-empty` on <cart-items> decides which one is shown. Two h1s on one
+        page is a heading-order fault, so the inactive one is an h2. The class
+        is untouched, so component-cart.css and gy-cart.css still style it and
+        every cart hook stays exactly where it was.
+      {%- endcomment -%}
+      <h2 class="cart__empty-text">{{ 'sections.cart.empty' | t }}</h2>
       <a href="{{ routes.all_products_collection_url }}" class="button">
         {{ 'general.continue_shopping' | t }}
       </a>
