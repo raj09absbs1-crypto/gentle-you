@@ -48,10 +48,29 @@
   assign body = text
   if body == blank
     assign words = description_words | default: 26
-    assign raw = product.description | strip_html | replace: '&nbsp;', ' ' | replace: '&amp;', '&'
+    comment
+      The merchant writes the description as a bullet list. Deleting the
+      markers ran every line into one sentence; keeping the line breaks as a
+      middot separator reads the way it was written.
+    endcomment
+    assign raw = product.description | replace: '<br>', '✔' | replace: '<br/>', '✔' | replace: '<br />', '✔'
+    assign raw = raw | replace: '</p>', '✔' | replace: '</li>', '✔'
+    assign raw = raw | strip_html | replace: '&nbsp;', ' ' | replace: '&amp;', '&'
     assign raw = raw | replace: 'Product Description:', '' | replace: 'Product description:', ''
-    assign raw = raw | replace: '✔', '' | replace: '✓', '' | replace: '•', ''
-    assign raw = raw | strip | truncatewords: words
+    assign raw = raw | replace: '✓', '✔' | replace: '•', '✔'
+    assign parts = raw | split: '✔'
+    assign cleaned = ''
+    for part in parts
+      assign bit = part | strip
+      if bit != blank
+        if cleaned == blank
+          assign cleaned = bit
+        else
+          assign cleaned = cleaned | append: ' · ' | append: bit
+        endif
+      endif
+    endfor
+    assign raw = cleaned | strip | truncatewords: words
     if raw != blank
       assign body = raw
     endif

@@ -601,9 +601,24 @@
   color: rgb(var(--gy-ink-muted));
 }
 
+/* With three points the fixed column counts strand the last one: half a row
+   on phones, an empty fourth cell on desktop. Give that case its own shape so
+   the row reads as deliberate at both ends. */
+.gy-trust-row:has(> :last-child:nth-child(3)) > :last-child {
+  grid-column: 1 / -1;
+}
+
 @media screen and (min-width: 750px) {
   .gy-trust-row {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .gy-trust-row:has(> :last-child:nth-child(3)) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gy-trust-row:has(> :last-child:nth-child(3)) > :last-child {
+    grid-column: auto;
   }
 }
 
@@ -730,6 +745,11 @@
 .gy-header__logo img {
   display: block;
   height: auto;
+  /* The supplied logo is an RGB PNG with no alpha, so it paints a hard white
+     rectangle over the warm header. Multiply lets pure white fall through to
+     the ground beneath while the lettering keeps its colour — no new asset,
+     and it degrades to the current look if a browser lacks blend modes. */
+  mix-blend-mode: multiply;
 }
 
 .gy-header__wordmark {
@@ -951,6 +971,8 @@
 .gy-footer__logo {
   display: block;
   height: auto;
+  /* Same opaque-white PNG as the header. */
+  mix-blend-mode: multiply;
 }
 
 .gy-footer__wordmark {

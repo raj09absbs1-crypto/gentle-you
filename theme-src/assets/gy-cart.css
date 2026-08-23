@@ -714,3 +714,11 @@ cart-remove-button .button svg,
   align-items: center;
   min-height: 4.4rem;
 }
+
+/* base.css aligns this row to flex-end below 990px, which was fine when the
+   link was plain text. Now that it is a 44px touch target its label floats
+   above the heading's baseline, so centre the row — exactly what Dawn already
+   does from 990px up. The touch target itself is unchanged. */
+.title-wrapper-with-link {
+  align-items: center;
+}
