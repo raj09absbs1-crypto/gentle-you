@@ -67,9 +67,6 @@
         "share",
         "judge_me_reviews_preview_badge_zmCTHB"
       ],
-      "custom_css": [
-        ".product-media-container {width: 100%;}"
-      ],
       "settings": {
         "enable_sticky_info": true,
         "color_scheme": "scheme-1",
