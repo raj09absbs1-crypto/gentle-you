@@ -428,3 +428,25 @@
     transform: none;
   }
 }
+
+/* Dawn puts these on their own line under the form, where they are the only
+   thing to aim at. Their bare line box measured 16px; a pointer target needs
+   at least 24, and a finger wants 44. */
+.customer a:not(.button) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.4rem;
+}
+
+@media screen and (max-width: 749px) {
+  .customer a:not(.button) { min-height: 4.4rem; }
+}
+
+/* Collection and blog card titles are the card's link. At the narrow widths
+   the heading's own line box fell to 22px. */
+.gy-static--collections .card__heading a,
+.main-blog .card__heading a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.6rem;
+}

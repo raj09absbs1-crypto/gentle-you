@@ -1,0 +1,66 @@
+{%- comment -%}
+  One size chart table inside the product size guide.
+
+  Rows and columns are merchant content from the Theme Editor (one row per
+  line, columns separated by |), so every number shown is whatever the merchant
+  published: the theme never derives, converts or invents a measurement. When
+  the shopper's current selection matches a row's size code that row is marked,
+  which is presentation only — the Shopify variant picker is untouched.
+
+  Accepts:
+  - heading: {String} chart title
+  - category: {String} optional label under the title
+  - columns: {String} header cells separated by |
+  - rows: {String} one row per line, cells separated by |
+  - current_code: {String} size code to mark as the shopper's current row
+  - label_id: {String} unique id fragment for the scroll region's label
+{%- endcomment -%}
+
+{%- if rows != blank -%}
+  {%- liquid
+    assign chart_headers = columns | split: '|'
+    assign chart_rows = rows | newline_to_br | split: '<br />'
+    assign current = current_code | upcase | strip
+  -%}
+
+  <section class="gy-guide__block gy-chart">
+    <header class="gy-chart__head">
+      <h3 class="gy-chart__title">{{ heading | escape }}</h3>
+      {%- if category != blank -%}
+        <p class="gy-chart__category">{{ category | escape }}</p>
+      {%- endif -%}
+    </header>
+
+    <div class="gy-chart__wrap" data-gy-chart-wrap>
+      <div class="gy-chart__scroll" tabindex="0" role="group" aria-label="{{ heading | escape }}" data-gy-chart-scroll>
+        <table class="gy-chart__table">
+          <thead>
+            <tr>
+              {%- for header in chart_headers -%}
+                <th scope="col">{{ header | strip }}</th>
+              {%- endfor -%}
+            </tr>
+          </thead>
+          <tbody>
+            {%- for row in chart_rows -%}
+              {%- assign cells = row | strip | split: '|' -%}
+              {%- if cells.size > 0 and row != blank -%}
+                {%- assign row_code = cells[0] | strip | upcase -%}
+                <tr {% if current != blank and row_code == current %}class="is-current" aria-current="true"{% endif %}>
+                  {%- for cell in cells -%}
+                    {%- if forloop.first -%}
+                      <th scope="row">{{ cell | strip }}</th>
+                    {%- else -%}
+                      <td>{{ cell | strip }}</td>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </tr>
+              {%- endif -%}
+            {%- endfor -%}
+          </tbody>
+        </table>
+      </div>
+      <p class="gy-chart__hint" data-gy-chart-hint>{{ 'sections.gy.swipe_table' | t }}</p>
+    </div>
+  </section>
+{%- endif -%}

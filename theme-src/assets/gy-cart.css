@@ -118,6 +118,11 @@ cart-drawer .cart__empty-text,
 }
 
 .cart-item__name {
+  /* The title is the line item's link back to the product; its bare line box
+     measured 20px, under the 24px a pointer target needs. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.4rem;
   font-family: var(--gy-font-body);
   font-size: 1.408rem;
   font-weight: 500;

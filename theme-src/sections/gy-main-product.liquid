@@ -37,6 +37,317 @@
 <script src="{{ 'gy-product.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'gentleyou-motion.js' | asset_url }}" defer="defer"></script>
 
+{%- comment -%}
+  Size guide.
+
+  Band and cup values are the product's real Shopify option values — the
+  theme never invents a size. Measurements come only from what the merchant
+  supplies: a `size_measurements` line per size, or a product metafield when
+  one is set. Where nothing is supplied the column simply stays empty rather
+  than showing a fabricated number.
+{%- endcomment -%}
+{%- liquid
+  assign band_option = null
+  assign cup_option = null
+  assign panty_option = null
+  comment
+    An option that names the cup can never be the band. "Cup size" contains
+    the band keyword ("size"), so on the products where Shopify lists the cup
+    option first it was being claimed as the band and both names ended up
+    pointing at the same option — which put cup letters in the band column of
+    the size guide. Deciding the cup first, and refusing it for the band,
+    resolves every option order in the catalogue.
+  endcomment
+  comment
+    A combo lists three size options — band, cup and the bottom half — and
+    every one of them contains the band keyword ("size"). Cup and bottom are
+    therefore decided first and refused for the band, exactly as the cup
+    already was, so the band cannot swallow "Panty Size" on the sets where
+    Shopify lists it before the bra size.
+  endcomment
+  assign panty_keyword = section.settings.panty_option_name | default: 'panty'
+  for option in product.options_with_values
+    assign lower_name = option.name | downcase
+    assign option_is_cup = false
+    assign option_is_panty = false
+    if lower_name contains section.settings.cup_option_name
+      assign option_is_cup = true
+    endif
+    if lower_name contains panty_keyword
+      assign option_is_panty = true
+    endif
+    if cup_option == null and option_is_cup
+      assign cup_option = option
+    endif
+    if panty_option == null and option_is_panty
+      assign panty_option = option
+    endif
+    if band_option == null and option_is_cup == false and option_is_panty == false and lower_name contains section.settings.band_option_name
+      assign band_option = option
+    endif
+  endfor
+
+  assign measurement_lines = section.settings.size_measurements | newline_to_br | split: '<br />'
+  assign metafield_chart = product.metafields.custom.size_chart
+-%}
+
+{%- comment -%}
+  Which size chart belongs to this product.
+
+  Detection uses the product's own Shopify classification only — product
+  type, standard category, tags and the optional custom.size_chart_type
+  metafield. The product title is deliberately not matched, so a combo or
+  bundle never inherits a chart from a word in its name. Each `size_chart`
+  block carries its own keywords, so the merchant decides in the Theme
+  Editor which products get which chart; blocks are tested in editor order
+  and the first match wins. A block with no keywords is the fallback for
+  products nothing else matches, and when no block matches at all the
+  section-level chart settings are used, so existing setups keep working.
+{%- endcomment -%}
+{%- liquid
+  assign chart_haystack = product.type
+  if product.category != blank
+    assign chart_haystack = chart_haystack | append: ' | ' | append: product.category.name
+  endif
+  if product.metafields.custom.size_chart_type != blank
+    assign chart_haystack = chart_haystack | append: ' | ' | append: product.metafields.custom.size_chart_type
+  endif
+  for tag in product.tags
+    assign chart_haystack = chart_haystack | append: ' | ' | append: tag
+  endfor
+  assign chart_haystack = chart_haystack | downcase
+
+  comment
+    Two haystacks, because the two keyword lists answer different questions.
+
+    The size option names are Shopify data as much as the type and the tags
+    are, and on a catalogue where type, category and tags have not been
+    filled in they are the only classification a product carries: an option
+    called "Cup Size" is evidence of a bra, "Panty Size" of a brief. So the
+    match keywords are tested against the option names too.
+
+    The exclude keywords are not. They exist to keep a brief from being
+    handed bra measurements, and a set legitimately offers both kinds of
+    size — testing "panty" against a combo's own option names would refuse
+    it the bra chart it needs. Exclusion stays a judgement about what the
+    product is, which is what type, category and tags describe.
+  endcomment
+  assign chart_option_haystack = chart_haystack
+  for option in product.options_with_values
+    assign chart_option_haystack = chart_option_haystack | append: ' | ' | append: option.name
+  endfor
+  assign chart_option_haystack = chart_option_haystack | downcase
+
+  assign chart_block = null
+  assign chart_fallback = null
+  assign panty_chart_block = null
+  assign panty_chart_matched = false
+  for block in section.blocks
+    if block.type != 'size_chart'
+      continue
+    endif
+    comment
+      Every block is run through the same keyword test; only where the answer
+      is filed differs. A chart marked as bottom sizing is held aside so a set
+      can show it alongside its top chart, and so a brief classified by type
+      or tag alone still finds it even when its size option is called plain
+      Size and nothing else.
+    endcomment
+    assign chart_excluded = false
+    assign exclude_words = block.settings.exclude | downcase | split: ','
+    for word in exclude_words
+      assign word = word | strip
+      if word != blank and chart_haystack contains word
+        assign chart_excluded = true
+      endif
+    endfor
+
+    assign chart_matched = false
+    if chart_excluded == false and block.settings.match != blank
+      assign match_words = block.settings.match | downcase | split: ','
+      for word in match_words
+        assign word = word | strip
+        if word != blank and chart_option_haystack contains word
+          assign chart_matched = true
+        endif
+      endfor
+    endif
+
+    if block.settings.chart_scope == 'bottom'
+      if panty_chart_block == null
+        assign panty_chart_block = block
+        assign panty_chart_matched = chart_matched
+      endif
+      continue
+    endif
+    if block.settings.match == blank
+      if chart_fallback == null
+        assign chart_fallback = block
+      endif
+      continue
+    endif
+    if chart_block == null and chart_matched
+      assign chart_block = block
+    endif
+  endfor
+  if chart_block == null
+    assign chart_block = chart_fallback
+  endif
+
+  assign chart_rows_raw = section.settings.size_chart_rows
+  assign chart_columns_raw = section.settings.size_chart_columns
+  assign chart_heading = section.settings.size_chart_heading | default: 'Size chart'
+  assign chart_category = section.settings.size_chart_category
+  assign measure_heading = section.settings.measure_heading | default: 'How to measure'
+  assign measure_step_1_title = section.settings.measure_step_1_title
+  assign measure_step_1 = section.settings.measure_step_1
+  assign measure_step_2_title = section.settings.measure_step_2_title
+  assign measure_step_2 = section.settings.measure_step_2
+  assign between_sizes_heading = section.settings.between_sizes_heading | default: 'Between sizes?'
+  assign between_sizes = section.settings.between_sizes
+  assign size_note = section.settings.size_note
+  assign size_contact = section.settings.size_contact
+
+  comment
+    The chart's own words — how to measure, what to do between sizes, the
+    footnote — come from whichever block is actually describing this product.
+    On a brief that is the bottom chart, which is never the top chart, so
+    without this the measuring instructions the merchant wrote for it would
+    be dropped along with it.
+  endcomment
+  assign guide_block = chart_block
+  if guide_block == null and panty_chart_matched
+    assign guide_block = panty_chart_block
+  endif
+
+  if chart_block != null and chart_block.settings.rows != blank
+    assign chart_rows_raw = chart_block.settings.rows
+    assign chart_columns_raw = chart_block.settings.columns | default: chart_columns_raw
+    assign chart_heading = chart_block.settings.heading | default: chart_heading
+    assign chart_category = chart_block.settings.category | default: chart_category
+  endif
+
+  if guide_block != null and guide_block.settings.rows != blank
+    assign measure_heading = guide_block.settings.measure_heading | default: measure_heading
+    if guide_block.settings.measure_step_1 != blank or guide_block.settings.measure_step_2 != blank
+      assign measure_step_1_title = guide_block.settings.measure_step_1_title
+      assign measure_step_1 = guide_block.settings.measure_step_1
+      assign measure_step_2_title = guide_block.settings.measure_step_2_title
+      assign measure_step_2 = guide_block.settings.measure_step_2
+    endif
+    assign between_sizes_heading = guide_block.settings.between_sizes_heading | default: between_sizes_heading
+    assign between_sizes = guide_block.settings.between_sizes | default: between_sizes
+    assign size_note = guide_block.settings.size_note | default: size_note
+    assign size_contact = guide_block.settings.size_contact | default: size_contact
+  endif
+
+  assign selected_band = ''
+  assign selected_cup = ''
+  if band_option
+    assign selected_band = band_option.selected_value.name | default: ''
+  endif
+  if cup_option
+    assign selected_cup = cup_option.selected_value.name | default: ''
+  endif
+  assign current_code = selected_band | append: selected_cup | upcase | strip
+
+  assign panty_rows = ''
+  assign panty_columns = ''
+  assign panty_heading = chart_heading
+  assign panty_category = ''
+  assign selected_panty = ''
+  if panty_option
+    assign selected_panty = panty_option.selected_value.name | default: ''
+  endif
+  if panty_chart_block
+    assign panty_rows = panty_chart_block.settings.rows
+    assign panty_columns = panty_chart_block.settings.columns
+    assign panty_heading = panty_chart_block.settings.heading | default: chart_heading
+    assign panty_category = panty_chart_block.settings.category
+  endif
+
+  comment
+    Which halves of the body this product actually sizes.
+
+    A Cup Size option is evidence of a top and a Panty Size option of a
+    bottom, and a chart whose own keywords match the product is evidence
+    either way — that is how a brief classified by type or tag is recognised
+    when its size option is called plain "Size". A set has both and shows
+    both. A product with neither shows whatever the old resolution produced,
+    so a shop that classifies its products by type and tags is unaffected.
+  endcomment
+  assign has_top = false
+  assign has_bottom = false
+  if cup_option or chart_block
+    assign has_top = true
+  endif
+  if panty_option or panty_chart_matched
+    assign has_bottom = true
+  endif
+
+  assign show_top_chart = true
+  if has_bottom and has_top == false
+    assign show_top_chart = false
+  endif
+
+  assign show_bottom_chart = false
+  if has_bottom and panty_rows != blank and panty_chart_block != chart_block
+    assign show_bottom_chart = true
+  endif
+
+  comment
+    Which size the bottom chart should mark as the shopper's own. On a set
+    that is the bottom option; on a brief whose only option is called Size it
+    is that one.
+  endcomment
+  if selected_panty == blank and has_bottom and panty_option == null and band_option
+    assign selected_panty = band_option.selected_value.name | default: ''
+  endif
+
+  comment
+    Whether the guide has any sizing in it at all. "Between sizes?" and
+    the contact footnote are general advice, not sizing, so a product
+    the charts do not cover was offering a Size guide link that opened
+    a drawer telling the shopper nothing about their size. The link is
+    only worth showing when there is something behind it.
+  endcomment
+  comment
+    On a set both charts are on screen at once. Two blocks headed Size chart
+    over a merchant category naming a different product, such as High-Waist
+    Briefs on a lingerie set, does not tell the shopper which one to read.
+    Labelling each chart with the option it sizes uses the exact words printed
+    above the picker they just used, which are the product's own Shopify
+    option names and nothing invented.
+  endcomment
+  assign shows_both_charts = false
+  if show_top_chart and chart_rows_raw != blank and show_bottom_chart and panty_option
+    assign shows_both_charts = true
+  endif
+  if shows_both_charts
+    if band_option
+      assign chart_category = band_option.name
+    endif
+    assign panty_category = panty_option.name
+  endif
+
+  assign guide_has_sizing = false
+  if band_option and section.settings.size_measurements != blank
+    assign guide_has_sizing = true
+  endif
+  if cup_option and chart_rows_raw == blank
+    assign guide_has_sizing = true
+  endif
+  if metafield_chart != blank
+    assign guide_has_sizing = true
+  endif
+  if show_top_chart and chart_rows_raw != blank
+    assign guide_has_sizing = true
+  endif
+  if show_bottom_chart
+    assign guide_has_sizing = true
+  endif
+-%}
+
 <product-info
   id="MainProduct-{{ section.id }}"
   class="gy-pdp gy-section gy-section--ivory"
@@ -130,7 +441,7 @@
                   {%- endif -%}
                 </div>
 
-                {%- if block.settings.show_size_guide -%}
+                {%- if block.settings.show_size_guide and guide_has_sizing -%}
                   <button class="gy-pdp__size-link" type="button" data-gy-size-guide-open aria-haspopup="dialog">
                     {{ section.settings.size_guide_label | default: 'Size guide' | escape }}
                     <span aria-hidden="true">&rarr;</span>
@@ -268,142 +579,7 @@
     </div>
   </div>
 
-  {%- comment -%}
-    Size guide.
-
-    Band and cup values are the product's real Shopify option values — the
-    theme never invents a size. Measurements come only from what the merchant
-    supplies: a `size_measurements` line per size, or a product metafield when
-    one is set. Where nothing is supplied the column simply stays empty rather
-    than showing a fabricated number.
-  {%- endcomment -%}
-  {%- liquid
-    assign band_option = null
-    assign cup_option = null
-    comment
-      An option that names the cup can never be the band. "Cup size" contains
-      the band keyword ("size"), so on the products where Shopify lists the cup
-      option first it was being claimed as the band and both names ended up
-      pointing at the same option — which put cup letters in the band column of
-      the size guide. Deciding the cup first, and refusing it for the band,
-      resolves every option order in the catalogue.
-    endcomment
-    for option in product.options_with_values
-      assign lower_name = option.name | downcase
-      assign option_is_cup = false
-      if lower_name contains section.settings.cup_option_name
-        assign option_is_cup = true
-      endif
-      if cup_option == null and option_is_cup
-        assign cup_option = option
-      endif
-      if band_option == null and option_is_cup == false and lower_name contains section.settings.band_option_name
-        assign band_option = option
-      endif
-    endfor
-
-    assign measurement_lines = section.settings.size_measurements | newline_to_br | split: '<br />'
-    assign metafield_chart = product.metafields.custom.size_chart
-  -%}
-
-  {%- comment -%}
-    Which size chart belongs to this product.
-
-    Detection uses the product's own Shopify classification only — product
-    type, standard category, tags and the optional custom.size_chart_type
-    metafield. The product title is deliberately not matched, so a combo or
-    bundle never inherits a chart from a word in its name. Each `size_chart`
-    block carries its own keywords, so the merchant decides in the Theme
-    Editor which products get which chart; blocks are tested in editor order
-    and the first match wins. A block with no keywords is the fallback for
-    products nothing else matches, and when no block matches at all the
-    section-level chart settings are used, so existing setups keep working.
-  {%- endcomment -%}
-  {%- liquid
-    assign chart_haystack = product.type
-    if product.category != blank
-      assign chart_haystack = chart_haystack | append: ' | ' | append: product.category.name
-    endif
-    if product.metafields.custom.size_chart_type != blank
-      assign chart_haystack = chart_haystack | append: ' | ' | append: product.metafields.custom.size_chart_type
-    endif
-    for tag in product.tags
-      assign chart_haystack = chart_haystack | append: ' | ' | append: tag
-    endfor
-    assign chart_haystack = chart_haystack | downcase
-
-    assign chart_block = null
-    assign chart_fallback = null
-    for block in section.blocks
-      if block.type != 'size_chart'
-        continue
-      endif
-      if block.settings.match == blank
-        if chart_fallback == null
-          assign chart_fallback = block
-        endif
-        continue
-      endif
-      if chart_block != null
-        continue
-      endif
-
-      assign chart_excluded = false
-      assign exclude_words = block.settings.exclude | downcase | split: ','
-      for word in exclude_words
-        assign word = word | strip
-        if word != blank and chart_haystack contains word
-          assign chart_excluded = true
-        endif
-      endfor
-
-      if chart_excluded == false
-        assign match_words = block.settings.match | downcase | split: ','
-        for word in match_words
-          assign word = word | strip
-          if word != blank and chart_haystack contains word
-            assign chart_block = block
-          endif
-        endfor
-      endif
-    endfor
-    if chart_block == null
-      assign chart_block = chart_fallback
-    endif
-
-    assign chart_rows_raw = section.settings.size_chart_rows
-    assign chart_columns_raw = section.settings.size_chart_columns
-    assign chart_heading = section.settings.size_chart_heading | default: 'Size chart'
-    assign chart_category = section.settings.size_chart_category
-    assign measure_heading = section.settings.measure_heading | default: 'How to measure'
-    assign measure_step_1_title = section.settings.measure_step_1_title
-    assign measure_step_1 = section.settings.measure_step_1
-    assign measure_step_2_title = section.settings.measure_step_2_title
-    assign measure_step_2 = section.settings.measure_step_2
-    assign between_sizes_heading = section.settings.between_sizes_heading | default: 'Between sizes?'
-    assign between_sizes = section.settings.between_sizes
-    assign size_note = section.settings.size_note
-    assign size_contact = section.settings.size_contact
-
-    if chart_block != null and chart_block.settings.rows != blank
-      assign chart_rows_raw = chart_block.settings.rows
-      assign chart_columns_raw = chart_block.settings.columns | default: chart_columns_raw
-      assign chart_heading = chart_block.settings.heading | default: chart_heading
-      assign chart_category = chart_block.settings.category | default: chart_category
-      assign measure_heading = chart_block.settings.measure_heading | default: measure_heading
-      if chart_block.settings.measure_step_1 != blank or chart_block.settings.measure_step_2 != blank
-        assign measure_step_1_title = chart_block.settings.measure_step_1_title
-        assign measure_step_1 = chart_block.settings.measure_step_1
-        assign measure_step_2_title = chart_block.settings.measure_step_2_title
-        assign measure_step_2 = chart_block.settings.measure_step_2
-      endif
-      assign between_sizes_heading = chart_block.settings.between_sizes_heading | default: between_sizes_heading
-      assign between_sizes = chart_block.settings.between_sizes | default: between_sizes
-      assign size_note = chart_block.settings.size_note | default: size_note
-      assign size_contact = chart_block.settings.size_contact | default: size_contact
-    endif
-  -%}
-
+  {%- if guide_has_sizing -%}
   <div class="gy-pdp__drawer" data-gy-size-guide-drawer hidden>
     <div class="gy-pdp__drawer-scrim" data-gy-size-guide-close></div>
     <aside
@@ -490,68 +666,35 @@
         {%- endif -%}
 
         {%- comment -%}
-          Size chart. Rows are merchant content from the Theme Editor (one row
-          per line, columns separated by |), so the numbers are whatever the
-          merchant published and the theme never derives or converts them.
-          When the shopper's selected band and cup match a row's size code the
-          row is highlighted; the Shopify variant picker is untouched.
+          Size charts. A bra shows the top chart, a brief shows the bottom
+          chart, and a set shows both — decided by the size options the product
+          actually offers, so a combo is never left with only half its sizing.
         {%- endcomment -%}
-        {%- if chart_rows_raw != blank -%}
-          {%- liquid
-            assign chart_headers = chart_columns_raw | split: '|'
-            assign chart_rows = chart_rows_raw | newline_to_br | split: '<br />'
 
-            assign selected_band = ''
-            assign selected_cup = ''
-            if band_option
-              assign selected_band = band_option.selected_value.name | default: ''
-            endif
-            if cup_option
-              assign selected_cup = cup_option.selected_value.name | default: ''
-            endif
-            assign current_code = selected_band | append: selected_cup | upcase | strip
+        {%- if show_top_chart -%}
+          {%- render 'gy-size-chart',
+            heading: chart_heading,
+            category: chart_category,
+            columns: chart_columns_raw,
+            rows: chart_rows_raw,
+            current_code: current_code
           -%}
+        {%- endif -%}
 
-          <section class="gy-guide__block gy-chart">
-            <header class="gy-chart__head">
-              <h3 class="gy-chart__title">{{ chart_heading | escape }}</h3>
-              {%- if chart_category != blank -%}
-                <p class="gy-chart__category">{{ chart_category | escape }}</p>
-              {%- endif -%}
-            </header>
-
-            <div class="gy-chart__wrap" data-gy-chart-wrap>
-            <div class="gy-chart__scroll" tabindex="0" role="group" aria-label="{{ chart_heading | escape }}" data-gy-chart-scroll>
-              <table class="gy-chart__table">
-                <thead>
-                  <tr>
-                    {%- for header in chart_headers -%}
-                      <th scope="col">{{ header | strip }}</th>
-                    {%- endfor -%}
-                  </tr>
-                </thead>
-                <tbody>
-                  {%- for row in chart_rows -%}
-                    {%- assign cells = row | strip | split: '|' -%}
-                    {%- if cells.size > 0 and row != blank -%}
-                      {%- assign row_code = cells[0] | strip | upcase -%}
-                      <tr {% if current_code != blank and row_code == current_code %}class="is-current" aria-current="true"{% endif %}>
-                        {%- for cell in cells -%}
-                          {%- if forloop.first -%}
-                            <th scope="row">{{ cell | strip }}</th>
-                          {%- else -%}
-                            <td>{{ cell | strip }}</td>
-                          {%- endif -%}
-                        {%- endfor -%}
-                      </tr>
-                    {%- endif -%}
-                  {%- endfor -%}
-                </tbody>
-              </table>
-            </div>
-            <p class="gy-chart__hint" data-gy-chart-hint>{{ 'sections.gy.swipe_table' | t }}</p>
-            </div>
-          </section>
+        {%- comment -%}
+          The bottom half of a set. It is rendered whenever the product offers
+          a bottom size option and the merchant has published a bottom chart,
+          which is what was missing on every combo: the guide resolved a single
+          chart, so the panty sizes in the picker had nothing to read against.
+        {%- endcomment -%}
+        {%- if show_bottom_chart -%}
+          {%- render 'gy-size-chart',
+            heading: panty_heading,
+            category: panty_category,
+            columns: panty_columns,
+            rows: panty_rows,
+            current_code: selected_panty
+          -%}
         {%- endif -%}
 
         {%- if measure_step_1 != blank or measure_step_2 != blank -%}
@@ -604,6 +747,7 @@
       </div>
     </aside>
   </div>
+  {%- endif -%}
 
   {%- if section.settings.enable_sticky_bar -%}
     <div class="gy-pdp__sticky" data-gy-sticky-bar hidden>
@@ -662,6 +806,7 @@
     { "type": "text", "id": "size_guide_intro", "label": "Supporting line", "default": "Simple measurements to help you choose comfortably." },
     { "type": "text", "id": "band_option_name", "label": "Band option name contains", "info": "Which product option holds the band size. Lower case.", "default": "size" },
     { "type": "text", "id": "cup_option_name", "label": "Cup option name contains", "info": "Which product option holds the cup size. Lower case.", "default": "cup" },
+    { "type": "text", "id": "panty_option_name", "label": "Bottom option name contains", "info": "Which product option holds the panty or brief size. Lower case.", "default": "panty" },
     { "type": "text", "id": "measurement_label", "label": "Measurement column heading", "default": "Underbust" },
     { "type": "textarea", "id": "size_measurements", "label": "Measurements", "info": "One per line as \"size: measurement\", for example \"32: 68-72 cm\". Sizes with nothing here show an empty cell — the theme never invents a measurement. A product metafield custom.size_chart is also rendered when set." },
     { "type": "text", "id": "size_chart_heading", "label": "Size chart heading", "default": "Size chart" },
@@ -744,7 +889,8 @@
     {
       "type": "size_chart", "name": "Size chart",
       "settings": [
-        { "type": "paragraph", "content": "Shown inside the size guide only when this product matches the keywords below. Keywords are checked against the product's Shopify type, category, tags and the custom.size_chart_type metafield \u2014 never its title \u2014 so combos and bundles do not pick up a chart by accident. Blocks are checked in the order they appear here and the first match wins. Leave the keywords empty to make this the chart for products nothing else matches." },
+        { "type": "paragraph", "content": "Shown inside the size guide only when this product matches the keywords below. Keywords are checked against the product's Shopify type, category, tags, size option names and the custom.size_chart_type metafield \u2014 never its title \u2014 so combos and bundles do not pick up a chart by accident. Blocks are checked in the order they appear here and the first match wins. Leave the keywords empty to make this the chart for products nothing else matches." },
+        { "type": "select", "id": "chart_scope", "label": "This chart sizes", "info": "A set that offers both a bra size and a panty size shows its top chart and its bottom chart together.", "default": "top", "options": [ { "value": "top", "label": "The top \u2014 bra, bralette, nightwear" }, { "value": "bottom", "label": "The bottom \u2014 panty, brief" } ] },
         { "type": "text", "id": "match", "label": "Show when type, category or tags contain", "info": "Separated by commas, for example: panty, panties, brief, briefs." },
         { "type": "text", "id": "exclude", "label": "But never when they contain", "info": "Optional. Separated by commas, for example: combo, set." },
         { "type": "text", "id": "heading", "label": "Heading", "default": "Size chart" },

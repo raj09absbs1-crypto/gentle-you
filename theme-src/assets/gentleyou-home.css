@@ -999,11 +999,21 @@
 }
 
 .gy-footer__social a {
+  /* The bare line box of 11px uppercase text is 12px tall, well under the
+     24px a pointer target needs. Padding the box gives the mark something to
+     hit without changing where the lettering sits. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.8rem;
   font-size: 1.12rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
   color: rgb(var(--gy-ink-soft));
+}
+
+@media screen and (max-width: 749px) {
+  .gy-footer__social a { min-height: 4.4rem; }
 }
 
 .gy-footer__columns {
@@ -1041,7 +1051,7 @@
 
 @media screen and (min-width: 750px) {
   .gy-footer__links a {
-    min-height: 0;
+    min-height: 2.8rem;
   }
 }
 
@@ -1078,8 +1088,15 @@
 }
 
 .gy-footer__policies a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.8rem;
   text-decoration: none;
   color: inherit;
+}
+
+@media screen and (max-width: 749px) {
+  .gy-footer__policies a { min-height: 4.4rem; }
 }
 
 @media screen and (min-width: 750px) {
