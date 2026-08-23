@@ -45,8 +45,11 @@
   --gy-space-3xl: 12rem;
 
   /* Radii */
-  --gy-radius-xs: 2px;
-  --gy-radius-sm: 6px;
+  /* One corner scale for the whole store. Every rounded thing takes one of
+     these five: nothing hardcodes its own radius, so a checkbox, a chip, a
+     button and a card can never disagree about how soft a corner is. */
+  --gy-radius-xs: 4px;
+  --gy-radius-sm: 10px;
   --gy-radius-md: 14px;
   --gy-radius-lg: 26px;
   --gy-radius-pill: 999px;

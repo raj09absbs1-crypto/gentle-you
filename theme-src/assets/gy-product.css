@@ -388,7 +388,7 @@
   padding: 0.88rem 1.52rem;
   margin: 0 0.72rem 0.72rem 0;
   border: 1px solid rgb(var(--gy-ink) / 0.16);
-  border-radius: 10px;
+  border-radius: var(--gy-radius-sm);
   background-color: rgb(var(--gy-canvas-warm));
   color: rgb(var(--gy-ink));
   font-size: 1.312rem;
@@ -637,7 +637,7 @@ body.gy-no-scroll { overflow: hidden; }
 }
 
 .gy-pdp .quantity {
-  border-radius: 10px;
+  border-radius: var(--gy-radius-sm);
   border: 1px solid rgb(var(--gy-ink) / 0.16);
   background-color: rgb(var(--gy-canvas-warm));
   overflow: hidden;
@@ -672,10 +672,16 @@ body.gy-no-scroll { overflow: hidden; }
 .gy-pdp .quantity::before,
 .gy-pdp .quantity::after { display: none; }
 
+/* Add to cart, Shopify's dynamic checkout and Shiprocket's Buy it Now are
+   three buttons from three different sources stacked in one column. They take
+   the same height and the same corner here so the column reads as one control,
+   not as three. This rule used to say pill and the submit then overrode itself
+   to 12px, which is how the dynamic checkout button ended up the only rounded
+   one in the stack. */
 .gy-pdp__buy .product-form__submit,
 .gy-pdp__buy .shopify-payment-button__button {
   min-height: 5.8rem;
-  border-radius: var(--gy-radius-pill);
+  border-radius: var(--gy-radius-md);
   font-size: 1.376rem;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -685,7 +691,6 @@ body.gy-no-scroll { overflow: hidden; }
 .gy-pdp__buy .product-form__submit {
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
   background-color: rgb(var(--gy-ink));
   color: rgb(var(--gy-canvas));
   box-shadow: var(--gy-elevation-1);
@@ -739,6 +744,105 @@ body.gy-no-scroll { overflow: hidden; }
   background-color: rgb(var(--gy-ink) / 0.55);
   box-shadow: none;
   cursor: not-allowed;
+}
+
+/* ---- Shiprocket's Buy it Now, brought in line with Add to cart ----
+
+   The button and its badge are injected at runtime by the Shiprocket app and
+   styled by the app's own stylesheet plus the <style> block inside
+   snippets/sr-checkout.liquid. Neither of those may be edited here, so the
+   theme states the geometry it needs from its own stylesheet instead. Nothing
+   below changes what the button does — it is size, colour and position only.
+
+   Measured against Add to cart before this rule: 45px tall against 58, square
+   corners against 12px, rgb(11 11 11) against the theme ink, 1.08px letter
+   spacing against 2.2, and no gap at all between the two. The !important flags
+   are here because the app's rules load after the theme's and cannot be
+   reordered from inside the theme. */
+.gy-pdp__buy .product-form__buttons {
+  display: grid;
+  gap: var(--gy-space-sm);
+}
+
+.gy-pdp__buy .shiprocket-headless {
+  /* The badge is absolutely positioned against the button's bottom edge; the
+     room for it is reserved here so it can sit clear of the corner instead of
+     across it. */
+  padding-bottom: 1.4rem;
+}
+
+.gy-pdp__buy .sr-headless-checkout {
+  min-height: 5.8rem !important;
+  height: auto !important;
+  margin: 0 !important;
+  border-radius: var(--gy-radius-md) !important;
+  background-color: rgb(var(--gy-ink)) !important;
+  color: rgb(var(--gy-canvas)) !important;
+  font-family: var(--gy-font-body) !important;
+  font-size: 1.376rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.16em !important;
+  overflow: visible;
+  box-shadow: var(--gy-elevation-1);
+  transition:
+    transform 200ms var(--gy-ease),
+    box-shadow 200ms var(--gy-ease),
+    opacity 200ms var(--gy-ease);
+}
+
+.gy-pdp__buy .sr-headless-checkout:not([disabled]):hover {
+  box-shadow: var(--gy-elevation-2);
+  transform: translateY(-1px);
+}
+
+.gy-pdp__buy .sr-headless-checkout:not([disabled]):active {
+  transform: translateY(0) scale(0.99);
+}
+
+.gy-pdp__buy .sr-headless-checkout:focus-visible {
+  outline: 2px solid rgb(var(--gy-ink));
+  outline-offset: 3px;
+}
+
+/* Out of the corner and under the button, where it reads as a credit rather
+   than as something spilling over the edge. */
+.gy-pdp__buy .sr-headless-checkout .sr-powered-by {
+  right: 50% !important;
+  bottom: -1.5rem !important;
+  transform: translateX(50%);
+  opacity: 0.55;
+}
+
+/* The label carries the same wide letter spacing as Add to cart, which with
+   the payment marks beside it is enough to wrap on a narrow phone. It is two
+   words on one line or it is not a button label. */
+.gy-pdp__buy .sr-headless-checkout .sr-checkout-visible2 {
+  white-space: nowrap;
+}
+
+/* The payment marks and the arrow the app places beside the label. */
+.gy-pdp__buy .sr-headless-checkout img {
+  max-height: 1.8rem;
+  width: auto;
+  flex: 0 0 auto;
+}
+
+/* The app spaces these with a flat 15px padding-left, which on a 320px screen
+   pushes the marks into the button's edge. */
+@media screen and (max-width: 429px) {
+  .gy-pdp__buy .sr-headless-checkout .sr-pl-15 {
+    padding-left: 0.8rem;
+  }
+  .gy-pdp__buy .sr-headless-checkout {
+    letter-spacing: 0.1em !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gy-pdp__buy .sr-headless-checkout {
+    transition: none !important;
+    transform: none !important;
+  }
 }
 
 /* Sits directly under the buy button: one short claim per line. The info
@@ -908,7 +1012,7 @@ body.gy-no-scroll { overflow: hidden; }
   flex: 0 0 auto;
   min-height: 4.8rem;
   padding-inline: 2.4rem;
-  border-radius: 12px;
+  border-radius: var(--gy-radius-md);
   font-size: 1.088rem;
   transition: transform 180ms var(--gy-ease);
 }
@@ -1050,7 +1154,7 @@ body.gy-no-scroll { overflow: hidden; }
   min-width: 4.4rem;
   padding: 0.88rem 1.36rem;
   border: 1px solid rgb(var(--gy-ink) / 0.14);
-  border-radius: 10px;
+  border-radius: var(--gy-radius-sm);
   background-color: rgb(var(--gy-canvas-warm));
   text-align: center;
   font-size: 1.36rem;

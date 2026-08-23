@@ -163,7 +163,7 @@ cart-drawer .cart__empty-text,
 .cart-item .quantity {
   width: 13.2rem;
   border: 1px solid rgb(var(--gy-ink) / 0.16);
-  border-radius: 10px;
+  border-radius: var(--gy-radius-sm);
   background-color: rgb(var(--gy-canvas-warm));
   overflow: hidden;
 }
@@ -202,7 +202,7 @@ cart-remove-button .button,
 .cart-remove-button .button {
   min-width: 4rem;
   min-height: 4rem;
-  border-radius: 8px;
+  border-radius: var(--gy-radius-sm);
   color: rgb(var(--gy-ink-muted));
   transition: color 180ms var(--gy-ease), background-color 180ms var(--gy-ease);
 }
@@ -255,7 +255,7 @@ cart-remove-button .button:hover {
 .cart__checkout-button,
 .cart__dynamic-checkout-buttons button {
   min-height: 5.6rem;
-  border-radius: 12px;
+  border-radius: var(--gy-radius-md);
   font-size: 1.216rem;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -664,7 +664,7 @@ cart-remove-button .button svg,
   min-height: 4.4rem;
   padding: 0 1.2rem;
   border: 1px solid rgb(var(--gy-ink) / 0.2);
-  border-radius: 10px;
+  border-radius: var(--gy-radius-sm);
   background-color: transparent;
   color: rgb(var(--gy-ink));
   font-family: inherit;

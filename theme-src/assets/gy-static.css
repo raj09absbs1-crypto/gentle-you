@@ -238,7 +238,10 @@
   padding: 2.2rem 1.6rem 0.8rem;
   border: 0;
   border-bottom: 1px solid rgb(var(--gy-ink) / 0.18);
-  border-radius: 0;
+  /* The field is an underlined box, not an outlined one, so only the two top
+     corners are visible against the warm fill — but they are corners, and they
+     are softened like every other corner in the store. */
+  border-radius: var(--gy-radius-sm) var(--gy-radius-sm) 0 0;
   background-color: rgb(var(--gy-canvas-warm) / 0.5);
   box-shadow: none;
   color: rgb(var(--gy-ink));
