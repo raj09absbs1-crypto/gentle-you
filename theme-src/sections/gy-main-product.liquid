@@ -596,12 +596,20 @@
   {%- if section.settings.enable_sticky_bar -%}
     <div class="gy-pdp__sticky" data-gy-sticky-bar hidden>
       <div class="gy-pdp__sticky-inner">
+        {%- comment -%}
+          The selected variant's own image where Shopify has one, so the bar
+          shows the piece in the colour being bought rather than the product's
+          default photograph.
+        {%- endcomment -%}
+        {%- liquid
+          assign sticky_image = variant.featured_media.preview_image | default: product.featured_image
+        -%}
         <div class="gy-pdp__sticky-media">
-          {%- if product.featured_image -%}
+          {%- if sticky_image -%}
             <img
-              src="{{ product.featured_image | image_url: width: 120 }}"
-              width="{{ product.featured_image.width }}"
-              height="{{ product.featured_image.height }}"
+              src="{{ sticky_image | image_url: width: 120 }}"
+              width="{{ sticky_image.width }}"
+              height="{{ sticky_image.height }}"
               alt=""
               loading="lazy"
             >
@@ -609,9 +617,16 @@
         </div>
         <div class="gy-pdp__sticky-text">
           <p class="gy-pdp__sticky-title">{{ product.title }}</p>
-          <p class="gy-pdp__sticky-price">
+          {%- comment -%}
+            A div, not a p: snippets/price.liquid renders a div, and a div
+            inside a paragraph makes the browser close the paragraph early —
+            which left this wrapper empty, put the price outside it, and so
+            stopped both of its style rules from ever matching. That is why
+            the struck compare-at price was showing in the bar.
+          {%- endcomment -%}
+          <div class="gy-pdp__sticky-price" id="StickyPrice-{{ section.id }}">
             {%- render 'price', product: product, use_variant: true -%}
-          </p>
+          </div>
         </div>
         <button class="gy-button gy-pdp__sticky-button" type="button" data-gy-sticky-add>
           {{ 'products.product.add_to_cart' | t }}

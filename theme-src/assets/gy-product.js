@@ -249,6 +249,20 @@
       const source = html.getElementById?.(`PriceMeta-${sectionId}`);
       if (meta && source) meta.innerHTML = source.innerHTML;
 
+      // The sticky bar quotes the same price, so it follows the same section
+      // HTML rather than holding a figure of its own.
+      const stickyPrice = info.querySelector(`#StickyPrice-${info.dataset.section}`);
+      const stickySource = html.getElementById?.(`StickyPrice-${sectionId}`);
+      if (stickyPrice && stickySource) stickyPrice.innerHTML = stickySource.innerHTML;
+
+      // And the thumbnail beside it follows the variant's own image.
+      const stickyImage = info.querySelector('.gy-pdp__sticky-media img');
+      const stickyImageSource = html.querySelector?.('.gy-pdp__sticky-media img');
+      if (stickyImage && stickyImageSource) {
+        stickyImage.src = stickyImageSource.getAttribute('src');
+        stickyImage.srcset = stickyImageSource.getAttribute('srcset') || '';
+      }
+
       // A quiet fade rather than a ticker; the figures themselves come from Liquid.
       if (reduce.matches) return;
       const priceBlock = info.querySelector('.gy-pdp__price-block');
