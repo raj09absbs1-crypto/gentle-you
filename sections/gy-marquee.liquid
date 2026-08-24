@@ -1,0 +1,50 @@
+{{ 'gy-premium.css' | asset_url | stylesheet_tag }}
+
+<div class="gy-marquee" style="--gy-marquee-speed: {{ section.settings.speed }}s;">
+  <div class="gy-marquee__track" aria-hidden="false">
+    {%- comment -%}
+      Two identical runs. The keyframe shifts the track by -50%, which is
+      exactly one run's width, so the second run is mid-frame when it loops.
+      The duplicate is hidden from assistive tech.
+    {%- endcomment -%}
+    {%- for pass in (1..2) -%}
+      <div class="gy-marquee__run" {% if pass == 2 %}aria-hidden="true"{% endif %}>
+        {%- for block in section.blocks -%}
+          <span class="gy-marquee__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.number != blank -%}
+              <span class="gy-marquee__num">{{ block.settings.number }}</span>
+            {%- endif -%}
+            {{ block.settings.text }}
+            <span class="gy-marquee__sep" aria-hidden="true">&bull;</span>
+          </span>
+        {%- endfor -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "GY Marquee",
+  "tag": "section",
+  "class": "gy-section",
+  "settings": [
+    { "type": "range", "id": "speed", "label": "Scroll duration (seconds)", "min": 15, "max": 80, "step": 1, "unit": "s", "default": 38,
+      "info": "Higher is slower. Pauses on hover." }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Highlighted number (optional)" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Happy customers" }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    { "name": "GY Marquee", "blocks": [ {"type":"item"}, {"type":"item"}, {"type":"item"} ] }
+  ]
+}
+{% endschema %}

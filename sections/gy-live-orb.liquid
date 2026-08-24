@@ -1,0 +1,74 @@
+{{ 'gy-premium.css' | asset_url | stylesheet_tag }}
+
+{%- assign sid = section.id -%}
+<div class="gy-orb" data-gy-orb
+     data-after="{{ section.settings.show_after }}"
+     role="status" aria-live="polite" hidden>
+  <span class="gy-orb__dot" aria-hidden="true"></span>
+  <span class="gy-orb__text">
+    <b>{{ section.settings.count }}</b> {{ section.settings.text }}
+  </span>
+  {%- if section.settings.dismissible -%}
+    <button class="gy-orb__close" data-gy-orb-close aria-label="Dismiss">
+      <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+  {%- endif -%}
+</div>
+
+<script>
+(function () {
+  var orb = document.querySelector('#shopify-section-{{ sid }} [data-gy-orb]');
+  if (!orb || orb.dataset.gyInit) return;
+  orb.dataset.gyInit = '1';
+
+  var KEY = 'gy-orb-dismissed';
+
+  // sessionStorage can throw in private mode — never let that break the page.
+  function dismissed() {
+    try { return sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; }
+  }
+  function remember() {
+    try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+  }
+
+  if (dismissed()) return;
+
+  orb.hidden = false;
+  var after = parseInt(orb.dataset.after, 10) || 600;
+
+  function check() {
+    if (window.scrollY > after) {
+      orb.classList.add('gy-orb--in');
+      window.removeEventListener('scroll', check);
+    }
+  }
+  window.addEventListener('scroll', check, { passive: true });
+  check();
+
+  var close = orb.querySelector('[data-gy-orb-close]');
+  if (close) {
+    close.addEventListener('click', function () {
+      orb.classList.remove('gy-orb--in');
+      remember();
+      setTimeout(function () { orb.hidden = true; }, 600);
+    });
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "GY Live Orb",
+  "tag": "section",
+  "class": "gy-section",
+  "settings": [
+    { "type": "text", "id": "count", "label": "Count", "default": "700" },
+    { "type": "text", "id": "text", "label": "Text", "default": "buying right now" },
+    { "type": "range", "id": "show_after", "label": "Show after scrolling", "min": 0, "max": 1600, "step": 50, "unit": "px", "default": 600 },
+    { "type": "checkbox", "id": "dismissible", "label": "Let visitors dismiss it", "default": true }
+  ],
+  "presets": [ { "name": "GY Live Orb" } ]
+}
+{% endschema %}

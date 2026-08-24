@@ -172,7 +172,6 @@
   if (!root || root.dataset.gyInit) return;
   root.dataset.gyInit = '1';
 
-  var track  = root.querySelector('[data-gy-track]');
   var slides = Array.prototype.slice.call(root.querySelectorAll('.gy-hero__slide'));
   var dots   = Array.prototype.slice.call(root.querySelectorAll('[data-gy-dot]'));
   if (slides.length < 2) return;
@@ -183,7 +182,7 @@
   var speed = parseInt(root.dataset.speed, 10) || 6000;
 
   function render() {
-    track.style.transform = 'translateX(' + (-i * 100) + '%)';
+    // Slides are stacked in one grid cell; is-active drives the crossfade.
     slides.forEach(function (s, n) { s.classList.toggle('is-active', n === i); });
     dots.forEach(function (d, n) {
       d.classList.toggle('is-active', n === i);
