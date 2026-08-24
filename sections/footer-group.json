@@ -24,12 +24,20 @@
             "heading": "Quick links",
             "menu": "footer"
           }
+        },
+        "text_help": {
+          "type": "text",
+          "settings": {
+            "heading": "Need help?",
+            "subtext": "<p>Questions about size, delivery or returns?</p><p><a href=\"mailto:gentleyousupport@gmail.com\">gentleyousupport@gmail.com</a></p><p>Cash on delivery available across India.</p>"
+          }
         }
       },
       "block_order": [
         "brand_information_EHkfnf",
         "link_list_YMKXY3",
-        "link_list_wXhNjn"
+        "link_list_wXhNjn",
+        "text_help"
       ],
       "settings": {
         "color_scheme": "scheme-lavender-footer",
