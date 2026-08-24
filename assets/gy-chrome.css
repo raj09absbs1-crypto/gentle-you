@@ -88,3 +88,16 @@
   .header__inline-menu .header__menu-item::after,
   .announcement-bar .slider-button { transition: none !important; }
 }
+
+/* ==========================================================================
+   Collection page
+   ========================================================================== */
+
+/* /collections/all has no description, so the banner renders a title and
+   then a large block of nothing before the filter bar. Tighten it. */
+.collection-hero__inner {
+  padding-bottom: 1rem;
+}
+.collection-hero--with-image .collection-hero__inner {
+  padding-bottom: 0;
+}
