@@ -1,6 +1,7 @@
 {{ 'gy-premium.css' | asset_url | stylesheet_tag }}
 
-<div class="gy-marquee" style="--gy-marquee-speed: {{ section.settings.speed }}s;">
+<div class="gy-marquee{% if section.settings.force_motion %} gy-force-motion{% endif %}"
+     style="--gy-marquee-speed: {{ section.settings.speed }}s;">
   <div class="gy-marquee__track" aria-hidden="false">
     {%- comment -%}
       Two identical runs. The keyframe shifts the track by -50%, which is
@@ -30,7 +31,9 @@
   "class": "gy-section",
   "settings": [
     { "type": "range", "id": "speed", "label": "Scroll duration (seconds)", "min": 15, "max": 80, "step": 1, "unit": "s", "default": 38,
-      "info": "Higher is slower. Pauses on hover." }
+      "info": "Higher is slower. Pauses on hover." },
+    { "type": "checkbox", "id": "force_motion", "label": "Always animate", "default": false,
+      "info": "By default the strip holds still for visitors whose device asks for reduced motion. Turn this on to animate for everyone." }
   ],
   "blocks": [
     {

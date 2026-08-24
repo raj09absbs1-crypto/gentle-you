@@ -399,7 +399,21 @@
   .gy-tile:hover .gy-tile__media img { transform: none; }
   .gy-tile__shine, .gy-split__buy::after { animation: none !important; }
   .gy-hero__slide.is-active .gy-split__frame img { animation: none !important; }
+
+  /* Escape hatch: a section explicitly set to always animate. Off by default,
+     so the accessible behaviour above is what visitors get unless a merchant
+     deliberately turns it on. */
+  .gy-force-motion .gy-marquee__track {
+    animation: gy-marquee var(--gy-marquee-speed, 38s) linear infinite !important;
+  }
+  .gy-force-motion .gy-orb__dot {
+    animation: gy-pulse 2s var(--gy-ease-soft) infinite !important;
+  }
+  .gy-force-motion.gy-hero .gy-hero__slide {
+    transition: opacity 0.9s var(--gy-ease), transform 1.2s var(--gy-ease) !important;
+  }
 }
+
 
 
 /* ==========================================================================

@@ -1,7 +1,7 @@
 {{ 'gy-premium.css' | asset_url | stylesheet_tag }}
 
 {%- assign sid = section.id -%}
-<div class="gy-orb" data-gy-orb
+<div class="gy-orb{% if section.settings.force_motion %} gy-force-motion{% endif %}" data-gy-orb
      data-after="{{ section.settings.show_after }}"
      role="status" aria-live="polite" hidden>
   <span class="gy-orb__dot" aria-hidden="true"></span>
@@ -67,7 +67,9 @@
     { "type": "text", "id": "count", "label": "Count", "default": "700" },
     { "type": "text", "id": "text", "label": "Text", "default": "buying right now" },
     { "type": "range", "id": "show_after", "label": "Show after scrolling", "min": 0, "max": 1600, "step": 50, "unit": "px", "default": 600 },
-    { "type": "checkbox", "id": "dismissible", "label": "Let visitors dismiss it", "default": true }
+    { "type": "checkbox", "id": "dismissible", "label": "Let visitors dismiss it", "default": true },
+    { "type": "checkbox", "id": "force_motion", "label": "Always animate", "default": false,
+      "info": "Keeps the pulsing dot moving even for visitors who ask for reduced motion." }
   ],
   "presets": [ { "name": "GY Live Orb" } ]
 }

@@ -1,7 +1,7 @@
 {{ 'gy-premium.css' | asset_url | stylesheet_tag }}
 
 {%- assign sid = section.id -%}
-<div class="gy-hero" data-gy-hero
+<div class="gy-hero{% if section.settings.force_motion %} gy-force-motion{% endif %}" data-gy-hero
      data-autoplay="{{ section.settings.autoplay }}"
      data-speed="{{ section.settings.speed }}">
 
@@ -177,7 +177,10 @@
   if (slides.length < 2) return;
 
   var i = 0, timer = null;
-  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // A section flagged "always animate" opts out of the reduced-motion clamp.
+  var forced  = root.classList.contains('gy-force-motion');
+  var reduced = !forced && window.matchMedia &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var autoplay = root.dataset.autoplay === 'true' && !reduced;
   var speed = parseInt(root.dataset.speed, 10) || 6000;
 
@@ -251,7 +254,9 @@
     { "type": "range", "id": "speed", "label": "Autoplay speed (ms)", "min": 3000, "max": 9000, "step": 500, "default": 6500 },
     { "type": "checkbox", "id": "show_dots", "label": "Show dots", "default": true },
     { "type": "text", "id": "trust_line", "label": "Trust line", "default": "Cash on delivery · Discreet packaging · Easy exchange" },
-    { "type": "text", "id": "aria_label", "label": "Accessible label", "default": "Featured products" }
+    { "type": "text", "id": "aria_label", "label": "Accessible label", "default": "Featured products" },
+    { "type": "checkbox", "id": "force_motion", "label": "Always animate", "default": false,
+      "info": "By default autoplay is off for visitors whose device asks for reduced motion. Turn this on to autoplay for everyone." }
   ],
   "blocks": [
     {
