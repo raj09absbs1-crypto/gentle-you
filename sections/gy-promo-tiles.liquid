@@ -1,44 +1,75 @@
 {{ 'gy-premium.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'gy-premium.js' | asset_url }}" defer="defer"></script>
 
-<div class="gy-tiles__wrap gy-promo-tiles-{{ section.id }}"
+<div class="gy-tiles__wrap"
      style="padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;">
 
   {%- if section.settings.heading != blank -%}
-    <h2 class="gy-tiles__heading {{ section.settings.heading_size }} gy-reveal">
-      {{ section.settings.heading }}
-    </h2>
+    <h2 class="gy-tiles__heading {{ section.settings.heading_size }} gy-reveal">{{ section.settings.heading }}</h2>
   {%- endif -%}
 
   <ul class="gy-tiles" role="list">
     {%- for block in section.blocks -%}
+      {%- liquid
+        assign p = block.settings.product
+        assign link = block.settings.link
+        assign img = block.settings.image
+        assign has_price = false
+        if p != blank
+          assign link = p.url
+          unless img
+            assign img = p.featured_image
+          endunless
+          assign price = p.price
+          assign was = p.compare_at_price_max
+          assign has_price = true
+          assign save_pct = 0
+          if was > price
+            assign save_pct = was | minus: price | times: 100 | divided_by: was
+          endif
+        endif
+      -%}
       <li class="gy-reveal gy-reveal--media" style="--gy-i:{{ forloop.index0 }};">
-        <a class="gy-tile"
-           href="{{ block.settings.link | default: '#' }}"
-           {{ block.shopify_attributes }}
+        <a class="gy-tile" href="{{ link | default: '#' }}" {{ block.shopify_attributes }}
            {% if block.settings.title != blank %}aria-label="{{ block.settings.title | strip_html | escape }}"{% endif %}>
 
-          {%- if block.settings.image -%}
+          {%- if img -%}
             <div class="gy-tile__media">
-              {{ block.settings.image
-                 | image_url: width: 1200
-                 | image_tag:
-                   loading: 'lazy',
-                   sizes: '(min-width: 750px) 33vw, 78vw',
-                   widths: '400,600,800,1000,1200',
-                   alt: block.settings.image.alt | default: block.settings.title | strip_html | escape }}
+              {{ img | image_url: width: 1000
+                     | image_tag:
+                       loading: 'lazy',
+                       sizes: '(min-width: 750px) 33vw, 74vw',
+                       widths: '400,600,800,1000',
+                       alt: img.alt | default: block.settings.title | strip_html | escape }}
             </div>
           {%- endif -%}
 
           <div class="gy-tile__veil"></div>
+          <div class="gy-tile__shine"></div>
+
+          {%- if block.settings.badge != blank -%}
+            <span class="gy-tile__badge">{{ block.settings.badge }}</span>
+          {%- endif -%}
 
           <div class="gy-tile__body">
             {%- if block.settings.title != blank -%}
               <h3 class="gy-tile__title">{{ block.settings.title }}</h3>
             {%- endif -%}
-            {%- if block.settings.subtitle != blank -%}
-              <p class="gy-tile__sub">{{ block.settings.subtitle }}</p>
-            {%- endif -%}
+
+            <div class="gy-tile__pricing">
+              {%- if has_price -%}
+                <span class="gy-tile__price">{{ price | money }}</span>
+                {%- if was > price -%}
+                  <span class="gy-tile__was">{{ was | money }}</span>
+                  {%- if save_pct > 0 -%}
+                    <span class="gy-tile__save">Save {{ save_pct }}%</span>
+                  {%- endif -%}
+                {%- endif -%}
+              {%- elsif block.settings.subtitle != blank -%}
+                <span class="gy-tile__price">{{ block.settings.subtitle }}</span>
+              {%- endif -%}
+            </div>
+
             {%- if block.settings.cta != blank -%}
               <span class="gy-tile__cta">
                 {{ block.settings.cta }}
@@ -64,34 +95,30 @@
     { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "Shop the Packs" },
     {
       "type": "select", "id": "heading_size", "label": "Heading size", "default": "h1",
-      "options": [
-        { "value": "h2", "label": "Small" },
-        { "value": "h1", "label": "Medium" },
-        { "value": "h0", "label": "Large" }
-      ]
+      "options": [ {"value":"h2","label":"Small"}, {"value":"h1","label":"Medium"}, {"value":"h0","label":"Large"} ]
     },
-    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 },
-    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 }
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
   ],
   "blocks": [
     {
       "type": "tile",
       "name": "Tile",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Background image" },
+        { "type": "product", "id": "product", "label": "Product",
+          "info": "Price, link and image come from this product automatically." },
+        { "type": "image_picker", "id": "image", "label": "Image override (optional)" },
         { "type": "inline_richtext", "id": "title", "label": "Title", "default": "PACK OF 6" },
-        { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "₹999 onwards" },
+        { "type": "text", "id": "badge", "label": "Corner badge", "default": "Bestseller" },
+        { "type": "text", "id": "subtitle", "label": "Price text (used only if no product is set)" },
         { "type": "text", "id": "cta", "label": "Button label", "default": "Shop Now" },
-        { "type": "url", "id": "link", "label": "Link" }
+        { "type": "url", "id": "link", "label": "Link (used only if no product is set)" }
       ]
     }
   ],
   "max_blocks": 4,
   "presets": [
-    {
-      "name": "GY Promo Tiles",
-      "blocks": [ { "type": "tile" }, { "type": "tile" }, { "type": "tile" } ]
-    }
+    { "name": "GY Promo Tiles", "blocks": [ {"type":"tile"}, {"type":"tile"}, {"type":"tile"} ] }
   ]
 }
 {% endschema %}

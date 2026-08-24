@@ -9,49 +9,133 @@
        aria-roledescription="carousel" aria-label="{{ section.settings.aria_label | escape }}">
     <div class="gy-hero__track" data-gy-track>
       {%- for block in section.blocks -%}
+        {%- liquid
+          assign p = block.settings.product
+          assign img = block.settings.image
+          assign title = block.settings.heading
+          assign link = block.settings.link
+          assign has_price = false
+          assign save_pct = 0
+          if p != blank
+            assign link = p.url
+            unless img
+              assign img = p.featured_image
+            endunless
+            if title == blank
+              assign title = p.title
+            endif
+            assign price = p.price
+            assign was = p.compare_at_price_max
+            assign has_price = true
+            if was > price
+              assign save_pct = was | minus: price | times: 100 | divided_by: was
+            endif
+            assign rating = p.metafields.reviews.rating.value
+            assign rating_count = p.metafields.reviews.rating_count.value
+          endif
+          assign img_loading = 'lazy'
+          assign img_priority = 'auto'
+          if forloop.first
+            assign img_loading = 'eager'
+            assign img_priority = 'high'
+          endif
+        -%}
         <div class="gy-hero__slide{% if forloop.first %} is-active{% endif %}"
              role="group" aria-roledescription="slide"
              aria-label="{{ forloop.index }} of {{ section.blocks.size }}"
              {{ block.shopify_attributes }}>
-          <a class="gy-hero__link" href="{{ block.settings.link | default: '#' }}"
-             {% if block.settings.heading != blank %}aria-label="{{ block.settings.heading | escape }}"{% endif %}>
-            {%- liquid
-              assign img_loading = 'lazy'
-              assign img_priority = 'auto'
-              if forloop.first
-                assign img_loading = 'eager'
-                assign img_priority = 'high'
-              endif
-            -%}
-            {%- if block.settings.image -%}
-              {{ block.settings.image
-                 | image_url: width: 1600
-                 | image_tag:
-                   class: 'gy-hero__img',
-                   loading: img_loading,
-                   fetchpriority: img_priority,
-                   sizes: '100vw',
-                   widths: '600,900,1200,1600,2000',
-                   alt: block.settings.image.alt | default: block.settings.heading | escape }}
-            {%- else -%}
-              {{ 'lifestyle-1' | placeholder_svg_tag: 'gy-hero__img' }}
-            {%- endif -%}
+          <div class="gy-split">
 
-            {%- if block.settings.heading != blank or block.settings.caption != blank -%}
-              <div class="gy-hero__scrim"></div>
-              <div class="gy-hero__copy">
-                {%- if block.settings.caption != blank -%}
-                  <p class="gy-hero__caption">{{ block.settings.caption }}</p>
+            <div class="gy-split__text">
+              {%- if block.settings.caption != blank -%}
+                <p class="gy-split__caption">{{ block.settings.caption }}</p>
+              {%- endif -%}
+
+              {%- if title != blank -%}
+                <h2 class="gy-split__title">{{ title }}</h2>
+              {%- endif -%}
+
+              {%- if has_price -%}
+                <div class="gy-split__pricing">
+                  <span class="gy-split__price">{{ price | money }}</span>
+                  {%- if was > price -%}
+                    <span class="gy-split__was">{{ was | money }}</span>
+                    {%- if save_pct > 0 -%}
+                      <span class="gy-split__save">Save {{ save_pct }}%</span>
+                    {%- endif -%}
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+              {%- if rating != blank and rating != 0 -%}
+                <div class="gy-split__stars">
+                  {%- for n in (1..5) -%}
+                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path d="M10 1.6l2.5 5.2 5.7.8-4.1 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4.1-4 5.7-.8z"
+                            {% if n > rating %}fill="none" stroke="currentColor" stroke-width="1.4"{% endif %}/>
+                    </svg>
+                  {%- endfor -%}
+                  <span>{{ rating | round: 1 }}{% if rating_count %} ({{ rating_count }}){% endif %}</span>
+                </div>
+              {%- endif -%}
+
+              {%- if block.settings.point_1 != blank or block.settings.point_2 != blank or block.settings.point_3 != blank -%}
+                <ul class="gy-split__points">
+                  {%- for i in (1..3) -%}
+                    {%- liquid
+                      case i
+                        when 1
+                          assign pt = block.settings.point_1
+                        when 2
+                          assign pt = block.settings.point_2
+                        when 3
+                          assign pt = block.settings.point_3
+                      endcase
+                    -%}
+                    {%- if pt != blank -%}
+                      <li>
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                          <path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{ pt }}
+                      </li>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+
+              <a class="gy-split__buy" href="{{ link | default: '#' }}">
+                {{ block.settings.cta | default: 'Buy Now' }}
+                <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" stroke="currentColor"
+                        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+
+              {%- if section.settings.trust_line != blank -%}
+                <p class="gy-split__trust">{{ section.settings.trust_line }}</p>
+              {%- endif -%}
+            </div>
+
+            <div class="gy-split__media">
+              <a class="gy-split__frame" href="{{ link | default: '#' }}"
+                 {% if title != blank %}aria-label="{{ title | strip_html | escape }}"{% endif %}>
+                {%- if img -%}
+                  {{ img | image_url: width: 1200
+                         | image_tag:
+                           loading: img_loading,
+                           fetchpriority: img_priority,
+                           sizes: '(min-width: 990px) 55vw, 100vw',
+                           widths: '500,700,900,1100,1300',
+                           alt: img.alt | default: title | strip_html | escape }}
+                {%- else -%}
+                  {{ 'lifestyle-1' | placeholder_svg_tag }}
                 {%- endif -%}
-                {%- if block.settings.heading != blank -%}
-                  <h2 class="gy-hero__heading">{{ block.settings.heading }}</h2>
-                {%- endif -%}
-                {%- if block.settings.cta != blank -%}
-                  <span class="gy-hero__cta">{{ block.settings.cta }}</span>
-                {%- endif -%}
-              </div>
-            {%- endif -%}
-          </a>
+              </a>
+            </div>
+
+          </div>
         </div>
       {%- endfor -%}
     </div>
@@ -105,7 +189,6 @@
   function go(n) { i = (n + slides.length) % slides.length; render(); }
   function next() { go(i + 1); }
   function prev() { go(i - 1); }
-
   function start() { if (autoplay && !timer) timer = setInterval(next, speed); }
   function stop()  { if (timer) { clearInterval(timer); timer = null; } }
   function bounce() { stop(); start(); }
@@ -116,27 +199,24 @@
     d.addEventListener('click', function () { go(parseInt(d.dataset.gyDot, 10)); bounce(); });
   });
 
-  // Pause while hovered or focused — never yank a slide out from under someone.
   root.addEventListener('mouseenter', stop);
   root.addEventListener('mouseleave', start);
   root.addEventListener('focusin', stop);
   root.addEventListener('focusout', start);
 
-  // Pause when scrolled out of view.
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (e) {
       e[0].isIntersecting ? start() : stop();
     }, { threshold: 0.2 }).observe(root);
   }
 
-  // Keyboard
   var vp = root.querySelector('.gy-hero__viewport');
   vp.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowRight') { e.preventDefault(); next(); bounce(); }
     if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); bounce(); }
   });
 
-  // Touch swipe — horizontal only, so vertical page scroll still works.
+  // Horizontal-only swipe, so vertical page scroll still works.
   var x0 = null, y0 = null, locked = null;
   vp.addEventListener('touchstart', function (e) {
     x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; locked = null; stop();
@@ -165,8 +245,9 @@
   "class": "gy-section",
   "settings": [
     { "type": "checkbox", "id": "autoplay", "label": "Autoplay", "default": true },
-    { "type": "range", "id": "speed", "label": "Autoplay speed (ms)", "min": 3000, "max": 9000, "step": 500, "default": 6000 },
+    { "type": "range", "id": "speed", "label": "Autoplay speed (ms)", "min": 3000, "max": 9000, "step": 500, "default": 6500 },
     { "type": "checkbox", "id": "show_dots", "label": "Show dots", "default": true },
+    { "type": "text", "id": "trust_line", "label": "Trust line", "default": "Cash on delivery · Discreet packaging · Easy exchange" },
     { "type": "text", "id": "aria_label", "label": "Accessible label", "default": "Featured products" }
   ],
   "blocks": [
@@ -174,11 +255,16 @@
       "type": "slide",
       "name": "Slide",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "caption", "label": "Caption (small, above heading)" },
-        { "type": "text", "id": "heading", "label": "Heading" },
-        { "type": "text", "id": "cta", "label": "Button label" },
-        { "type": "url", "id": "link", "label": "Link to product" }
+        { "type": "product", "id": "product", "label": "Product",
+          "info": "Title, price, rating, image and link all come from this product." },
+        { "type": "image_picker", "id": "image", "label": "Image override (optional)" },
+        { "type": "text", "id": "caption", "label": "Caption (small, above title)" },
+        { "type": "text", "id": "heading", "label": "Title override (optional)" },
+        { "type": "text", "id": "point_1", "label": "Detail 1" },
+        { "type": "text", "id": "point_2", "label": "Detail 2" },
+        { "type": "text", "id": "point_3", "label": "Detail 3" },
+        { "type": "text", "id": "cta", "label": "Button label", "default": "Buy Now" },
+        { "type": "url", "id": "link", "label": "Link (used only if no product is set)" }
       ]
     }
   ],
