@@ -1,0 +1,97 @@
+{{ 'gy-premium.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'gy-premium.js' | asset_url }}" defer="defer"></script>
+
+<div class="gy-tiles__wrap gy-promo-tiles-{{ section.id }}"
+     style="padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;">
+
+  {%- if section.settings.heading != blank -%}
+    <h2 class="gy-tiles__heading {{ section.settings.heading_size }} gy-reveal">
+      {{ section.settings.heading }}
+    </h2>
+  {%- endif -%}
+
+  <ul class="gy-tiles" role="list">
+    {%- for block in section.blocks -%}
+      <li class="gy-reveal gy-reveal--media" style="--gy-i:{{ forloop.index0 }};">
+        <a class="gy-tile"
+           href="{{ block.settings.link | default: '#' }}"
+           {{ block.shopify_attributes }}
+           {% if block.settings.title != blank %}aria-label="{{ block.settings.title | strip_html | escape }}"{% endif %}>
+
+          {%- if block.settings.image -%}
+            <div class="gy-tile__media">
+              {{ block.settings.image
+                 | image_url: width: 1200
+                 | image_tag:
+                   loading: 'lazy',
+                   sizes: '(min-width: 750px) 33vw, 78vw',
+                   widths: '400,600,800,1000,1200',
+                   alt: block.settings.image.alt | default: block.settings.title | strip_html | escape }}
+            </div>
+          {%- endif -%}
+
+          <div class="gy-tile__veil"></div>
+
+          <div class="gy-tile__body">
+            {%- if block.settings.title != blank -%}
+              <h3 class="gy-tile__title">{{ block.settings.title }}</h3>
+            {%- endif -%}
+            {%- if block.settings.subtitle != blank -%}
+              <p class="gy-tile__sub">{{ block.settings.subtitle }}</p>
+            {%- endif -%}
+            {%- if block.settings.cta != blank -%}
+              <span class="gy-tile__cta">
+                {{ block.settings.cta }}
+                <svg viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false">
+                  <path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" stroke="currentColor"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            {%- endif -%}
+          </div>
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+
+{% schema %}
+{
+  "name": "GY Promo Tiles",
+  "tag": "section",
+  "class": "gy-section",
+  "settings": [
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "Shop the Packs" },
+    {
+      "type": "select", "id": "heading_size", "label": "Heading size", "default": "h1",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" }
+      ]
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Tile",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Background image" },
+        { "type": "inline_richtext", "id": "title", "label": "Title", "default": "PACK OF 6" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "₹999 onwards" },
+        { "type": "text", "id": "cta", "label": "Button label", "default": "Shop Now" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "GY Promo Tiles",
+      "blocks": [ { "type": "tile" }, { "type": "tile" }, { "type": "tile" } ]
+    }
+  ]
+}
+{% endschema %}

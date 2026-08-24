@@ -1,0 +1,70 @@
+{{ 'gy-premium.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'gy-premium.js' | asset_url }}" defer="defer"></script>
+
+<div class="gy-usp" style="padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;">
+  <div class="gy-usp__grid">
+    {%- for block in section.blocks -%}
+      <div class="gy-usp__item gy-reveal" style="--gy-i:{{ forloop.index0 }};" {{ block.shopify_attributes }}>
+        <div class="gy-usp__icon" aria-hidden="true">
+          {%- case block.settings.icon -%}
+            {%- when 'fabric' -%}
+              <svg viewBox="0 0 24 24" fill="none"><path d="M3 8c3-4 6 4 9 0s6-4 9 0M3 16c3-4 6 4 9 0s6-4 9 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            {%- when 'fit' -%}
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z" stroke="currentColor" stroke-width="1.6"/><path d="M4 21c0-4 3.6-6.5 8-6.5S20 17 20 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            {%- when 'exchange' -%}
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 9a8 8 0 0 1 13.5-4L20 7M20 15A8 8 0 0 1 6.5 19L4 17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 3v4h-4M4 21v-4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {%- when 'cod' -%}
+              <svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="6" width="19" height="12" rx="2.5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/></svg>
+            {%- when 'discreet' -%}
+              <svg viewBox="0 0 24 24" fill="none"><path d="M3 8.5 12 4l9 4.5v7L12 20l-9-4.5v-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 8.5 12 13l9-4.5M12 13v7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            {%- else -%}
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-7-9.3A4.2 4.2 0 0 1 12 7a4.2 4.2 0 0 1 7 3.7C19 15.6 12 20 12 20Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          {%- endcase -%}
+        </div>
+        {%- if block.settings.title != blank -%}
+          <h3 class="gy-usp__title">{{ block.settings.title }}</h3>
+        {%- endif -%}
+        {%- if block.settings.text != blank -%}
+          <p class="gy-usp__text">{{ block.settings.text }}</p>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "GY Trust Row",
+  "tag": "section",
+  "class": "gy-section",
+  "settings": [
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "select", "id": "icon", "label": "Icon", "default": "fabric",
+          "options": [
+            { "value": "fabric",   "label": "Fabric" },
+            { "value": "fit",      "label": "Fit" },
+            { "value": "exchange", "label": "Easy exchange" },
+            { "value": "cod",      "label": "Cash on delivery" },
+            { "value": "discreet", "label": "Discreet packaging" },
+            { "value": "care",     "label": "Care" }
+          ]
+        },
+        { "type": "text", "id": "title", "label": "Title", "default": "Ultra-soft fabric" },
+        { "type": "text", "id": "text",  "label": "Text",  "default": "Breathable cotton blend, gentle on skin all day." }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    { "name": "GY Trust Row", "blocks": [ {"type":"item"}, {"type":"item"}, {"type":"item"}, {"type":"item"} ] }
+  ]
+}
+{% endschema %}

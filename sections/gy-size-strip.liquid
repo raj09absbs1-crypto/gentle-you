@@ -1,0 +1,51 @@
+{{ 'gy-premium.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'gy-premium.js' | asset_url }}" defer="defer"></script>
+
+<div class="gy-sizes" style="padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;">
+  <div class="gy-sizes__inner">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="gy-sizes__heading {{ section.settings.heading_size }} gy-reveal">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    {%- if section.settings.note != blank -%}
+      <p class="gy-sizes__note gy-reveal" style="--gy-i:1;">{{ section.settings.note }}</p>
+    {%- endif -%}
+
+    <ul class="gy-sizes__list" role="list">
+      {%- for block in section.blocks -%}
+        <li class="gy-reveal" style="--gy-i:{{ forloop.index0 }};" {{ block.shopify_attributes }}>
+          <a class="gy-size" href="{{ block.settings.link | default: '#' }}">{{ block.settings.label }}</a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "GY Shop by Size",
+  "tag": "section",
+  "class": "gy-section",
+  "settings": [
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "Shop by Size" },
+    {
+      "type": "select", "id": "heading_size", "label": "Heading size", "default": "h1",
+      "options": [ {"value":"h2","label":"Small"}, {"value":"h1","label":"Medium"}, {"value":"h0","label":"Large"} ]
+    },
+    { "type": "text", "id": "note", "label": "Note", "default": "Not sure of your size? Take the 60-second fit guide." },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "size",
+      "name": "Size",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "32B" },
+        { "type": "url",  "id": "link",  "label": "Link" }
+      ]
+    }
+  ],
+  "max_blocks": 16,
+  "presets": [ { "name": "GY Shop by Size" } ]
+}
+{% endschema %}
