@@ -1,0 +1,9 @@
+{% comment %}
+  Loads the GentleYou premium stylesheet on every page.
+
+  The gy-* sections link it themselves, which covers the homepage, but the
+  product-card rules in it (hover crossfade, two-line title alignment) are
+  needed anywhere a card renders — collection pages, search, related
+  products. Rendered once from layout/theme.liquid.
+{% endcomment %}
+{{ 'gy-premium.css' | asset_url | stylesheet_tag }}

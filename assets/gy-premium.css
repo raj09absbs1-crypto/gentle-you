@@ -528,3 +528,49 @@
   .gy-orb { left: 0.75rem; bottom: 1rem; font-size: 0.8rem; padding: 0.75rem 1.05rem 0.75rem 0.85rem; }
   .gy-orb__text b { font-size: 0.98rem; }
 }
+
+
+/* ==========================================================================
+   Product cards — applies everywhere, not just the homepage
+   ========================================================================== */
+
+/* Dawn swaps to the second image on hover by flipping opacity 0 -> 1, but its
+   transition only covers `transform`, so the swap lands in a single frame.
+   Giving opacity a duration is what turns it into a crossfade. */
+.card-wrapper .media.media--hover-effect > img {
+  transition: opacity 0.55s var(--gy-ease), transform 0.9s var(--gy-ease);
+}
+
+@media screen and (min-width: 990px) {
+  .card-wrapper:hover .media.media--hover-effect > img:first-child:not(:only-child) {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  .card-wrapper:hover .media.media--hover-effect > img + img {
+    opacity: 1;
+    transform: scale(1.04);
+    transition: opacity 0.55s var(--gy-ease), transform 0.9s var(--gy-ease);
+  }
+  .card-wrapper:hover .media.media--hover-effect > img:first-child:only-child {
+    transform: scale(1.04);
+  }
+}
+
+/* Titles vary from one line to two, which pushed the rating, price and button
+   of every short-titled card up by exactly one line. Reserving two lines keeps
+   a row aligned, and the clamp stops a very long name running to three. */
+.product-card-wrapper .card__heading {
+  min-height: 2.7em;
+  line-height: 1.35;
+}
+.product-card-wrapper .card__heading > a {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-wrapper .media.media--hover-effect > img { transition: none !important; }
+  .card-wrapper:hover .media.media--hover-effect > img { transform: none !important; }
+}
