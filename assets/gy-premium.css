@@ -420,6 +420,7 @@
    Social-proof marquee — infinite auto-scroll strip
    The track holds two identical runs of the items; translating it by -50%
    lands exactly on the start of the second run, so the loop is seamless.
+   Each run is floored at 100vw so that shift always has content behind it.
    ========================================================================== */
 .gy-marquee {
   background: var(--gy-plum);
@@ -445,7 +446,18 @@
 .gy-marquee:hover .gy-marquee__track { animation-play-state: paused; }
 @keyframes gy-marquee { to { transform: translateX(-50%); } }
 
-.gy-marquee__run { display: flex; flex: none; }
+/* Each run is at least a screen wide. The track is two runs and the keyframe
+   shifts it by -50% (exactly one run), so the loop is seamless only if a run
+   is no narrower than the viewport — otherwise the strip runs out of content
+   and leaves an empty gap on the right. When the items are naturally wider
+   than the screen the run just uses its own width. */
+.gy-marquee__run {
+  display: flex;
+  flex: none;
+  min-width: 100vw;
+  justify-content: space-around;
+  align-items: center;
+}
 .gy-marquee__item {
   display: inline-flex; align-items: center; gap: 0.6rem;
   padding: 0 2.1rem;
