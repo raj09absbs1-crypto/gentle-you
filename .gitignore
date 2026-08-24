@@ -1,0 +1,5 @@
+# The 21 Aug theme export. Its contents are the unpacked theme in this
+# branch, and Shopify's GitHub integration flags files at the repo root
+# that are not part of a theme. The zip itself is still the sole file on
+# main, and remains in this branch's history.
+theme_export__*.zip
