@@ -28,6 +28,10 @@
             assign save_pct = was | minus: price | times: 100 | divided_by: was
           endif
         endif
+        assign alt_text = block.settings.title | strip_html | escape
+        if img.alt != blank
+          assign alt_text = img.alt | escape
+        endif
       -%}
       <li class="gy-reveal gy-reveal--media" style="--gy-i:{{ forloop.index0 }};">
         <a class="gy-tile" href="{{ link | default: '#' }}" {{ block.shopify_attributes }}
@@ -40,7 +44,7 @@
                        loading: 'lazy',
                        sizes: '(min-width: 750px) 33vw, 74vw',
                        widths: '400,600,800,1000',
-                       alt: img.alt | default: block.settings.title | strip_html | escape }}
+                       alt: alt_text }}
             </div>
           {%- endif -%}
 

@@ -33,6 +33,10 @@
             assign rating = p.metafields.reviews.rating.value
             assign rating_count = p.metafields.reviews.rating_count.value
           endif
+          assign alt_text = title | strip_html | escape
+          if img.alt != blank
+            assign alt_text = img.alt | escape
+          endif
           assign img_loading = 'lazy'
           assign img_priority = 'auto'
           if forloop.first
@@ -126,9 +130,9 @@
                          | image_tag:
                            loading: img_loading,
                            fetchpriority: img_priority,
-                           sizes: '(min-width: 990px) 55vw, 100vw',
+                           sizes: '(min-width: 990px) 520px, 100vw',
                            widths: '500,700,900,1100,1300',
-                           alt: img.alt | default: title | strip_html | escape }}
+                           alt: alt_text }}
                 {%- else -%}
                   {{ 'lifestyle-1' | placeholder_svg_tag }}
                 {%- endif -%}

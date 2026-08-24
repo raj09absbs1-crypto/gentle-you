@@ -128,7 +128,7 @@
   box-shadow: 0 6px 18px rgba(45,27,78,0.25);
 }
 .gy-tile__was {
-  font-size: 0.85rem; color: rgba(255,255,255,0.78);
+  font-size: 0.85rem; color: rgba(255,255,255,0.85);
   text-decoration: line-through;
 }
 .gy-tile__save {
@@ -162,7 +162,7 @@
 
 .gy-split {
   display: grid;
-  grid-template-columns: 45% 55%;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: clamp(1.5rem, 4vw, 4rem);
   max-width: 1400px;
@@ -237,9 +237,12 @@
 }
 
 /* Portrait frame */
-.gy-split__media { position: relative; }
+/* Portrait frame is capped so a 3:4 crop never becomes a 900px-tall slab. */
+.gy-split__media { position: relative; width: 100%; max-width: 520px; margin-inline: auto 0; }
 .gy-split__frame {
   position: relative;
+  z-index: 1;
+  display: block;
   aspect-ratio: 3 / 4;
   border-radius: 24px;
   overflow: hidden;
@@ -344,7 +347,7 @@
 @media (max-width: 989px) {
   .gy-usp__grid { grid-template-columns: repeat(2, 1fr); gap: 2.25rem 1.25rem; }
   .gy-split { grid-template-columns: 1fr; gap: 1.75rem; }
-  .gy-split__media { order: -1; }        /* photo first on narrow screens */
+  .gy-split__media { order: -1; max-width: none; margin-inline: auto; }
   .gy-split__frame { aspect-ratio: 4 / 5; }
 }
 
