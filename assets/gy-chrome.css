@@ -1,0 +1,90 @@
+/* ==========================================================================
+   GentleYou — site chrome (announcement bar + header)
+   Kept separate from gy-premium.css so the page-content styles and the
+   chrome can be edited without touching each other.
+   Depends on the tokens declared in gy-premium.css, which loads first.
+   ========================================================================== */
+
+/* ==========================================================================
+   Announcement bar
+   ========================================================================== */
+
+/* Dawn's arrows sit at the very edges of a full-bleed bar, marooned metres
+   from the centred message. Constraining the slider brings them in to flank
+   the text instead of the browser window. */
+.announcement-bar-slider {
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+/* The message inherits the heading font, which is a serif here — too dressy
+   for a utility strip. Small, spaced caps in the body face reads as a bar. */
+.announcement-bar__message {
+  font-family: var(--font-body-family);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.9rem 0;
+}
+
+.announcement-bar .slider-button {
+  opacity: 0.45;
+  transition: opacity 0.35s var(--gy-ease);
+}
+.announcement-bar .slider-button:hover,
+.announcement-bar .slider-button:focus-visible {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+/* The logo PNG carries a white background. Multiply drops that white into
+   whatever the header sits on, so the box around it disappears without
+   needing a re-cut transparent file. */
+.header__heading-logo {
+  mix-blend-mode: multiply;
+}
+
+/* Lavender hairline instead of Dawn's grey, so the header belongs to the
+   palette rather than sitting on top of it. */
+.header-wrapper--border-bottom {
+  border-bottom: 1px solid var(--gy-lavender);
+}
+
+/* Nav links: a lavender underline that grows from the left on hover. */
+.header__menu-item {
+  position: relative;
+  transition: color 0.3s var(--gy-ease);
+}
+.header__inline-menu .header__menu-item::after {
+  content: '';
+  position: absolute;
+  left: 1.2rem;
+  right: 1.2rem;
+  bottom: 0.55rem;
+  height: 1.5px;
+  background: var(--gy-plum);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--gy-ease);
+}
+.header__inline-menu .header__menu-item:hover::after,
+.header__inline-menu .header__menu-item[aria-expanded='true']::after {
+  transform: scaleX(1);
+}
+/* Dawn already underlines the current page; don't double up on it. */
+.header__inline-menu .header__menu-item span {
+  text-decoration: none;
+}
+
+/* Sticky header lifts off the page once it detaches. */
+.shopify-section-header-sticky {
+  box-shadow: 0 6px 24px rgba(45, 27, 78, 0.10);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header__inline-menu .header__menu-item::after,
+  .announcement-bar .slider-button { transition: none !important; }
+}

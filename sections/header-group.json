@@ -1,1 +1,69 @@
-{"name":"t:sections.header.name","type":"header","sections":{"announcement-bar":{"type":"announcement-bar","blocks":{"announcement_y94gQX":{"type":"announcement","settings":{"text":"💖 Soft on You. Launch Offers are Live","link":""}},"announcement_D6hf4P":{"type":"announcement","settings":{"text":"COD available | Free shipping","link":""}}},"block_order":["announcement_y94gQX","announcement_D6hf4P"],"settings":{"auto_rotate":true,"change_slides_speed":4,"color_scheme":"scheme-dark-lavender","show_line_separator":true,"show_social":false,"enable_country_selector":false,"enable_language_selector":false}},"header":{"type":"header","settings":{"logo_position":"middle-left","mobile_logo_position":"center","menu":"main-menu","menu_type_desktop":"dropdown","sticky_header_type":"on-scroll-up","show_line_separator":true,"color_scheme":"scheme-1","menu_color_scheme":"scheme-1","enable_country_selector":true,"enable_language_selector":true,"enable_customer_avatar":true,"margin_bottom":0,"padding_top":20,"padding_bottom":20}}},"order":["announcement-bar","header"]}
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement_y94gQX": {
+          "type": "announcement",
+          "settings": {
+            "text": "Soft on you — launch offers are live",
+            "link": ""
+          }
+        },
+        "announcement_D6hf4P": {
+          "type": "announcement",
+          "settings": {
+            "text": "Cash on delivery available across India",
+            "link": ""
+          }
+        },
+        "announcement_cod3": {
+          "type": "announcement",
+          "settings": {
+            "text": "Discreet packaging on every order",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "announcement_y94gQX",
+        "announcement_D6hf4P",
+        "announcement_cod3"
+      ],
+      "settings": {
+        "auto_rotate": true,
+        "change_slides_speed": 6,
+        "color_scheme": "scheme-dark-lavender",
+        "show_line_separator": true,
+        "show_social": false,
+        "enable_country_selector": false,
+        "enable_language_selector": false
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_position": "middle-left",
+        "mobile_logo_position": "center",
+        "menu": "main-menu",
+        "menu_type_desktop": "dropdown",
+        "sticky_header_type": "on-scroll-up",
+        "show_line_separator": true,
+        "color_scheme": "scheme-1",
+        "menu_color_scheme": "scheme-1",
+        "enable_country_selector": false,
+        "enable_language_selector": false,
+        "enable_customer_avatar": true,
+        "margin_bottom": 0,
+        "padding_top": 16,
+        "padding_bottom": 16
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header"
+  ]
+}

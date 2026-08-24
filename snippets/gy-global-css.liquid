@@ -1,9 +1,14 @@
 {% comment %}
-  Loads the GentleYou premium stylesheet on every page.
+  Loads the GentleYou stylesheets on every page.
 
-  The gy-* sections link it themselves, which covers the homepage, but the
-  product-card rules in it (hover crossfade, two-line title alignment) are
-  needed anywhere a card renders — collection pages, search, related
-  products. Rendered once from layout/theme.liquid.
+  The gy-* sections link gy-premium.css themselves, which covers the
+  homepage, but the product-card rules in it (hover crossfade, two-line
+  title alignment) are needed anywhere a card renders — collection pages,
+  search, related products. gy-chrome.css styles the announcement bar and
+  header, which appear on every page. Rendered once from layout/theme.liquid.
+
+  gy-premium.css must come first: it declares the --gy-* tokens that
+  gy-chrome.css uses.
 {% endcomment %}
 {{ 'gy-premium.css' | asset_url | stylesheet_tag }}
+{{ 'gy-chrome.css' | asset_url | stylesheet_tag }}
