@@ -128,3 +128,29 @@
 .product-card-wrapper .quick-add {
   margin-top: auto;
 }
+
+/* The grid is set to a portrait ratio, which should give every card the same
+   125% media box, yet rendered heights still vary — so the box is being told
+   something different somewhere in the chain. Rather than chase which page
+   set what, pin the ratio and make the image fill it. Every product card is
+   then the same shape on every template, whatever the section setting says. */
+.product-card-wrapper .card__inner {
+  --ratio-percent: 125%;
+}
+.product-card-wrapper .card__media img,
+.product-card-wrapper .card__inner .media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* With the button pinned to the bottom, a card whose product has no reviews
+   leaves the star row's worth of space above it. Tightening the text block
+   keeps that from reading as a hole. */
+.product-card-wrapper > .card__content {
+  padding-top: 0.6rem;
+}
+.product-card-wrapper .card__information {
+  padding-top: 0.4rem;
+  padding-bottom: 0.6rem;
+}
