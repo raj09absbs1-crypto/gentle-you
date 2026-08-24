@@ -1,8 +1,9 @@
 /* ==========================================================================
-   GentleYou — site chrome (announcement bar + header)
-   Kept separate from gy-premium.css so the page-content styles and the
-   chrome can be edited without touching each other.
-   Depends on the tokens declared in gy-premium.css, which loads first.
+   GentleYou — site chrome and shared UI fixes
+   Announcement bar, header, collection page, and product-card row
+   alignment. Kept separate from gy-premium.css so these can be edited
+   without rewriting that file.
+   Loads after gy-premium.css, whose --gy-* tokens it uses.
    ========================================================================== */
 
 /* ==========================================================================
@@ -100,4 +101,30 @@
 }
 .collection-hero--with-image .collection-hero__inner {
   padding-bottom: 0;
+}
+
+/* Cards in a row have to finish together. Reserving two lines for the title
+   fixed the long/short name case, but not this one: Judge.me omits the star
+   row entirely for a product with no reviews, so those cards came up about
+   30px short and took their price and button up with them.
+   Stretching the card and pushing quick-add to the bottom makes the row end
+   level regardless of which optional rows a given product renders. */
+.grid__item {
+  display: flex;
+}
+.grid__item > .product-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.product-card-wrapper > .card__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+.product-card-wrapper .card__information {
+  flex: 1 0 auto;
+}
+.product-card-wrapper .quick-add {
+  margin-top: auto;
 }
